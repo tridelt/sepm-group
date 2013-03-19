@@ -1,7 +1,7 @@
 # http://qt-project.org/quarterly/view/using_cmake_to_build_qt_projects
 
 cmake_minimum_required(VERSION 2.6)
-project(task2)
+project(chat)
 
 set(CMAKE_C_COMPILER "gcc-4.6")
 set(CMAKE_CXX_COMPILER "/usr/bin/g++-4.6")
@@ -34,13 +34,10 @@ set(LIBS ${LIBS} ${QT_LIBRARIES})
 set(LIBS ${LIBS} ${QT_QTDECLARATIVE_LIBRARY})
 set(LIBS ${LIBS} bfd)   # for backward pretty stacktracing
 
-SET(task2_HEADERS FileWatcher.h)
-QT4_WRAP_CPP(task2_HEADERS_MOC ${task2_HEADERS})
-
 
 #begin snippet
 #next lines are for creating .h & .cpp files out of .ice Files
-set(out_dir "${CMAKE_CURRENT_SOURCE_DIR}")
+set(out_dir "${CMAKE_CURRENT_SOURCE_DIR}/common")
 set(out_file "${out_dir}/SecureDistributedChat.cpp")
 
 add_custom_command(OUTPUT
@@ -52,7 +49,7 @@ COMMAND "${ZeroCIce_slice2cpp_BIN}"
   -I /usr/share/slice/
   --stream
   --output-dir "${out_dir}"
-  "${CMAKE_CURRENT_SOURCE_DIR}/SecureDistributedChat.ice"
+  "${CMAKE_CURRENT_SOURCE_DIR}/common/SecureDistributedChat.ice"
 )
 
 #end snippet
@@ -66,17 +63,32 @@ add_custom_target( HEADER_Resources ALL SOURCES ${HEADER_FILES_LIST} )
 
 
 # copy resources to build dir
-add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ui"
+add_custom_command(OUTPUT ui_files
+    POST_BUILD
     COMMAND cmake -E create_symlink "${CMAKE_CURRENT_SOURCE_DIR}/ui" "${CMAKE_CURRENT_BINARY_DIR}/ui")
-list(APPEND copy_deps "${CMAKE_CURRENT_BINARY_DIR}/ui")
 
-add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ca.crt"
+add_custom_command(OUTPUT cert
+    POST_BUILD
     COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/ca.crt" "${CMAKE_CURRENT_BINARY_DIR}/ca.crt")
-list(APPEND copy_deps "${CMAKE_CURRENT_BINARY_DIR}/ca.crt")
+
+
+# copy executables to top of build dir
+add_custom_command(OUTPUT client_binary
+    POST_BUILD
+    COMMAND cmake -E copy "${CMAKE_BINARY_DIR}/client/client" "${CMAKE_BINARY_DIR}/chat_client")
+
+add_custom_command(OUTPUT server_binary
+    POST_BUILD
+    COMMAND cmake -E copy "${CMAKE_BINARY_DIR}/server/server" "${CMAKE_BINARY_DIR}/chat_server")
+
 
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/common)
 
-add_executable(client client.cpp FileWatcher.cpp NotifyPipe.cpp backward.cpp ${out_file} ${task2_HEADERS_MOC} ${copy_deps})
 
-target_link_libraries(client ${LIBS})
+add_subdirectory(common)
+add_subdirectory(client)
+add_subdirectory(server)
+
+add_custom_target(post_build_steps ALL DEPENDS server client ui_files cert client_binary server_binary)
