@@ -12,6 +12,8 @@ For gccfilter (makes the output of gcc _much_ nicer), a few perl modules are nee
 ```
 cpan install Regexp::Common
 cpan install Getopt::ArgvFile
+cpan install Getopt::Long
+cpan install Term::ANSIColor
 ```
 
 Backwards also needs a library to print pretty stack traces:
