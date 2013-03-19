@@ -1,0 +1,4 @@
+build/
+SecureDistributedChat.cpp
+SecureDistributedChat.h
+CMakeLists.txt.user
