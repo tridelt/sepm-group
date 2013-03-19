@@ -1,8 +1,9 @@
 ### Building
 ```
-mkdir build && cd build
-cmake ..
-make -j 8
+mkdir build && cd build     # only needed the first time
+
+cmake ..                    # make sure that you are in ./build
+make -j 8                   # when doing those
 ```
 
 ### Dependencies
@@ -15,5 +16,13 @@ cpan install Getopt::ArgvFile
 
 Backwards also needs a library to print pretty stack traces:
 ```
-sudo aptitude install binutils-dev
+sudo apt-get install binutils-dev
 ```
+
+Other libraries (Qt, boost, ZeroC ICE):
+```
+sudo apt-get install libqt4-dev libboost-program-options-dev libzeroc-ice34-dev
+```
+
+
+Please [file an issue](https://github.com/Mononofu/sepm-group/issues/new) if you had to do anything else to get a working build!
