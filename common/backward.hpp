@@ -24,6 +24,8 @@
 #ifndef H_6B9572DA_A64B_49E6_B234_051480991C89
 #define H_6B9572DA_A64B_49E6_B234_051480991C89
 
+#pragma GCC system_header
+
 #ifndef __cplusplus
 #	error "It's not going to compile without a C++ compiler..."
 #endif
@@ -2087,10 +2089,10 @@ void crit_err_hdlr(int sig_num, siginfo_t * info, void * ucontext)
  uc = (sig_ucontext_t *)ucontext;
 
  /* Get the address at the time the signal was raised from the EIP (x86) */
- caller_address = (void *) uc->uc_mcontext.eip;   
+ caller_address = (void *) uc->uc_mcontext.eip;
 
- fprintf(stderr, "signal %d (%s), address is %p from %p\n", 
-  sig_num, strsignal(sig_num), info->si_addr, 
+ fprintf(stderr, "signal %d (%s), address is %p from %p\n",
+  sig_num, strsignal(sig_num), info->si_addr,
   (void *)caller_address);
 
  size = backtrace(array, 50);

@@ -1,4 +1,5 @@
 # http://qt-project.org/quarterly/view/using_cmake_to_build_qt_projects
+# lot's of cmake modules: https://github.com/rpavlik/cmake-modules
 
 cmake_minimum_required(VERSION 2.6)
 project(chat)
@@ -6,15 +7,8 @@ project(chat)
 set(CMAKE_C_COMPILER "gcc-4.6")
 set(CMAKE_CXX_COMPILER "/usr/bin/g++-4.6")
 
-set(CMAKE_CXX_FLAGS "-g -Wall")
+set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -Werror -pedantic -std=c++0x")
 
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_GNUCPP)
-  option(COLOR_GCC "Use GCCFilter to color compiler output messages" ON)
-  set(COLOR_GCC_OPTIONS "-c -r -w" CACHE STRING "Arguments that are passed to gccfilter when output coloring is switchend on. Defaults to -c -r -w.")
-  if(COLOR_GCC)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${PROJECT_SOURCE_DIR}/cmake/gccfilter ${COLOR_GCC_OPTIONS}")
-  endif()
-endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -24,15 +18,38 @@ find_package(Qt4 REQUIRED)
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
 
+find_package(Boost COMPONENTS program_options REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
+
 
 include_directories(${ZeroCIce_INCLUDE_DIR})
 set(LIBS ${LIBS} ${ZeroCIceCore_LIBRARY})
 set(LIBS ${LIBS} ${ZeroCIceUtil_LIBRARY})
 set(LIBS ${LIBS} ${ZeroCIceSSL_LIBRARY})
-set(LIBS ${LIBS} boost_program_options)
+set(LIBS ${LIBS} ${Boost_LIBRARIES})
 set(LIBS ${LIBS} ${QT_LIBRARIES})
 set(LIBS ${LIBS} ${QT_QTDECLARATIVE_LIBRARY})
-set(LIBS ${LIBS} bfd)   # for backward pretty stacktracing
+
+
+# only enable pretty backtraces if libbfd is available
+find_package(bfd)
+if(bfd_FOUND)
+  add_definitions(-DBACKWARD_HAS_BFD)
+  set(LIBS ${LIBS} ${bfd_LIBRARIES})   # for backward pretty stacktracing
+endif()
+
+
+# only enable gccfilter if necessary perl modules are present
+find_package(PerlModules COMPONENTS Regexp::Common Getopt::ArgvFile Getopt::Long Term::ANSIColor)
+if(Regexp::Common_FOUND AND Getopt::ArgvFile_FOUND AND Getopt::Long_FOUND AND Term::ANSIColor_FOUND)
+  if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_GNUCPP)
+    option(COLOR_GCC "Use GCCFilter to color compiler output messages" ON)
+    set(COLOR_GCC_OPTIONS "-c -r -w" CACHE STRING "Arguments that are passed to gccfilter when output coloring is switchend on. Defaults to -c -r -w.")
+    if(COLOR_GCC)
+      set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${PROJECT_SOURCE_DIR}/cmake/gccfilter ${COLOR_GCC_OPTIONS}")
+    endif()
+  endif()
+endif()
 
 
 #begin snippet
