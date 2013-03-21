@@ -55,13 +55,12 @@ void FileWatcher::watch(string dir, function<void()> callback) {
 }
 
 
-void FileWatcher::start(string dir, function<void()> callback) {
-  running = true;
-  future = QtConcurrent::run(this, &FileWatcher::watch, dir, callback);
+FileWatcher::FileWatcher(string dir, function<void()> callback) :
+  running(true), future(QtConcurrent::run(this, &FileWatcher::watch, dir, callback)) {
 }
 
 
-void FileWatcher::stop() {
+FileWatcher::~FileWatcher() {
   running = false;
   pipe.notify();
   future.waitForFinished();

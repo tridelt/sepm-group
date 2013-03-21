@@ -24,10 +24,7 @@ int main(int argc, char** argv) {
   cout << "Hello from client" << endl;
 
   ViewRefresher refresher;
-  FileWatcher watcher;
-
-  watcher.start("./ui", bind(&ViewRefresher::refreshAll, &refresher));
-  watcher.stop();
+  FileWatcher watcher("./ui", bind(&ViewRefresher::refreshAll, &refresher));
 
   return 0;
 }

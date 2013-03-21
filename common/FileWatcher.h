@@ -9,18 +9,15 @@ class FileWatcher : public QObject {
   Q_OBJECT
 
 public:
-  ~FileWatcher() {
-    stop();
-  }
-  void start(string dir, function<void()> callback);
-  void stop();
+  FileWatcher(string dir, function<void()> callback);
+  ~FileWatcher();
 
 private:
   void watch(string dir, function<void()> callback);
 
+  bool running;
   NotifyPipe pipe;
   QFuture<void> future;
-  bool running;
 };
 
 class WatchException : exception {
