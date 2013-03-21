@@ -3,8 +3,25 @@
 mkdir build && cd build     # only needed the first time
 
 cmake ..                    # make sure that you are in ./build
-make -j 8                   # when doing those
+make                        # when doing those
 ```
+
+To make sure all your shiny cores are used for compiling, put this into your .zshrc (or .bashrc, if you haven't seen the light yet):
+```
+MAKEFLAGS="-j 8"
+```
+Or just manually specify it every time:
+```
+make -j 8
+```
+
+
+### Testing
+
+I've set up [Google Test](https://code.google.com/p/googletest/) as a unit testing framework. To run tests, simply do `make test`. Tests are in `./test`, if you want to add some either add them to an existing file (if they fit) or create a new one. If you create a new file, make sure to add it to CMakeLists.txt in `./test`.
+
+For an introduction to Google Test, see the [Primer](https://code.google.com/p/googletest/wiki/Primer), for concrete code check out the [samples](https://code.google.com/p/googletest/wiki/Samples).
+
 
 ### Dependencies
 
