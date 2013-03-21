@@ -1,5 +1,8 @@
 ### Building
+We are using an out of source build, if you've never done this just follow the instructions below:
+
 ```
+# in the top-level dir of the project
 mkdir build && cd build     # only needed the first time
 
 cmake ..                    # make sure that you are in ./build
