@@ -8,9 +8,7 @@
 #define EVENT_SIZE  ( sizeof (struct inotify_event) )
 #define BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
 
-void FileWatcher::watch(string dir) {
-  qRegisterMetaType<QDeclarativeView*>("QDeclarativeView*");
-
+void FileWatcher::watch(string dir, function<void()> callback) {
   int fd = inotify_init();
   if(fd < 0)
     throw WatchException("failed to init inotify");
@@ -40,14 +38,8 @@ void FileWatcher::watch(string dir) {
         if(length < 0) {
           throw WatchException("failed to read() events");
         } else {
-          // refresh all views
-          QMapIterator<QString, QDeclarativeView *> i(views);
-          while(i.hasNext()) {
-            i.next();
-            QMetaObject::invokeMethod(this, "refreshView", Qt::QueuedConnection,
-                                    Q_ARG(QDeclarativeView*, i.value()),
-                                    Q_ARG(QUrl, QUrl(i.key())));
-          }
+          // notify that some file changed
+          callback();
         }
       } else {
         throw WatchException("unexpected fd");
@@ -63,9 +55,9 @@ void FileWatcher::watch(string dir) {
 }
 
 
-void FileWatcher::start(string dir) {
+void FileWatcher::start(string dir, function<void()> callback) {
   running = true;
-  future = QtConcurrent::run(this, &FileWatcher::watch, dir);
+  future = QtConcurrent::run(this, &FileWatcher::watch, dir, callback);
 }
 
 
@@ -73,11 +65,4 @@ void FileWatcher::stop() {
   running = false;
   pipe.notify();
   future.waitForFinished();
-}
-
-void FileWatcher::refreshView(QDeclarativeView* view, const QUrl &url) {
-  // important: .qml is only reloaded if the cache is cleared first
-  view->engine()->clearComponentCache();
-  view->setSource(url);
-  view->show();
 }

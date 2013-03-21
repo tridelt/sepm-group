@@ -1,6 +1,7 @@
 #include <iostream>
 #include <boost/program_options.hpp>
 #include "FileWatcher.h"
+#include "ViewRefresher.h"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -20,9 +21,13 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  auto watcher = new FileWatcher();
-  watcher->stop();
-
   cout << "Hello from client" << endl;
+
+  ViewRefresher refresher;
+  FileWatcher watcher;
+
+  watcher.start("./ui", bind(&ViewRefresher::refreshAll, &refresher));
+  watcher.stop();
+
   return 0;
 }

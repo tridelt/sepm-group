@@ -1,5 +1,4 @@
 #include <string>
-#include <QtDeclarative/QDeclarativeView>
 #include <QObject>
 #include "NotifyPipe.h"
 #include <QFuture>
@@ -13,18 +12,12 @@ public:
   ~FileWatcher() {
     stop();
   }
-  void addWatch(QDeclarativeView *view, QString layout) {
-    views[layout] = view;
-  }
-  void watch(string dir);
-  void start(string dir);
+  void start(string dir, function<void()> callback);
   void stop();
 
-public slots:
-  void refreshView(QDeclarativeView* view, const QUrl &url);
-
 private:
-  QMap<QString, QDeclarativeView*> views;
+  void watch(string dir, function<void()> callback);
+
   NotifyPipe pipe;
   QFuture<void> future;
   bool running;
