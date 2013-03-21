@@ -2,7 +2,7 @@
 # lot's of cmake modules: https://github.com/rpavlik/cmake-modules
 
 cmake_minimum_required(VERSION 2.6)
-project(chat)
+project(chat CXX C)
 
 set(CMAKE_C_COMPILER "gcc-4.6")
 set(CMAKE_CXX_COMPILER "/usr/bin/g++-4.6")
@@ -102,10 +102,14 @@ add_custom_command(OUTPUT server_binary
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/common)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
 
+add_subdirectory(dependencies)
 
 add_subdirectory(common)
 add_subdirectory(client)
 add_subdirectory(server)
 
 add_custom_target(post_build_steps ALL DEPENDS server client ui_files cert client_binary server_binary)
+
+add_subdirectory(tests)
