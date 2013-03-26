@@ -1,6 +1,6 @@
 /*
  * backward.hpp
- * Copyright © 2013 François-Xavier 'Bombela' Bourlet <bombela@gmail.com>
+ * Copyright 2013 Google Inc. All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,6 @@
 
 #ifndef H_6B9572DA_A64B_49E6_B234_051480991C89
 #define H_6B9572DA_A64B_49E6_B234_051480991C89
-
-#pragma GCC system_header
 
 #ifndef __cplusplus
 #	error "It's not going to compile without a C++ compiler..."
@@ -147,7 +145,27 @@
 
 
 #	if BACKWARD_HAS_UNWIND == 1
+
 #		include <unwind.h>
+// while gcc's unwind.h defines something like that:
+//  extern _Unwind_Ptr _Unwind_GetIP (struct _Unwind_Context *);
+//  extern _Unwind_Ptr _Unwind_GetIPInfo (struct _Unwind_Context *, int *);
+//
+// clang's unwind.h defines something like this:
+//  uintptr_t _Unwind_GetIP(struct _Unwind_Context* __context);
+//
+// Even if the _Unwind_GetIPInfo can be linked to, it is not declared, worse we
+// cannot just redeclare it because clang's unwind.h doesn't define _Unwind_Ptr
+// anyway.
+//
+// Luckily we can play on the fact that the guard macros have a different name:
+#ifdef __CLANG_UNWIND_H
+// In fact, this function still comes from libgcc (on my different linux boxes,
+// clang links against libgcc).
+#		include <inttypes.h>
+extern "C" uintptr_t _Unwind_GetIPInfo(_Unwind_Context*, int*);
+#endif
+
 #	endif
 
 #	include <cxxabi.h>
@@ -372,8 +390,8 @@ public:
 /*************** A TRACE ***************/
 
 struct Trace {
-	void*  addr;
-	size_t idx;
+	void*    addr;
+	unsigned idx;
 
 	Trace():
 		addr(0), idx(0) {}
@@ -458,8 +476,8 @@ struct ResolvedTrace: public TraceWithLocals {
 	struct SourceLoc {
 		std::string function;
 		std::string filename;
-		size_t      line;
-		size_t      col;
+		unsigned    line;
+		unsigned    col;
 
 		SourceLoc(): line(0), col(0) {}
 
@@ -510,7 +528,7 @@ public:
 	Trace operator[](size_t) { return Trace(); }
 	size_t load_here(size_t=0) { return 0; }
 	size_t load_from(void*, size_t=0) { return 0; }
-	size_t thread_id() const { return 0; }
+	unsigned thread_id() const { return 0; }
 };
 
 #ifdef BACKWARD_SYSTEM_LINUX
@@ -519,7 +537,7 @@ class StackTraceLinuxImplBase {
 public:
 	StackTraceLinuxImplBase(): _thread_id(0), _skip(0) {}
 
-	size_t thread_id() const {
+	unsigned thread_id() const {
 		return _thread_id;
 	}
 
@@ -1040,7 +1058,7 @@ private:
 		bfd_symtab_t dynamic_symtab;
 	};
 
-	typedef typename details::hashtable<std::string, bfd_fileobject>::type
+	typedef details::hashtable<std::string, bfd_fileobject>::type
 		fobj_bfd_map_t;
 	fobj_bfd_map_t      _fobj_bfd_map;
 
@@ -1053,7 +1071,7 @@ private:
 			_bfd_loaded = true;
 		}
 
-		typename fobj_bfd_map_t::iterator it =
+		fobj_bfd_map_t::iterator it =
 			_fobj_bfd_map.find(filename_object);
 		if (it != _fobj_bfd_map.end()) {
 			return it->second;
@@ -1411,16 +1429,23 @@ private:
 	struct inliners_search_cb {
 		void operator()(Dwarf_Die* die) {
 			switch (dwarf_tag(die)) {
+				const char* name;
 				case DW_TAG_subprogram:
-					trace.source.function = dwarf_diename(die)?:"";
+					if ((name = dwarf_diename(die))) {
+						trace.source.function = name;
+					}
 					break;
 
 				case DW_TAG_inlined_subroutine:
 					ResolvedTrace::SourceLoc sloc;
 					Dwarf_Attribute attr_mem;
 
-					sloc.function = dwarf_diename(die)?:"";
-					sloc.filename = die_call_file(die)?:"";
+					if ((name = dwarf_diename(die))) {
+						trace.source.function = name;
+					}
+					if ((name = die_call_file(die))) {
+						sloc.filename = name;
+					}
 
 					Dwarf_Word line = 0, col = 0;
 					dwarf_formudata(dwarf_attr(die, DW_AT_call_line,
@@ -1842,14 +1867,14 @@ public:
 
 			fprintf(os, "Stack trace (most recent call last)");
 			if (st.thread_id()) {
-				fprintf(os, " in thread %zi:\n", st.thread_id());
+				fprintf(os, " in thread %u:\n", st.thread_id());
 			} else {
 				fprintf(os, ":\n");
 			}
 
 			_resolver.load_stacktrace(st);
-			for (size_t trace_idx = st.size(); trace_idx > 0; --trace_idx) {
-				fprintf(os, "#%-2zi", trace_idx);
+			for (unsigned trace_idx = st.size(); trace_idx > 0; --trace_idx) {
+				fprintf(os, "#%-2u", trace_idx);
 				bool already_indented = true;
 				const ResolvedTrace trace = _resolver.resolve(st[trace_idx-1]);
 
@@ -1925,8 +1950,8 @@ private:
 	void print_source_loc(FILE* os, const char* indent,
 			const ResolvedTrace::SourceLoc& source_loc,
 			void* addr=0) {
-		fprintf(os, "%sSource \"%s\", line %zi, in %s",
-				indent, source_loc.filename.c_str(), source_loc.line,
+		fprintf(os, "%sSource \"%s\", line %i, in %s",
+				indent, source_loc.filename.c_str(), (int)source_loc.line,
 				source_loc.function.c_str());
 
 		if (address and addr != 0) {
@@ -1985,8 +2010,25 @@ private:
 class SignalHandling {
 public:
 	SignalHandling(): _loaded(false) {
-		// TODO: add a signal dedicated stack, so we can handle stack-overflow.
 		bool success = true;
+
+		const size_t stack_size = 1024 * 1024 * 8;
+		_stack_content.reset((char*)malloc(stack_size));
+		if (_stack_content) {
+			stack_t ss;
+			ss.ss_sp = _stack_content.get();
+			ss.ss_size = stack_size;
+			ss.ss_flags = 0;
+			std::cout << "stack "
+				<< ss.ss_sp << " - " << (void*)(((char*)ss.ss_sp) + ss.ss_size)
+				<< std::endl;
+			if (sigaltstack(&ss, 0) < 0) {
+				success = false;
+			}
+		} else {
+			success = false;
+		}
+
 		const int signals[] = {
 			// default action: Core
 			SIGILL,
@@ -2023,7 +2065,7 @@ public:
 				sig != signals + sizeof signals / sizeof *signals; ++sig) {
 
 			struct sigaction action;
-			action.sa_flags = SA_SIGINFO;
+			action.sa_flags = SA_SIGINFO | SA_ONSTACK;
 			sigemptyset(&action.sa_mask);
 			action.sa_sigaction = &sig_handler;
 
@@ -2036,7 +2078,8 @@ public:
 	bool loaded() const { return _loaded; }
 
 private:
-	bool _loaded;
+	details::handle<char*> _stack_content;
+	bool                   _loaded;
 
 	static void sig_handler(int, siginfo_t* info, void* _ctx) {
 		ucontext_t *uctx = (ucontext_t*) _ctx;
@@ -2061,7 +2104,8 @@ private:
 		printer.print(st, stderr);
 
 		psiginfo(info, 0);
-		exit(EXIT_FAILURE);
+		// terminate the process immediately.
+		_exit(EXIT_FAILURE);
 	}
 };
 
@@ -2089,10 +2133,10 @@ void crit_err_hdlr(int sig_num, siginfo_t * info, void * ucontext)
  uc = (sig_ucontext_t *)ucontext;
 
  /* Get the address at the time the signal was raised from the EIP (x86) */
- caller_address = (void *) uc->uc_mcontext.eip;
+ caller_address = (void *) uc->uc_mcontext.eip;   
 
- fprintf(stderr, "signal %d (%s), address is %p from %p\n",
-  sig_num, strsignal(sig_num), info->si_addr,
+ fprintf(stderr, "signal %d (%s), address is %p from %p\n", 
+  sig_num, strsignal(sig_num), info->si_addr, 
   (void *)caller_address);
 
  size = backtrace(array, 50);
