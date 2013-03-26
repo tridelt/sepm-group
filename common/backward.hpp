@@ -2019,9 +2019,9 @@ public:
 			ss.ss_sp = _stack_content.get();
 			ss.ss_size = stack_size;
 			ss.ss_flags = 0;
-			std::cout << "stack "
+			/*std::cout << "stack "
 				<< ss.ss_sp << " - " << (void*)(((char*)ss.ss_sp) + ss.ss_size)
-				<< std::endl;
+				<< std::endl;*/
 			if (sigaltstack(&ss, 0) < 0) {
 				success = false;
 			}
@@ -2133,10 +2133,10 @@ void crit_err_hdlr(int sig_num, siginfo_t * info, void * ucontext)
  uc = (sig_ucontext_t *)ucontext;
 
  /* Get the address at the time the signal was raised from the EIP (x86) */
- caller_address = (void *) uc->uc_mcontext.eip;   
+ caller_address = (void *) uc->uc_mcontext.eip;
 
- fprintf(stderr, "signal %d (%s), address is %p from %p\n", 
-  sig_num, strsignal(sig_num), info->si_addr, 
+ fprintf(stderr, "signal %d (%s), address is %p from %p\n",
+  sig_num, strsignal(sig_num), info->si_addr,
   (void *)caller_address);
 
  size = backtrace(array, 50);

@@ -3,6 +3,7 @@
 #include <boost/bind.hpp>
 #include "FileWatcher.h"
 #include "ViewRefresher.h"
+#include "ExitHandler.h"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -27,6 +28,7 @@ int main(int argc, char** argv) {
   ViewRefresher refresher;
   FileWatcher watcher("./ui", boost::bind(&ViewRefresher::fileChanged, &refresher, _1, _2, _3));
 
+  // create or modify a file in ./ui to see the changes getting picked up
   FileWatcher demo("./ui", [](string name, bool isDir, FileWatcher::FileEvent e) {
     switch(e) {
       case FileWatcher::CREATE:
@@ -45,8 +47,18 @@ int main(int argc, char** argv) {
     cout << name << endl;
   });
 
+  ExitHandler::i()->setHandler([](int) {
+    // called when SIGINT (eg by Ctrl+C) is received
+    // do cleanup
+
+    // bad - cout not guaranteed to work, since not reentrant
+    // this is just to show the handler is working
+    cout << " Got signal .. terminating" << endl;
+  });
+
   int test;
   cin >> test;
+
 
   return 0;
 }
