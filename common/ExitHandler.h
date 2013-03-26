@@ -1,3 +1,6 @@
+#ifndef EXITHANDLER_H
+#define EXITHANDLER_H
+
 #include <functional>
 using namespace std;
 
@@ -11,3 +14,5 @@ private:
   static ExitHandler* inst;
   function<void(int)> handler;
 };
+
+#endif

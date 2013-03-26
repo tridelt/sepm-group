@@ -1,3 +1,6 @@
+#ifndef VIEWREFRESHER_H
+#define VIEWREFRESHER_H
+
 #include <string>
 #include <QtDeclarative/QDeclarativeView>
 #include <QObject>
@@ -21,3 +24,5 @@ public slots:
 private:
   QMap<QString, QDeclarativeView*> views;
 };
+
+#endif
