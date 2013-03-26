@@ -9,6 +9,7 @@ set(CMAKE_CXX_COMPILER "/usr/bin/g++-4.6")
 
 set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -Werror -pedantic -std=c++0x")
 
+set(CMAKE_AUTOMOC TRUE)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
