@@ -1,5 +1,6 @@
 #include <iostream>
 #include <boost/program_options.hpp>
+#include <boost/bind.hpp>
 #include "FileWatcher.h"
 #include "ViewRefresher.h"
 
@@ -24,7 +25,28 @@ int main(int argc, char** argv) {
   cout << "Hello from client" << endl;
 
   ViewRefresher refresher;
-  FileWatcher watcher("./ui", bind(&ViewRefresher::refreshAll, &refresher));
+  FileWatcher watcher("./ui", boost::bind(&ViewRefresher::fileChanged, &refresher, _1, _2, _3));
+
+  FileWatcher demo("./ui", [](string name, bool isDir, FileWatcher::FileEvent e) {
+    switch(e) {
+      case FileWatcher::CREATE:
+        cout << "created ";
+        break;
+      case FileWatcher::MODIFY:
+        cout << "modified ";
+        break;
+      case FileWatcher::DELETE:
+        cout << "deleted ";
+        break;
+      default:
+        cout << "unknown event: ";
+    }
+    cout << (isDir ? "dir " : "file ");
+    cout << name << endl;
+  });
+
+  int test;
+  cin >> test;
 
   return 0;
 }

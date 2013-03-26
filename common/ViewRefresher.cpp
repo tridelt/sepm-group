@@ -8,7 +8,7 @@ void ViewRefresher::refreshView(QDeclarativeView* view, const QUrl &url) {
   view->show();
 }
 
-void ViewRefresher::refreshAll() {
+void ViewRefresher::fileChanged(string, bool, FileWatcher::FileEvent) {
   qRegisterMetaType<QDeclarativeView*>("QDeclarativeView*");
   // refresh all views
   QMapIterator<QString, QDeclarativeView *> i(views);

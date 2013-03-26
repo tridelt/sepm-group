@@ -1,3 +1,6 @@
+#ifndef FILEWATCHER_H
+#define FILEWATCHER_H
+
 #include <string>
 #include <QObject>
 #include "NotifyPipe.h"
@@ -5,15 +8,23 @@
 
 using namespace std;
 
+
+
 class FileWatcher : public QObject {
   Q_OBJECT
 
 public:
-  FileWatcher(string dir, function<void()> callback);
+  enum FileEvent {
+    CREATE,
+    MODIFY,
+    DELETE
+  };
+
+  FileWatcher(string dir, function<void(string, bool, FileEvent)> callback);
   ~FileWatcher();
 
 private:
-  void watch(string dir, function<void()> callback);
+  void watch(string dir, function<void(string, bool, FileEvent)> callback);
 
   bool running;
   NotifyPipe pipe;
@@ -30,3 +41,5 @@ public:
 private:
   string reason;
 };
+
+#endif

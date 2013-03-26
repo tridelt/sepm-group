@@ -2,6 +2,7 @@
 #include <QtDeclarative/QDeclarativeView>
 #include <QObject>
 #include <QMap>
+#include "FileWatcher.h"
 
 using namespace std;
 
@@ -12,7 +13,7 @@ public:
   void addWatch(QDeclarativeView *view, QString layout) {
     views[layout] = view;
   }
-  void refreshAll();
+  void fileChanged(string name, bool isDir, FileWatcher::FileEvent e);
 
 public slots:
   void refreshView(QDeclarativeView* view, const QUrl &url);

@@ -8,7 +8,7 @@
 #define EVENT_SIZE  ( sizeof (struct inotify_event) )
 #define BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )
 
-void FileWatcher::watch(string dir, function<void()> callback) {
+void FileWatcher::watch(string dir, function<void(string, bool, FileEvent)> callback) {
   int fd = inotify_init();
   if(fd < 0)
     throw WatchException("failed to init inotify");
@@ -38,8 +38,21 @@ void FileWatcher::watch(string dir, function<void()> callback) {
         if(length < 0) {
           throw WatchException("failed to read() events");
         } else {
-          // notify that some file changed
-          callback();
+          int i = 0;
+          while(i < length) {
+            struct inotify_event *event = ( struct inotify_event * ) &buffer[ i ];
+            if ( event->len ) {
+              // notify that some file changed
+              if ( event->mask & IN_CREATE )
+                callback(event->name, event->mask & IN_ISDIR, CREATE);
+              else if ( event->mask & IN_DELETE )
+                callback(event->name, event->mask & IN_ISDIR, DELETE);
+              else if ( event->mask & IN_MODIFY )
+                callback(event->name, event->mask & IN_ISDIR, MODIFY);
+            }
+
+            i += EVENT_SIZE + event->len;
+          }
         }
       } else {
         throw WatchException("unexpected fd");
@@ -55,7 +68,7 @@ void FileWatcher::watch(string dir, function<void()> callback) {
 }
 
 
-FileWatcher::FileWatcher(string dir, function<void()> callback) :
+FileWatcher::FileWatcher(string dir, function<void(string, bool, FileEvent)> callback) :
   running(true), future(QtConcurrent::run(this, &FileWatcher::watch, dir, callback)) {
 }
 
