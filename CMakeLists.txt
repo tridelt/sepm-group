@@ -53,25 +53,6 @@ if(Regexp::Common_FOUND AND Getopt::ArgvFile_FOUND AND Getopt::Long_FOUND AND Te
 endif()
 
 
-#begin snippet
-#next lines are for creating .h & .cpp files out of .ice Files
-set(out_dir "${CMAKE_CURRENT_SOURCE_DIR}/common")
-set(out_file "${out_dir}/SecureDistributedChat.cpp")
-
-add_custom_command(OUTPUT
-"${out_file}"
-COMMAND "${ZeroCIce_slice2cpp_BIN}"
-  --add-header=cstddef
-  -I /usr/share/Ice/slice/
-  -I /usr/share/Ice-3.4.2/slice/
-  -I /usr/share/slice/
-  --stream
-  --output-dir "${out_dir}"
-  "${CMAKE_CURRENT_SOURCE_DIR}/common/SecureDistributedChat.ice"
-)
-
-#end snippet
-
 # hack to show files in Qt Creator
 FILE(GLOB QML_FILES_LIST "${CMAKE_CURRENT_SOURCE_DIR}/ui/*.qml")
 add_custom_target( QML_Resources ALL SOURCES ${QML_FILES_LIST} )
@@ -107,6 +88,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
 
 add_subdirectory(dependencies)
 
+add_subdirectory(ice)
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/ice)
 add_subdirectory(common)
 add_subdirectory(client)
 add_subdirectory(server)
