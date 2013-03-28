@@ -7,9 +7,6 @@
 
 include(LibFindMacros)
 
-# Use pkg-config to get hints about paths
-libfind_pkg_check_modules(binutils_PKGCONF binutils-dev)
-
 # Include dir
 find_path(bfd_INCLUDE_DIR
   NAMES bfd.h
