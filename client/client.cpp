@@ -4,6 +4,7 @@
 #include "FileWatcher.h"
 #include "ViewRefresher.h"
 #include "ExitHandler.h"
+#include "PluginManager.h"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -25,39 +26,51 @@ int main(int argc, char** argv) {
 
   cout << "Hello from client" << endl;
 
-  ViewRefresher refresher;
-  FileWatcher watcher("./ui", boost::bind(&ViewRefresher::fileChanged, &refresher, _1, _2, _3));
 
-  // create or modify a file in ./ui to see the changes getting picked up
-  FileWatcher demo("./ui", [](string name, bool isDir, FileWatcher::FileEvent e) {
-    switch(e) {
-      case FileWatcher::CREATE:
-        cout << "created ";
-        break;
-      case FileWatcher::MODIFY:
-        cout << "modified ";
-        break;
-      case FileWatcher::DELETE:
-        cout << "deleted ";
-        break;
-      default:
-        cout << "unknown event: ";
-    }
-    cout << (isDir ? "dir " : "file ");
-    cout << name << endl;
-  });
+  try {
 
-  ExitHandler::i()->setHandler([](int) {
-    // called when SIGINT (eg by Ctrl+C) is received
-    // do cleanup
+    ViewRefresher refresher;
+    FileWatcher watcher("./ui", boost::bind(&ViewRefresher::fileChanged, &refresher, _1, _2, _3));
 
-    // bad - cout not guaranteed to work, since not reentrant
-    // this is just to show the handler is working
-    cout << " Got signal .. terminating" << endl;
-  });
+    // create or modify a file in ./ui to see the changes getting picked up
+    FileWatcher demo("./ui", [](string name, bool isDir, FileWatcher::FileEvent e) {
+      switch(e) {
+        case FileWatcher::CREATE:
+          cout << "created ";
+          break;
+        case FileWatcher::MODIFY:
+          cout << "modified ";
+          break;
+        case FileWatcher::DELETE:
+          cout << "deleted ";
+          break;
+        default:
+          cout << "unknown event: ";
+      }
+      cout << (isDir ? "dir " : "file ");
+      cout << name << endl;
+    });
 
-  int test;
-  cin >> test;
+    ExitHandler::i()->setHandler([](int) {
+      // called when SIGINT (eg by Ctrl+C) is received
+      // do cleanup
+
+      // bad - cout not guaranteed to work, since not reentrant
+      // this is just to show the handler is working
+      cout << " Got signal .. terminating" << endl;
+    });
+
+    PluginManager manager;
+
+    manager.listPlugins();
+
+    int test;
+    cin >> test;
+
+  } catch(PluginException ex) {
+    cerr << ex.what() << endl;
+  }
+
 
 
   return 0;
