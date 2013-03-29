@@ -55,3 +55,8 @@ To see such a pretty stack trace, try
 
 
 Please [file an issue](https://github.com/Mononofu/sepm-group/issues/new) if you had to do anything else to get a working build!
+
+
+###  Plugins
+
+To make development easier and more independent, I've added a simple plugin system. Plugins live under `./plugins` and are automatically reloaded on change to make rapid development possible. All plugins have to implement the `Plugin` interface from `common/Plugin.h`, for an example see `plugins/hello_world/hello.cpp`. (The interface is bare bones atm, we need to figure out what plugins should be able to do and how).
