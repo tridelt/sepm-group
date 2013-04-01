@@ -6,7 +6,7 @@ add_executable(basicTests
     more_tests.cpp
 )
 
-target_link_libraries(basicTests gtest gtest_main pthread)
+target_link_libraries(basicTests gtest gtest_main pthread ${LIBS})
 
 add_custom_target(basicTests_runtest
     COMMAND basicTests --gtest_output=xml:reports/ #cmake 2.6 required

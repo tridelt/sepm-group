@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
 
 TEST(MoreTests, DummyTest) {
-  EXPECT_EQ(2, 1);
+  EXPECT_EQ(1, 1);
 }

@@ -5,5 +5,5 @@ TEST(SanityTest, CanTest) {
 }
 
 TEST(SanityTest, CStringEquality) {
-  EXPECT_STREQ("hello", "helloo");
+  EXPECT_STREQ("hello", "hello");
 }
