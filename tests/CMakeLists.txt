@@ -9,7 +9,12 @@ add_executable(basicTests
 target_link_libraries(basicTests gtest gtest_main pthread)
 
 add_custom_target(basicTests_runtest
-    COMMAND basicTests #cmake 2.6 required
+    COMMAND basicTests --gtest_output=xml:reports/ #cmake 2.6 required
     DEPENDS basicTests
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/tests")
-add_dependencies(test basicTests_runtest)
+
+
+add_subdirectory(plugins)
+
+add_dependencies(test basicTests_runtest plugin_tests)
+

@@ -17,4 +17,6 @@ protected:
   virtual ~Plugin() { }
 };
 
+extern "C" Plugin* make_plugin();
+
 #endif

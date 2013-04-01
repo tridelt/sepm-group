@@ -30,7 +30,7 @@ For an introduction to Google Test, see the [Primer](https://code.google.com/p/g
 
 Libraries (Qt, boost, ZeroC ICE), needed to compile:
 ```
-sudo apt-get install libqt4-dev libboost-program-options-dev libzeroc-ice34-dev
+sudo apt-get install libqt4-dev libboost-program-options-dev libboost-filesystem-dev libzeroc-ice34-dev
 ```
 
 
