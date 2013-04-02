@@ -30,7 +30,7 @@ For an introduction to Google Test, see the [Primer](https://code.google.com/p/g
 
 ### Dependencies
 
-Libraries (Qt, boost, ZeroC ICE), needed to compile:
+Libraries (Qt, boost, ZeroC ICE), binaries, etc. needed to compile:
 ```
 sudo apt-get install cmake make gcc-4.6 g++-4.6 build-essential libqt4-dev libboost-program-options-dev libboost-filesystem-dev libzeroc-ice34-dev
 ```
