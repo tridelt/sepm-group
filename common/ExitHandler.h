@@ -6,6 +6,7 @@ using namespace std;
 
 class ExitHandler {
 public:
+  // TODO: add docs here
   static ExitHandler* i();
   void setHandler(function<void(int)> h);
   void handle(int s);
