@@ -21,7 +21,9 @@ make -j 8
 
 ### Testing
 
-I've set up [Google Test](https://code.google.com/p/googletest/) as a unit testing framework. To run tests, simply do `make test`. Tests are in `./test`, if you want to add some either add them to an existing file (if they fit) or create a new one. If you create a new file, make sure to add it to CMakeLists.txt in `./test`.
+I've set up [Google Test](https://code.google.com/p/googletest/) as a unit testing framework. To run tests, simply do `make test`. Tests are in subdirectories of `./test` (corresponding to the source they are testing), if you want to add some either add them to an existing file (if they fit) or create a new one. If you create a new file, make sure to add it to the right `CMakeLists.txt`.
+
+You can also run only a subset of all tests. This is useful if your changes only affect of subset of the codebase. Use one of `make test_common`, `make test_client`, `make test_server`, `make test_plugins` or `make test_plugin_name`.
 
 For an introduction to Google Test, see the [Primer](https://code.google.com/p/googletest/wiki/Primer), for concrete code check out the [samples](https://code.google.com/p/googletest/wiki/Samples).
 
@@ -64,4 +66,4 @@ To make development easier and more independent, I've added a simple plugin syst
 
 ### Continuous Integration with Jenkins
 
-You can access the Jenkins server at http://ec2.furidamu.org. To login, simply use your GitHub account.
+You can access the Jenkins server at http://ec2.furidamu.org. To login, simply use your GitHub account. Every push to the main repository on GitHub will automatically trigger a rebuild and a full run of the test-suite.

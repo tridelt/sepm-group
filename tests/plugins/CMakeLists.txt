@@ -1,5 +1,5 @@
-add_custom_target(plugin_tests)
+add_custom_target(test_plugins)
 
 add_subdirectory(hello_world)
 
-add_dependencies(plugin_tests hello_world_tests_run)
+add_dependencies(test_plugins test_hello_world)

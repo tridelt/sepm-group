@@ -12,7 +12,7 @@ add_executable(${PLUGIN_NAME}_tests
 
 target_link_libraries(${PLUGIN_NAME}_tests gtest gtest_main pthread ${PLUGIN_NAME} ${LIBS})
 
-add_custom_target(${PLUGIN_NAME}_tests_run
+add_custom_target(test_${PLUGIN_NAME}
     COMMAND ${PLUGIN_NAME}_tests --gtest_output=xml:../../reports/ #cmake 2.6 required
     DEPENDS ${PLUGIN_NAME}_tests
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
