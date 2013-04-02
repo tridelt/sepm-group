@@ -71,3 +71,7 @@ To make development easier and more independent, I've added a simple plugin syst
 ### Continuous Integration with Jenkins
 
 You can access the Jenkins server at http://ec2.furidamu.org. To login, simply use your GitHub account. Every push to the main repository on GitHub will automatically trigger a rebuild and a full run of the test-suite.
+
+### Documentation
+
+Documentation is automatically generated with doxygen, so please use doxygen-style comments. You can see the documentation online: http://ec2.furidamu.org/doc/, or generate it locally with `make doc`.
