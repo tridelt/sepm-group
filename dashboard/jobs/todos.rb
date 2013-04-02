@@ -7,7 +7,7 @@ if Dir.exists?('/home/mononofu/Programmieren/TU/SEPM-group/')
 end
 
 
-SCHEDULER.every '3m', :first_in => 0 do |job|
+SCHEDULER.every '60m', :first_in => 0 do |job|
   todos = Array.new
 
   Dir.glob("#{source_dir}**/*") { |fn|

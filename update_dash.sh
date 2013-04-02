@@ -1,0 +1,4 @@
+cd /home/mononofu/sepm-group/dashboard
+dashing job commits EeLg5ZnXHTMeygHF7DVxptN9A56UxsXu4pN
+dashing job tests EeLg5ZnXHTMeygHF7DVxptN9A56UxsXu4pN
+dashing job todos EeLg5ZnXHTMeygHF7DVxptN9A56UxsXu4pN

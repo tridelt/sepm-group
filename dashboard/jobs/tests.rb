@@ -2,7 +2,7 @@ require 'rexml/document'
 
 max_length = 25
 
-SCHEDULER.every '3m', :first_in => 0 do |job|
+SCHEDULER.every '60m', :first_in => 0 do |job|
   tests = Array.new
 
   Dir.glob("/var/lib/jenkins/jobs/SEPM group/builds/*") { |fn|

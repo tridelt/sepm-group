@@ -1,7 +1,7 @@
 require 'dashing'
 
 configure do
-  set :auth_token, 'YOUR_AUTH_TOKEN'
+  set :auth_token, 'EeLg5ZnXHTMeygHF7DVxptN9A56UxsXu4pN'
   set :default_dashboard, 'dash'
 
   helpers do
