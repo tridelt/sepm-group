@@ -5,6 +5,12 @@
 
 using namespace std;
 
+/** \brief Interface that has to be implemented by all Plugins.
+ *
+ * All plugins need to implement this interface in order to correctly work with
+ * this project. Some methods might be optional, those can be left out if they
+ * are not needed.
+ */
 class Plugin {
 public:
   virtual string name() = 0;

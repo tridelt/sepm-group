@@ -106,6 +106,8 @@ add_subdirectory(client)
 add_subdirectory(server)
 add_subdirectory(plugins)
 
+add_subdirectory(doxygen)
+
 add_custom_target(post_build_steps ALL DEPENDS bin_dir server client ui_files cert client_binary server_binary plugin_dir)
 
 add_subdirectory(tests)
