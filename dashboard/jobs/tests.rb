@@ -1,6 +1,6 @@
 require 'rexml/document'
 
-max_length = 20
+max_length = 25
 
 SCHEDULER.every '3m', :first_in => 0 do |job|
   tests = Array.new
