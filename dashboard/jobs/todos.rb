@@ -12,11 +12,12 @@ SCHEDULER.every '3m', :first_in => 0 do |job|
 
   Dir.glob("#{source_dir}**/*") { |fn|
     if !fn.include?('dependencies') and !fn.include?('backward.hpp') and
-      !fn.include?('doxygen') and !fn.include?('dashboard') and File.file?(fn)
+      !fn.include?('doxygen') and !fn.include?('dashboard') and
+      !fn.include?('build') and File.file?(fn)
       File.open(fn) { |file|
         lineno = 1
         while (line = file.gets)
-          if line.include?('TODO')
+          if line.include?('TODO') or line.include?('FIXME') or line.include?('BUG')
             todos.push({
               label: "#{File.basename(fn)}:#{lineno}",
               value: line.strip!
