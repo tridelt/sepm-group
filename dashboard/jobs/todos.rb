@@ -1,10 +1,16 @@
 
 max_length = 10
 
+source_dir = '/var/lib/jenkins/jobs/SEPM group/workspace/'
+if Dir.exists?('/home/mononofu/Programmieren/TU/SEPM-group/')
+  source_dir = '/home/mononofu/Programmieren/TU/SEPM-group/'
+end
+
+
 SCHEDULER.every '3m', :first_in => 0 do |job|
   todos = Array.new
 
-  Dir.glob('/home/mononofu/Programmieren/TU/SEPM-group/**/*') { |fn|
+  Dir.glob("#{source_dir}**/*") { |fn|
     if !fn.include?('dependencies') and !fn.include?('backward.hpp') and
       !fn.include?('Doxyfile') and !fn.include?('dashboard') and File.file?(fn)
       File.open(fn) { |file|

@@ -75,3 +75,7 @@ You can access the Jenkins server at http://ec2.furidamu.org. To login, simply u
 ### Documentation
 
 Documentation is automatically generated with doxygen, so please use doxygen-style comments. You can see the documentation online: http://ec2.furidamu.org/doc/, or generate it locally with `make doc`.
+
+### Dashboard
+
+To have an easy overview over the project, a pretty dashboard is available on http://ec2.furidamu.org/dash/. It's build using [Dashing](http://shopify.github.com/dashing/), you can contribute using the normal project repository.
