@@ -30,7 +30,7 @@ For an introduction to Google Test, see the [Primer](https://code.google.com/p/g
 
 Libraries (Qt, boost, ZeroC ICE), needed to compile:
 ```
-sudo apt-get install libqt4-dev libboost-program-options-dev libboost-filesystem-dev libzeroc-ice34-dev
+sudo apt-get install cmake make gcc-4.6 g++-4.6 build-essential libqt4-dev libboost-program-options-dev libboost-filesystem-dev libzeroc-ice34-dev
 ```
 
 
@@ -60,3 +60,8 @@ Please [file an issue](https://github.com/Mononofu/sepm-group/issues/new) if you
 ###  Plugins
 
 To make development easier and more independent, I've added a simple plugin system. Plugins live under `./plugins` and are automatically reloaded on change to make rapid development possible. All plugins have to implement the `Plugin` interface from `common/Plugin.h`, for an example see `plugins/hello_world/hello.cpp`. (The interface is bare bones atm, we need to figure out what plugins should be able to do and how).
+
+
+### Continuous Integration with Jenkins
+
+You can access the Jenkins server at http://ec2.furidamu.org. To login, simply use your GitHub account.
