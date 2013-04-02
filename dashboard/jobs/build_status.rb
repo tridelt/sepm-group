@@ -29,9 +29,6 @@ SCHEDULER.every '10s', :first_in => 0 do |job|
     status = "building"
   end
 
-
-  puts activity
-  puts status
   send_event('build_status', { text: activity, status: status })
 
 end # SCHEDULER
