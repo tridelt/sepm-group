@@ -78,4 +78,4 @@ Documentation is automatically generated with doxygen, so please use doxygen-sty
 
 ### Dashboard
 
-To have an easy overview over the project, a pretty dashboard is available on http://dash.furidamu.org/. It's built using [Dashing](http://shopify.github.com/dashing/), you can contribute using the normal project repository.
+To have an easy overview over the project, a pretty dashboard is available on http://dash.furidamu.org:3030/. It's built using [Dashing](http://shopify.github.com/dashing/), you can contribute using the normal project repository.
