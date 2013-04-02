@@ -5,7 +5,7 @@ add_executable(test_common_exec
     notify_pipe.cpp
 )
 
-target_link_libraries(test_common_exec gtest gtest_main pthread ${LIBS})
+target_link_libraries(test_common_exec gtest gtest_main pthread ${LIBS} common)
 
 add_custom_target(test_common
     COMMAND test_common_exec --gtest_output=xml:../reports/
