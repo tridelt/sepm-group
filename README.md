@@ -55,6 +55,10 @@ To see such a pretty stack trace, try
 ./chat_client --non-sense
 ```
 
+If you want to generate documentation with `make doc`, first install doxygen:
+```
+sudo apt-get install doxygen
+```
 
 Please [file an issue](https://github.com/Mononofu/sepm-group/issues/new) if you had to do anything else to get a working build!
 
