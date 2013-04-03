@@ -29,11 +29,12 @@ SCHEDULER.every '10s', :first_in => 0 do |job|
       status = 'warning'
       activity = "Failed"
     end
+    activity = "\##{build_name} #{activity}"
   else
     status = "building"
+    activity = "\##{Integer(build_name) + 1} #{activity}"
   end
 
-  activity = "\##{build_name} #{activity}"
 
   send_event('build_status', { text: activity, status: status })
 
