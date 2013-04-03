@@ -17,6 +17,10 @@ SCHEDULER.every '10s', :first_in => 0 do |job|
   activity = doc.elements["//Project[@name='SEPM group']"]
         .attributes["activity"]
 
+  build_name = doc.elements["//Project[@name='SEPM group']"]
+        .attributes["lastBuildLabel"]
+
+
   if activity == "Sleeping"
     if status == 'Success'
       status = 'ok'
@@ -28,6 +32,8 @@ SCHEDULER.every '10s', :first_in => 0 do |job|
   else
     status = "building"
   end
+
+  activity = "\##{build_name} #{activity}"
 
   send_event('build_status', { text: activity, status: status })
 
