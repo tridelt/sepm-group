@@ -2,7 +2,7 @@ require 'net/http'
 require 'rexml/document'
 
 # Web search for "madonna"
-url = 'http://ec2.furidamu.org/cc.xml'
+url = 'http://sepm.furidamu.org/cc.xml'
 
 
 SCHEDULER.every '10s', :first_in => 0 do |job|

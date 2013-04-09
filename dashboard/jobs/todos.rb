@@ -1,7 +1,7 @@
 
 max_length = 10
 
-source_dir = '/var/lib/jenkins/jobs/SEPM group/workspace/'
+source_dir = '/var/lib/jenkins/jobs/sepm/workspace/'
 if Dir.exists?('/home/mononofu/Programmieren/TU/SEPM-group/')
   source_dir = '/home/mononofu/Programmieren/TU/SEPM-group/'
 end

@@ -5,7 +5,7 @@ max_length = 25
 SCHEDULER.every '60m', :first_in => 0 do |job|
   tests = Array.new
 
-  Dir.glob("/var/lib/jenkins/jobs/SEPM group/builds/*") { |fn|
+  Dir.glob("/var/lib/jenkins/jobs/sepm/builds/*") { |fn|
     build_name = File.basename(fn)
     if(build_name =~ /^\d+$/)
       if File.exists?("#{fn}/junitResult.xml")
