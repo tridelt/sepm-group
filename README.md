@@ -32,7 +32,7 @@ For an introduction to Google Test, see the [Primer](https://code.google.com/p/g
 
 Libraries (Qt, boost, ZeroC ICE), binaries, etc. needed to compile:
 ```
-sudo apt-get install cmake make gcc-4.6 g++-4.6 build-essential libqt4-dev libboost-program-options-dev libboost-filesystem-dev libzeroc-ice34-dev
+sudo apt-get install git cmake make gcc-4.6 g++-4.6 build-essential libqt4-dev libboost-program-options-dev libboost-filesystem-dev libzeroc-ice34-dev
 ```
 
 
@@ -70,12 +70,12 @@ To make development easier and more independent, I've added a simple plugin syst
 
 ### Continuous Integration with Jenkins
 
-You can access the Jenkins server at http://ec2.furidamu.org. To login, simply use your GitHub account. Every push to the main repository on GitHub will automatically trigger a rebuild and a full run of the test-suite.
+You can access the Jenkins server at http://sepm.furidamu.org. To login, simply use your GitHub account. Every push to the main repository on GitHub will automatically trigger a rebuild and a full run of the test-suite.
 
 ### Documentation
 
-Documentation is automatically generated with doxygen, so please use doxygen-style comments. You can see the documentation online: http://ec2.furidamu.org/doc/, or generate it locally with `make doc`.
+Documentation is automatically generated with doxygen, so please use doxygen-style comments. You can see the documentation online: http://sepm.furidamu.org/doc/, or generate it locally with `make doc`.
 
 ### Dashboard
 
-To have an easy overview over the project, a pretty dashboard is available on http://dash.furidamu.org:3030/. It's built using [Dashing](http://shopify.github.com/dashing/), you can contribute using the normal project repository.
+To have an easy overview over the project, a pretty dashboard is available on http://dash.furidamu.org/. It's built using [Dashing](http://shopify.github.com/dashing/), you can contribute using the normal project repository.

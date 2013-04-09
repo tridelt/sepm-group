@@ -6,6 +6,7 @@ case "$1" in
     ;;
   "end")
     dashing job tests EeLg5ZnXHTMeygHF7DVxptN9A56UxsXu4pN
+    dashing job build_status EeLg5ZnXHTMeygHF7DVxptN9A56UxsXu4pN
     ;;
 esac
 
