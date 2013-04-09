@@ -11,13 +11,13 @@ SCHEDULER.every '10s', :first_in => 0 do |job|
 
   # extract event information
   doc = REXML::Document.new(xml_data)
-  status = doc.elements["//Project[@name='SEPM group']"]
+  status = doc.elements["//Project[@name='sepm']"]
         .attributes["lastBuildStatus"]
 
-  activity = doc.elements["//Project[@name='SEPM group']"]
+  activity = doc.elements["//Project[@name='sepm']"]
         .attributes["activity"]
 
-  build_name = doc.elements["//Project[@name='SEPM group']"]
+  build_name = doc.elements["//Project[@name='sepm']"]
         .attributes["lastBuildLabel"]
 
 
