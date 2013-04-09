@@ -38,9 +38,13 @@ SCHEDULER.every '60m', :first_in => 0 do |job|
     data.each do |commit|
       raw_date = commit['commit']['author']['date']
       time = DateTime.parse(raw_date).new_offset(Rational(2, 24)).strftime('%H:%M')
+      msg = commit['commit']['message']
+      if msg.length > 55
+        msg = msg[0, 55] + "..."
+      end
       commits.push({
         label: time + ", " + commit['commit']['author']['name'],
-        value: commit['commit']['message'],
+        value: msg,
         date: raw_date
       })
     end
