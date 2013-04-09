@@ -75,6 +75,7 @@ You can access the Jenkins server at http://sepm.furidamu.org. To login, simply 
 ### Documentation
 
 Documentation is automatically generated with doxygen, so please use doxygen-style comments. You can see the documentation online: http://sepm.furidamu.org/doc/, or generate it locally with `make doc`.
+The online documentation is automatically kept up to date by Jenkins, so you can rely on it for development.
 
 ### Dashboard
 
