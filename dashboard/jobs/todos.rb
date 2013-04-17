@@ -13,7 +13,7 @@ SCHEDULER.every '60m', :first_in => 0 do |job|
   Dir.glob("#{source_dir}**/*") { |fn|
     if !fn.include?('dependencies') and !fn.include?('backward.hpp') and
       !fn.include?('doxygen') and !fn.include?('dashboard') and
-      !fn.include?('build') and File.file?(fn)
+      !fn.include?('build') and !fn.include?('cmake') and File.file?(fn)
       File.open(fn) { |file|
         lineno = 1
         while (line = file.gets)
@@ -29,7 +29,7 @@ SCHEDULER.every '60m', :first_in => 0 do |job|
     end
   }
 
-
+  print todos
   send_event('todos', { items: todos.slice(0, max_length) })
 
 end # SCHEDULER
