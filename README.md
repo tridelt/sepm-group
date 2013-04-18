@@ -67,16 +67,23 @@ Please [file an issue](https://github.com/Mononofu/sepm-group/issues/new) if you
 
 To make development easier and more independent, I've added a simple plugin system. Plugins live under `./plugins` and are automatically reloaded on change to make rapid development possible. All plugins have to implement the `Plugin` interface from `common/Plugin.h`, for an example see `plugins/hello_world/hello.cpp`. (The interface is bare bones atm, we need to figure out what plugins should be able to do and how).
 
+These are mainly for the client - on the server, it's probably better to run "bots" as separate processes that communicate using zmq. That could work for the client too - just make sure that the plugins have zmq sockets to get and send information.
 
 ### Continuous Integration with Jenkins
 
 You can access the Jenkins server at http://sepm.furidamu.org. To login, simply use your GitHub account. Every push to the main repository on GitHub will automatically trigger a rebuild and a full run of the test-suite.
+
 
 ### Documentation
 
 Documentation is automatically generated with doxygen, so please use doxygen-style comments. You can see the documentation online: http://sepm.furidamu.org/doc/, or generate it locally with `make doc`.
 The online documentation is automatically kept up to date by Jenkins, so you can rely on it for development.
 
+
 ### Dashboard
 
 To have an easy overview over the project, a pretty dashboard is available on http://dash.furidamu.org/. It's built using [Dashing](http://shopify.github.com/dashing/), you can contribute using the normal project repository.
+
+
+### Style Checking
+Jenkins runs cppcheck for each commit, the results are visible both in jenkins and in the dashboard. If you are feeling particularly masochistic, run `python cmake/lint.py` to see the full linter output from `cpplint.py`
