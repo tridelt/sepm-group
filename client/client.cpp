@@ -5,9 +5,26 @@
 #include "ViewRefresher.h"
 #include "ExitHandler.h"
 #include "PluginManager.h"
+#include "zmqpp/zmqpp.hpp"
+#include <QtConcurrentRun>
 
 namespace po = boost::program_options;
 using namespace std;
+
+class MessageReader {
+public:
+  MessageReader(zmqpp::socket *s) {
+    QtConcurrent::run(this, &MessageReader::read, s);
+  }
+
+  void read(zmqpp::socket *source) {
+    while(true) {
+      string msg;
+      source->receive(msg);
+      cout << "> " << msg << endl;
+    }
+  }
+};
 
 int main(int argc, char** argv) {
   po::options_description desc("Allowed options");
@@ -64,8 +81,26 @@ int main(int argc, char** argv) {
 
     manager.listPlugins();
 
-    int test;
-    cin >> test;
+
+    zmqpp::context context;
+
+    zmqpp::socket message_source(context, zmqpp::socket_type::sub);
+    message_source.connect("tcp://127.0.0.1:5555");
+    message_source.subscribe("");
+
+    zmqpp::socket message_sink(context, zmqpp::socket_type::pub);
+    message_sink.connect("tcp://127.0.0.1:5556");
+
+    MessageReader reader(&message_source);
+
+    string line;
+
+    while(true) {
+      getline(cin, line);
+      if(cin.eof())
+        break;
+      message_sink.send(line);
+    }
 
   } catch(PluginException ex) {
     cerr << ex.what() << endl;
