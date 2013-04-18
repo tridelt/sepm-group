@@ -10,7 +10,7 @@ end
 
 
 
-SCHEDULER.every '10s', :first_in => 0 do |job|
+SCHEDULER.every '60m', :first_in => 0 do |job|
   issues = Array.new
 
   # get the XML data as a string
