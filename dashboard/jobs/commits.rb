@@ -15,7 +15,7 @@ require 'date'
 # example for tracking single user repositories
 # github_username = 'users/ephigenia'
 # example for tracking an organisations repositories
-github_username = ENV['GITHUB_USER_REPOS_USERNAME'] || 'Mononofu'
+github_username = ENV['GITHUB_USER_REPOS_USERNAME'] || 'sepm-depm'
 github_repo = 'sepm-group'
 # number of repositories to display in the list
 max_length = 7
