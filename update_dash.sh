@@ -11,4 +11,4 @@ case "$1" in
     dashing job build_status EeLg5ZnXHTMeygHF7DVxptN9A56UxsXu4pN
     ;;
 esac
-
+exit 0
