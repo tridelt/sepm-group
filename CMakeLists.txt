@@ -9,15 +9,25 @@ set(CMAKE_CXX_COMPILER "/usr/bin/g++-4.6")
 
 set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -Werror -pedantic -std=c++0x")
 
+if (CMAKE_COMPILER_IS_GNUCXX)
+    ADD_DEFINITIONS(-Wall -Wcast-align -Wchar-subscripts -Wpointer-arith
+       -Wwrite-strings -Wpacked -Wformat-security
+       -Woverloaded-virtual -Wnon-virtual-dtor )
+endif(CMAKE_COMPILER_IS_GNUCXX)
+
 set(CMAKE_AUTOMOC TRUE)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
 find_package(ZeroCIce REQUIRED)
 
-find_package(Qt4 REQUIRED)
+find_package(Qt4 COMPONENTS QtCore REQUIRED)
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
+
+find_package(QCA2 REQUIRED)
+
+include_directories(${QT_INCLUDES} ${QCA2_INCLUDE_DIR})
 
 find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
