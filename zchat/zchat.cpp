@@ -3,6 +3,9 @@
 #include "ExitHandler.h"
 #include "IceServer.h"
 #include "SecureDistributedChat.h"
+#include "IceClient.h"
+#include "zmqpp/zmqpp.hpp"
+#include "SocketHandler.h"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -22,7 +25,6 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  cout << "Hello from server" << endl;
 
 
   ExitHandler::i()->setHandler([](int) {
@@ -34,7 +36,12 @@ int main(int argc, char** argv) {
     cout << " Got signal .. terminating" << endl;
   });
 
-  IceServer server;
+  cout << "Hello from server" << endl;
+
+  IceServer *server = new IceServer();
+  IceClient client("selinux.inso.tuwien.ac.at");
+
+  delete server;
 
   return 0;
 }

@@ -7,7 +7,6 @@ IceServer::IceServer(int port, string pub_key_path, string priv_key_path, string
   char prog_name[] = "sdc_client";
   char *argv[] = { prog_name };
   Ice::PropertiesPtr props = Ice::createProperties(argc, argv);
-  try {
     // enable the SSL plugin for secure connections
     props->setProperty("Ice.Plugin.IceSSL", "IceSSL:createIceSSL");
     props->setProperty("IceSSL.CertFile", pub_key_path);
@@ -29,14 +28,13 @@ IceServer::IceServer(int port, string pub_key_path, string priv_key_path, string
     id.threadHook = new ThreadHook();
     ic = Ice::initialize(id);
 
+    cout << "ssl -p" + port << endl;
+
     Ice::ObjectAdapterPtr oa =
-      ic->createObjectAdapterWithEndpoints("InterServerEndpoint", "ssl -p " + port);
+      ic->createObjectAdapterWithEndpoints("InterServerEndpoint", "ssl -p 1337");
     oa->add(new InterServerImpl(), ic->stringToIdentity("InterServer"));
     oa->activate();
-  } catch (const Ice::Exception& e) {
-    if (ic) ic->destroy();
-    throw;
-  }
+
 }
 
 

@@ -11,7 +11,8 @@ class InterServerImpl : public virtual sdc::InterServerI {
   void invite(const sdc::User&, const string&, const sdc::ByteSeq&, const Ice::Current&);
 
   /** receive message from remote user for chat on local server */
-  void sendMessage(const sdc::User&, const sdc::ByteSeq&, const string&, const Ice::Current&);
+  void sendMessage(const sdc::User &sender, const sdc::ByteSeq &msg,
+    const string &chat, const Ice::Current&);
 
   /** remote user leaves local chat */
   void leaveChat(const sdc::User&, const string&, const Ice::Current&);
@@ -26,5 +27,7 @@ class InterServerImpl : public virtual sdc::InterServerI {
   void clientRemoveChatParticipant(const sdc::User&, const sdc::User&, const string&, const Ice::Current&);
 
   /** receive message from remote chat for local user */
-  void clientAppendMessageToChat(const sdc::User&, const sdc::ByteSeq&, const string&, const sdc::User&, const Ice::Current&);
+  void clientAppendMessageToChat(const sdc::User &recipient,
+    const sdc::ByteSeq &msg, const string &chat, const sdc::User &sender,
+    const Ice::Current&);
 };
