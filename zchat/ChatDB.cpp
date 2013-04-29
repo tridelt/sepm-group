@@ -45,10 +45,31 @@ sdc::User ChatDB::userForString(const string &user) {
 string ChatDB::decryptMsgForChat(const string &chat, const sdc::ByteSeq &msg) {
   boost::lock_guard<boost::mutex> lock(mutex);
 
+  if(chatKeys.count(chat) == 0) {
+    cout << "can't find channel " << chat << ", skipping decryption" << endl;
+    return string(msg.begin(), msg.end());
+  }
+
   sdc::Security sec;
   auto plain = sec.decryptAES(chatKeys[chat], msg);
 
   return string(plain.begin(), plain.end());
+}
+
+
+sdc::ByteSeq ChatDB::encryptMsgForChat(const string &chat, const string &msg) {
+  boost::lock_guard<boost::mutex> lock(mutex);
+
+  if(chatKeys.count(chat) == 0) {
+    cout << "can't find channel " << chat << ", skipping encryption" << endl;
+    return sdc::ByteSeq(msg.begin(), msg.end());
+  }
+
+  sdc::Security sec;
+  sdc::ByteSeq plain(msg.begin(), msg.end());
+  auto cryptText = sec.encryptAES(chatKeys[chat], plain);
+
+  return sdc::ByteSeq(cryptText);
 }
 
 void ChatDB::setKeyForChat(const string &chat, const sdc::ByteSeq &key) {

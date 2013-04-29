@@ -1,6 +1,7 @@
 #include "SocketHandler.h"
 #include <string>
 #include <boost/thread.hpp>
+#include "defines.h"
 
 using namespace std;
 
@@ -24,14 +25,14 @@ void SocketHandler::create_sockets() {
 
   chan_event_sock.reset(new zmqpp::socket(context, zmqpp::socket_type::pub));
   chan_event_sock->set(zmqpp::socket_option::linger, 10);
-  chan_event_sock->connect("ipc://sepm_chan_event");
+  chan_event_sock->bind(ZMQ_SOCK_CHAN_EVENT_BIND);
 
-  msg_sock.reset(new zmqpp::socket(context, zmqpp::socket_type::pub));
-  msg_sock->set(zmqpp::socket_option::linger, 10);
-  msg_sock->connect("ipc://sepm_msg");
+  msg_sock_out.reset(new zmqpp::socket(context, zmqpp::socket_type::pub));
+  msg_sock_out->set(zmqpp::socket_option::linger, 10);
+  msg_sock_out->bind(ZMQ_SOCK_MSG_OUT_BIND);
 
   sockets.insert(chan_event_sock.get());
-  sockets.insert(msg_sock.get());
+  sockets.insert(msg_sock_out.get());
 }
 
 void SocketHandler::destroy_sockets() {
@@ -43,10 +44,10 @@ void SocketHandler::destroy_sockets() {
     chan_event_sock.release();
   }
 
-  if(sockets.count(msg_sock.get()) != 0) {
-    sockets.erase(msg_sock.get());
-    msg_sock->close();
-    msg_sock.release();
+  if(sockets.count(msg_sock_out.get()) != 0) {
+    sockets.erase(msg_sock_out.get());
+    msg_sock_out->close();
+    msg_sock_out.release();
   }
 }
 
@@ -63,7 +64,7 @@ void SocketHandler::destroy_all_sockets() {
 void SocketHandler::send_msg(string chat, string recipient, string sender, string msg) {
   zmqpp::message zmsg;
   zmsg << chat << recipient << sender << msg;
-  msg_sock->send(zmsg);
+  msg_sock_out->send(zmsg);
 }
 
 

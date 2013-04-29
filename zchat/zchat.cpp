@@ -2,9 +2,8 @@
 #include <boost/program_options.hpp>
 #include "ExitHandler.h"
 #include "IceServer.h"
-#include "SecureDistributedChat.h"
 #include "IceClient.h"
-#include "zmqpp/zmqpp.hpp"
+#include "MessageReader.h"
 #include "SocketHandler.h"
 
 namespace po = boost::program_options;
@@ -40,6 +39,11 @@ int main(int argc, char** argv) {
 
   IceServer server;
   IceClient client("selinux.inso.tuwien.ac.at");
+
+  MessageReader reader(SocketHandler::i()->getContext());
+
+  string wait;
+  cin >> wait;
 
   return 0;
 }

@@ -11,7 +11,9 @@ public:
   set<string> usersForChat(const string &chat);
   sdc::InterServerI* serverForUser(const string &user);
   sdc::User userForString(const string &user);
+
   string decryptMsgForChat(const string &chat, const sdc::ByteSeq &msg);
+  sdc::ByteSeq encryptMsgForChat(const string &chat, const string &msg);
 
   void setKeyForChat(const string &chat, const sdc::ByteSeq &key);
   void addUserToChat(const string &chat, const string &user);

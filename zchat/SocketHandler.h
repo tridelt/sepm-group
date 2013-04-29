@@ -19,6 +19,8 @@ public:
 
   void send_msg(string chat, string recipient, string sender, string msg);
   void send_chan_event(string chat, string recipient, string event, string body);
+
+  zmqpp::context* getContext() { return &context; }
 private:
   SocketHandler() { }
   ~SocketHandler();
@@ -27,7 +29,7 @@ private:
 
   zmqpp::context context;
   boost::thread_specific_ptr<zmqpp::socket> chan_event_sock;
-  boost::thread_specific_ptr<zmqpp::socket> msg_sock;
+  boost::thread_specific_ptr<zmqpp::socket> msg_sock_out;
   set<zmqpp::socket*> sockets;
 };
 

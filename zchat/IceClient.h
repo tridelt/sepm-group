@@ -6,6 +6,7 @@
 #include <IceUtil/IceUtil.h>
 #include <IceSSL/IceSSL.h>
 #include "SecureDistributedChat.h"
+#include "ThreadHook.h"
 
 using namespace std;
 
