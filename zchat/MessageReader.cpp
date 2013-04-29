@@ -62,11 +62,26 @@ void MessageReader::operator()() {
         zmqpp::message msg;
         chan_actions_sock->receive(msg);
 
-        cout << "got msg: ";
-        for(uint i = 0; i < msg.parts(); ++i) {
-          cout << msg.get(i);
+        if(msg.parts() >= 3) {
+          string chan, user, action;
+          msg >> chan;
+          msg >> user;
+          msg >> action;
+
+          if(action == "join") {
+            cout << user << " joined " << chan << endl;
+            ChatDB::i()->addUserToChat(chan, user);
+          } else {
+            cout << "unknown action " << action << endl;
+          }
+
+        } else {
+          cout << "got unknown msg: ";
+          for(uint i = 0; i < msg.parts(); ++i) {
+            cout << msg.get(i) << " ";
+          }
+          cout << endl;
         }
-        cout << endl;
       }
     }
   } catch(zmqpp::zmq_internal_exception &e) {

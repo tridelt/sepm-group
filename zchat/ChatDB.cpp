@@ -6,17 +6,15 @@ boost::mutex ChatDB::mutex;
 
 
 ChatDB::ChatDB() {
-  boost::lock_guard<boost::mutex> lock(mutex);
-
   sdc::Security sec;
   sec.genRSAKey(publicKey, privateKey);
 }
 
 ChatDB* ChatDB::i() {
-  boost::lock_guard<boost::mutex> lock(mutex);
-
   if(instance == NULL) {
-    instance = new ChatDB();
+    boost::lock_guard<boost::mutex> lock(mutex);
+    if(instance == NULL)
+      instance = new ChatDB();
   }
   return instance;
 }

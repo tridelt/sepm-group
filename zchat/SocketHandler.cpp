@@ -9,9 +9,10 @@ SocketHandler* SocketHandler::instance;
 boost::mutex SocketHandler::mutex;
 
 SocketHandler* SocketHandler::i() {
-  boost::lock_guard<boost::mutex> lock(mutex);
   if(instance == NULL) {
-    instance = new SocketHandler();
+    boost::lock_guard<boost::mutex> lock(mutex);
+    if(instance == NULL)
+      instance = new SocketHandler();
   }
   return instance;
 }
