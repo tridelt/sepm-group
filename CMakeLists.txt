@@ -29,7 +29,7 @@ find_package(QCA2 REQUIRED)
 
 include_directories(${QT_INCLUDES} ${QCA2_INCLUDE_DIR})
 
-find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
+find_package(Boost COMPONENTS program_options thread filesystem system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
 
@@ -95,6 +95,10 @@ add_custom_command(OUTPUT server_binary
     POST_BUILD
     COMMAND cmake -E copy "${CMAKE_BINARY_DIR}/server/server" "${CMAKE_BINARY_DIR}/bin/server")
 
+add_custom_command(OUTPUT zchat_binary
+    POST_BUILD
+    COMMAND cmake -E copy "${CMAKE_BINARY_DIR}/zchat/zchat" "${CMAKE_BINARY_DIR}/bin/zchat")
+
 # make dir for plugins
 add_custom_command(OUTPUT plugin_dir
     POST_BUILD
@@ -116,10 +120,11 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/ice)
 add_subdirectory(common)
 add_subdirectory(client)
 add_subdirectory(server)
+add_subdirectory(zchat)
 add_subdirectory(plugins)
 
 add_subdirectory(doxygen)
 
-add_custom_target(post_build_steps ALL DEPENDS bin_dir server client ui_files cert client_binary server_binary plugin_dir)
+add_custom_target(post_build_steps ALL DEPENDS bin_dir server client ui_files cert client_binary server_binary zchat_binary plugin_dir)
 
 add_subdirectory(tests)
