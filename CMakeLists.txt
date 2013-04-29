@@ -40,6 +40,7 @@ set(LIBS ${LIBS} ${ZeroCIceSSL_LIBRARY})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 set(LIBS ${LIBS} ${QT_LIBRARIES})
 set(LIBS ${LIBS} ${QT_QTDECLARATIVE_LIBRARY})
+set(LIBS ${LIBS} qca)
 
 
 # only enable pretty backtraces if libbfd is available
@@ -52,11 +53,12 @@ endif()
 
 # only enable gccfilter if necessary perl modules are present
 find_package(PerlModules COMPONENTS Regexp::Common Getopt::ArgvFile Getopt::Long Term::ANSIColor)
-if(Regexp::Common_FOUND AND Getopt::ArgvFile_FOUND AND Getopt::Long_FOUND AND Term::ANSIColor_FOUND)
+if(${PERLMODULES_FOUND} STREQUAL "TRUE")
   if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_GNUCPP)
     option(COLOR_GCC "Use GCCFilter to color compiler output messages" ON)
     set(COLOR_GCC_OPTIONS "-c -r -w" CACHE STRING "Arguments that are passed to gccfilter when output coloring is switchend on. Defaults to -c -r -w.")
     if(COLOR_GCC)
+      message("OOOOOOOONNNN")
       set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${PROJECT_SOURCE_DIR}/cmake/gccfilter ${COLOR_GCC_OPTIONS}")
     endif()
   endif()
@@ -96,14 +98,17 @@ add_custom_command(OUTPUT server_key
 # copy executables to bin dir
 add_custom_command(OUTPUT client_binary
     POST_BUILD
+    DEPENDS client
     COMMAND cmake -E copy "${CMAKE_BINARY_DIR}/client/client" "${CMAKE_BINARY_DIR}/bin/client")
 
 add_custom_command(OUTPUT server_binary
     POST_BUILD
+    DEPENDS server
     COMMAND cmake -E copy "${CMAKE_BINARY_DIR}/server/server" "${CMAKE_BINARY_DIR}/bin/server")
 
 add_custom_command(OUTPUT zchat_binary
     POST_BUILD
+    DEPENDS zchat
     COMMAND cmake -E copy "${CMAKE_BINARY_DIR}/zchat/zchat" "${CMAKE_BINARY_DIR}/bin/zchat")
 
 # make dir for plugins

@@ -36,12 +36,17 @@ public:
       // Initialize a communicator with these properties.
       Ice::InitializationData id;
       id.properties = props;
+      id.threadHook = new ThreadHook();
       ic = Ice::initialize(id);
 
       Ice::ObjectPrx base = ic->stringToProxy(
         (connection_string % server % port).str() );
 
       interServer = sdc::InterServerIPrx::checkedCast(base);
+    } catch (const sdc::SDCException &e) {
+      cout << "got exception: " << e.what << endl;
+      if (ic) ic->destroy();
+      throw;
     } catch (const Ice::Exception& e) {
       if (ic) ic->destroy();
       throw;

@@ -10,7 +10,7 @@ namespace zmqpp
 
 std::string version()
 {
-	return ZMQPP_BUILD_VERSION;
+	return "ZMQPP_BUILD_VERSION";
 }
 
 void version(uint8_t& major, uint8_t& minor, uint8_t& revision)

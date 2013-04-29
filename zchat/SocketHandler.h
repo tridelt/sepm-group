@@ -17,7 +17,8 @@ public:
   void destroy_sockets();
   void destroy_all_sockets();
 
-  void send_msg(string chat, string user, string msg);
+  void send_msg(string chat, string recipient, string sender, string msg);
+  void send_chan_event(string chat, string recipient, string event, string body);
 private:
   SocketHandler() { }
   ~SocketHandler();
@@ -25,7 +26,7 @@ private:
   static boost::mutex mutex;
 
   zmqpp::context context;
-  boost::thread_specific_ptr<zmqpp::socket> auth_req_sock;
+  boost::thread_specific_ptr<zmqpp::socket> chan_event_sock;
   boost::thread_specific_ptr<zmqpp::socket> msg_sock;
   set<zmqpp::socket*> sockets;
 };

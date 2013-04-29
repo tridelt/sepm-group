@@ -38,10 +38,8 @@ int main(int argc, char** argv) {
 
   cout << "Hello from server" << endl;
 
-  IceServer *server = new IceServer();
+  IceServer server;
   IceClient client("selinux.inso.tuwien.ac.at");
-
-  delete server;
 
   return 0;
 }
