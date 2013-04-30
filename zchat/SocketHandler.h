@@ -6,6 +6,7 @@
 #include <boost/thread.hpp>
 #include <string>
 #include <set>
+#include "MessageRouter.h"
 
 using namespace std;
 

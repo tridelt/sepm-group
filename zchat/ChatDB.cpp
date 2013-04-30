@@ -31,11 +31,30 @@ set<string> ChatDB::usersForChat(const string &chat) {
 sdc::InterServerI* ChatDB::serverForUser(const string &user) {
   boost::lock_guard<boost::mutex> lock(mutex);
 
+  if(userServers.count(user) == 0)
+    return &localServer;
+
   return userServers[user];
 }
 
+sdc::InterServerI* ChatDB::serverForChat(const string &chat) {
+  boost::lock_guard<boost::mutex> lock(mutex);
+
+  if(chatServers.count(chat) == 0)
+    return &localServer;
+
+  return chatServers[chat];
+}
+
+
 sdc::User ChatDB::userForString(const string &user) {
   boost::lock_guard<boost::mutex> lock(mutex);
+
+  if(users.count(user) == 0) {
+    sdc::User u;
+    u.ID = user;
+    return u;
+  }
 
   return users[user];
 }

@@ -1,6 +1,7 @@
 #include "MessageReader.h"
 #include "defines.h"
 #include "ChatDB.h"
+#include "SocketHandler.h"
 
 MessageReader::MessageReader(zmqpp::context *ctx) : running(true), context(ctx) {
   my_thread = new boost::thread(*this);
@@ -13,11 +14,15 @@ MessageReader::~MessageReader() {
 void MessageReader::operator()() {
   cout << "starting MessageReader thread" << endl;
 
+  SocketHandler::i()->create_sockets();
+
+  cout << "binding chan_actions_sock to " << ZMQ_SOCK_CHAN_ACTION_BIND << endl;
   chan_actions_sock = new zmqpp::socket(*context, zmqpp::socket_type::sub);
   chan_actions_sock->set(zmqpp::socket_option::linger, 10);
   chan_actions_sock->subscribe("");
   chan_actions_sock->bind(ZMQ_SOCK_CHAN_ACTION_BIND);
 
+  cout << "binding msg_in_sock to " << ZMQ_SOCK_MSG_IN_BIND << endl;
   msg_in_sock = new zmqpp::socket(*context, zmqpp::socket_type::sub);
   msg_in_sock->set(zmqpp::socket_option::linger, 10);
   msg_in_sock->subscribe("");
@@ -43,12 +48,9 @@ void MessageReader::operator()() {
           msg >> content;
           cout << "[" << chan << "] " << user << ": " << content << endl;
           auto sender = ChatDB::i()->userForString(user);
-          for(auto chanMember : ChatDB::i()->usersForChat(chan)) {
-            auto server = ChatDB::i()->serverForUser(chanMember);
-            auto recipient = ChatDB::i()->userForString(chanMember);
-            auto cryptText = ChatDB::i()->encryptMsgForChat(chan, content);
-            server->clientAppendMessageToChat(recipient, cryptText, chan, sender);
-          }
+          auto server = ChatDB::i()->serverForChat(chan);
+          auto cryptText = ChatDB::i()->encryptMsgForChat(chan, content);
+          server->sendMessage(sender, cryptText, chan);
         } else {
           cout << "got unknown msg: ";
           for(uint i = 0; i < msg.parts(); ++i) {
@@ -90,5 +92,7 @@ void MessageReader::operator()() {
 
   delete msg_in_sock;
   delete chan_actions_sock;
+
+  SocketHandler::i()->destroy_sockets();
   cout << "stopping MessageReader thread" << endl;
 }

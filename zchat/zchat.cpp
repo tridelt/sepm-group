@@ -38,10 +38,12 @@ int main(int argc, char** argv) {
   cout << "Hello from server" << endl;
 
   IceServer server;
-  IceClient client("selinux.inso.tuwien.ac.at");
+  //IceClient client("selinux.inso.tuwien.ac.at");
 
+  MessageRouter router(SocketHandler::i()->getContext());
   MessageReader reader(SocketHandler::i()->getContext());
 
+  cout << "Waiting for exit.." << endl;
   string wait;
   cin >> wait;
 

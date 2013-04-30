@@ -1,3 +1,6 @@
+#ifndef INTERSERVER_IMPL_H
+#define INTERSERVER_IMPL_H
+
 #include "SecureDistributedChat.h"
 #include <string>
 
@@ -33,3 +36,5 @@ class InterServerImpl : public virtual sdc::InterServerI {
     const sdc::ByteSeq &msg, const string &chat, const sdc::User &sender,
     const Ice::Current&);
 };
+
+#endif

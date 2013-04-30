@@ -26,11 +26,11 @@ void SocketHandler::create_sockets() {
 
   chan_event_sock.reset(new zmqpp::socket(context, zmqpp::socket_type::pub));
   chan_event_sock->set(zmqpp::socket_option::linger, 10);
-  chan_event_sock->bind(ZMQ_SOCK_CHAN_EVENT_BIND);
+  chan_event_sock->connect(ZMQ_SOCK_CHAN_EVENT_CONN_INTERNAL);
 
   msg_sock_out.reset(new zmqpp::socket(context, zmqpp::socket_type::pub));
   msg_sock_out->set(zmqpp::socket_option::linger, 10);
-  msg_sock_out->bind(ZMQ_SOCK_MSG_OUT_BIND);
+  msg_sock_out->connect(ZMQ_SOCK_MSG_OUT_CONN_INTERNAL);
 
   sockets.insert(chan_event_sock.get());
   sockets.insert(msg_sock_out.get());
