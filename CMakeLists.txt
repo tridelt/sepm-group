@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -Werror -pedantic -std=c++0x")
 
 if (CMAKE_COMPILER_IS_GNUCXX)
     ADD_DEFINITIONS(-Wall -Wcast-align -Wchar-subscripts -Wpointer-arith
-       -Wwrite-strings -Wpacked
+       -Wwrite-strings -Wpacked -Wno-format
        -Woverloaded-virtual -Wnon-virtual-dtor )
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
