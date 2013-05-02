@@ -1,3 +1,6 @@
+#ifndef THREAD_HOOK_H
+#define THREAD_HOOK_H
+
 #include <iostream>
 #include <Ice/Ice.h>
 #include "SocketHandler.h"
@@ -17,3 +20,5 @@ public:
     SocketHandler::i()->destroy_sockets();
   }
 };
+
+#endif

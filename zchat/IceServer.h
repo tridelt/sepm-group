@@ -1,3 +1,6 @@
+#ifndef ICE_SERVER_H
+#define ICE_SERVER_H
+
 #include <Ice/Ice.h>
 #include <string>
 
@@ -14,3 +17,5 @@ class IceServer {
   private:
     Ice::CommunicatorPtr ic;
 };
+
+#endif

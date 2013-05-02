@@ -1,3 +1,6 @@
+#ifndef CHAT_DB_H
+#define CHAT_DB_H
+
 #include "SecureDistributedChat.h"
 #include <set>
 #include <string>
@@ -43,3 +46,5 @@ private:
   map<string, sdc::ByteSeq> chatKeys; /** Map[Chat, AES-Key] */
   map<string, IceClient*> servers;
 };
+
+#endif
