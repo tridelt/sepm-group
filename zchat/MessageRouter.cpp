@@ -42,19 +42,15 @@ void MessageRouter::operator()() {
         continue;
 
       if(poller.has_input(msg_sock_out_int)) {
-        cout << "forwarding msg_sock_out" << endl;
         zmqpp::message msg;
         msg_sock_out_int.receive(msg);
         msg_sock_out.send(msg);
-        cout << "forwarding msg_sock_out done" << endl;
       }
 
       if(poller.has_input(chan_event_sock_int)) {
-        cout << "forwarding chan_event_sock" << endl;
         zmqpp::message msg;
         chan_event_sock_int.receive(msg);
         chan_event_sock.send(msg);
-        cout << "forwarding chan_event_sock done" << endl;
       }
     }
     catch(zmqpp::zmq_internal_exception &e) {

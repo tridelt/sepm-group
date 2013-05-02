@@ -7,6 +7,7 @@
 #include <IceSSL/IceSSL.h>
 #include "SecureDistributedChat.h"
 #include "ThreadHook.h"
+#include "InterServerProxyWrapper.h"
 
 using namespace std;
 
@@ -44,6 +45,7 @@ public:
         (connection_string % server % port).str() );
 
       interServer = sdc::InterServerIPrx::checkedCast(base);
+      wrapper = new InterServerProxyWrapper(interServer);
     } catch (const sdc::SDCException &e) {
       cout << "got exception: " << e.what << endl;
       if (ic) ic->destroy();
@@ -59,9 +61,14 @@ public:
     if (ic) ic->destroy();
   }
 
+  sdc::InterServerI* getServer() {
+    return wrapper;
+  }
+
 private:
   Ice::CommunicatorPtr ic;
   sdc::InterServerIPrx interServer;
+  InterServerProxyWrapper* wrapper;
 };
 
 #endif

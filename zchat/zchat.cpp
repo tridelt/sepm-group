@@ -5,6 +5,7 @@
 #include "IceClient.h"
 #include "MessageReader.h"
 #include "SocketHandler.h"
+#include "Security.h"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -36,6 +37,13 @@ int main(int argc, char** argv) {
   });
 
   cout << "Hello from server" << endl;
+
+  sdc::Security sec;
+  sdc::ByteSeq pubkey, privkey;
+  sec.genRSAKey(pubkey, privkey);
+  auto key = sec.genAESKey(256);
+  auto crypt_key = sec.encryptRSA(pubkey, key);
+
 
   IceServer server;
   //IceClient client("selinux.inso.tuwien.ac.at");

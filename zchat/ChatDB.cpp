@@ -1,5 +1,6 @@
 #include "ChatDB.h"
 #include "Security.h"
+#include "sdcHelper.h"
 
 ChatDB* ChatDB::instance;
 boost::mutex ChatDB::mutex;
@@ -51,9 +52,25 @@ sdc::User ChatDB::userForString(const string &user) {
   boost::lock_guard<boost::mutex> lock(mutex);
 
   if(users.count(user) == 0) {
-    sdc::User u;
-    u.ID = user;
-    return u;
+    if(sdc::sdcHelper::isValidID(user)) {
+      auto serverStr = sdc::sdcHelper::getServerFromID(user);
+      auto server = serverForString(serverStr);
+
+      users[user] = server->retrieveUser(user);
+
+      cout << "got user: " << users[user].ID << " for " << user << endl;
+      string dump_key(users[user].publicKey.begin(), users[user].publicKey.end());
+      cout << dump_key << endl;
+
+      sdc::Security sec;
+      sec.savePubKey(users[user].publicKey, "pubkey2");
+    } else {
+      // local user
+      sdc::User u;
+      u.ID = user;
+      u.publicKey = publicKey;
+      users[user] = u;
+    }
   }
 
   return users[user];
@@ -95,6 +112,18 @@ void ChatDB::setKeyForChat(const string &chat, const sdc::ByteSeq &key) {
   chatKeys[chat] = sdc::ByteSeq(key);
 }
 
+
+sdc::ByteSeq ChatDB::getKeyForChat(const string &chat) {
+  boost::lock_guard<boost::mutex> lock(mutex);
+
+  if(chatKeys.count(chat) == 0) {
+    sdc::Security sec;
+    chatKeys[chat] = sec.genAESKey(256);
+  }
+
+  return chatKeys[chat];
+}
+
 void ChatDB::addUserToChat(const string &chat, const string &user) {
   boost::lock_guard<boost::mutex> lock(mutex);
 
@@ -108,4 +137,14 @@ void ChatDB::removeUserFromChat(const string &chat, const string &user) {
   boost::lock_guard<boost::mutex> lock(mutex);
 
   chatUsers[chat].erase(user);
+}
+
+
+sdc::InterServerI* ChatDB::serverForString(const string &server) {
+  if(servers.count(server) == 0) {
+    cout << "create new IceClient for " << server << endl;
+    servers[server] = new IceClient(server);
+  }
+
+  return servers[server]->getServer();
 }

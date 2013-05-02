@@ -2,6 +2,7 @@
 #include "defines.h"
 #include "ChatDB.h"
 #include "SocketHandler.h"
+#include "Security.h"
 
 MessageReader::MessageReader(zmqpp::context *ctx) : running(true), context(ctx) {
   my_thread = new boost::thread(*this);
@@ -70,9 +71,25 @@ void MessageReader::operator()() {
           msg >> user;
           msg >> action;
 
+          auto sender = ChatDB::i()->userForString(user);
+          auto server = ChatDB::i()->serverForUser(user);
+
           if(action == "join") {
+            // only works with local chats
             cout << user << " joined " << chan << endl;
             ChatDB::i()->addUserToChat(chan, user);
+          } else if(action == "quit") {
+            cout << user << " quit " << chan << endl;
+            server->leaveChat(sender, chan);
+          } else if(action == "invite") {
+            cout << user << " was invited to " << chan << endl;
+
+            sdc::Security sec;
+            sec.savePubKey(sender.publicKey, "pubkey1");
+
+            auto raw_key = ChatDB::i()->getKeyForChat(chan);
+            auto key = sec.encryptRSA(sender.publicKey, raw_key);
+            server->invite(sender, chan, key);
           } else {
             cout << "unknown action " << action << endl;
           }
