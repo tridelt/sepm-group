@@ -40,6 +40,8 @@ set(LIBS ${LIBS} ${ZeroCIceSSL_LIBRARY})
 set(LIBS ${LIBS} ${Boost_LIBRARIES})
 set(LIBS ${LIBS} ${QT_LIBRARIES})
 set(LIBS ${LIBS} ${QT_QTDECLARATIVE_LIBRARY})
+set(LIBS ${LIBS} dl)
+set(LIBS ${LIBS} pthread)
 
 
 # only enable pretty backtraces if libbfd is available
