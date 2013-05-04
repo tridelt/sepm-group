@@ -27,13 +27,13 @@ add_definitions(${QT_DEFINITIONS})
 
 find_package(QCA2 REQUIRED)
 
-include_directories(${QT_INCLUDES} ${QCA2_INCLUDE_DIR})
+include_directories(SYSTEM ${QT_INCLUDES} ${QCA2_INCLUDE_DIR})
 
 find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
 
-include_directories(${ZeroCIce_INCLUDE_DIR})
+include_directories(SYSTEM ${ZeroCIce_INCLUDE_DIR})
 set(LIBS ${LIBS} ${ZeroCIceCore_LIBRARY})
 set(LIBS ${LIBS} ${ZeroCIceUtil_LIBRARY})
 set(LIBS ${LIBS} ${ZeroCIceSSL_LIBRARY})
