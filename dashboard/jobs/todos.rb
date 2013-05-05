@@ -1,9 +1,9 @@
 
-max_length = 10
+max_length = 7
 
 source_dir = '/var/lib/jenkins/jobs/sepm/workspace/'
-if Dir.exists?('/home/mononofu/Programmieren/TU/SEPM-group/')
-  source_dir = '/home/mononofu/Programmieren/TU/SEPM-group/'
+if Dir.exists?('/home/mononofu/Programmieren/sepm-group/')
+  source_dir = '/home/mononofu/Programmieren/sepm-group/'
 end
 
 
@@ -15,15 +15,30 @@ SCHEDULER.every '60m', :first_in => 0 do |job|
       !fn.include?('doxygen') and !fn.include?('dashboard') and
       !fn.include?('build') and !fn.include?('cmake') and File.file?(fn)
       File.open(fn) { |file|
-        lineno = 1
+        lineno = 0
         while (line = file.gets)
-          if line.include?('TODO') or line.include?('FIXME') or line.include?('BUG')
-            todos.push({
-              label: "#{File.basename(fn)}:#{lineno}",
-              value: line.strip!
-            })
-          end
           lineno = lineno + 1
+
+          if line.include?('TODO')
+            line = line[line.index('TODO:') + 6, line.length]
+          elsif line.include?('FIXME')
+            line = line[line.index('FIXME:') + 7, line.length]
+          elsif line.include?('BUG')
+            line = line[line.index('BUG:') + 5, line.length]
+          else
+            next
+          end
+
+          line = line.strip!
+
+          if line.length > 55
+            line = line[0, 55] + "..."
+          end
+
+          todos.push({
+              label: "#{File.basename(fn)}:#{lineno}",
+              value: line
+            })
         end
       }
     end

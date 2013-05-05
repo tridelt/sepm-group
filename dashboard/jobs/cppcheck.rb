@@ -1,11 +1,11 @@
 require 'net/http'
 require 'rexml/document'
 
-max_length = 10
+max_length = 7
 
 source_dir = '/var/lib/jenkins/jobs/sepm/workspace/'
-if Dir.exists?('/home/mononofu/Programmieren/TU/SEPM-group/')
-  source_dir = '/home/mononofu/Programmieren/TU/SEPM-group/'
+if Dir.exists?('/home/mononofu/Programmieren/sepm-group/')
+  source_dir = '/home/mononofu/Programmieren/sepm-group/'
 end
 
 
