@@ -2,7 +2,6 @@
 #include <IceSSL/IceSSL.h>
 #include "SecureDistributedChat.h"
 #include "AuthenticationImpl.h"
-#include <IceUtil/IceUtil.h>
 
 IceServer::IceServer(string pub_key_path, string priv_key_path, string ca_path) {
   int argc = 1;
@@ -30,8 +29,7 @@ IceServer::IceServer(string pub_key_path, string priv_key_path, string ca_path) 
     id.properties = props;
     ic = Ice::initialize(id);
 
-    Ice::ObjectAdapterPtr oa =
-      ic->createObjectAdapterWithEndpoints("AuthenticationEndpoint", "ssl -p 1337");
+    oa = ic->createObjectAdapterWithEndpoints("AuthenticationEndpoint", "ssl -p 1337");
     oa->add(new AuthenticationImpl(), ic->stringToIdentity("Authentication"));
     oa->activate();
   } catch (const Ice::Exception& e) {
@@ -46,25 +44,13 @@ IceServer::~IceServer() {
 }
 
 
-Ice::ObjectPrx IceServer::createAdapter(const Ice::ObjectPtr &o, const Ice::ConnectionPtr &) {
-  // TODO: figure out how to properly create a new endpoint here
-  // atm, this will only work for one client
-  Ice::ObjectAdapterPtr oa = ic->createObjectAdapterWithEndpoints("SomeEndpoint", "ssl -p 1337");
-
+Ice::ObjectPrx IceServer::exposeObject(const Ice::ObjectPtr &o, const string &name) {
   Ice::Identity adapter_ident;
-  adapter_ident.name = IceUtil::generateUUID();
+  adapter_ident.name = name;
   adapter_ident.category = "";
 
   Ice::ObjectPrx proxy = oa->add(o, adapter_ident);
   oa->activate();
 
   return proxy;
-}
-
-void IceServer::run() {
-  ic->waitForShutdown();
-}
-
-void IceServer::stop() {
-  ic->destroy();
 }

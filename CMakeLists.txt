@@ -30,7 +30,7 @@ find_package(QCA2 REQUIRED)
 include_directories(SYSTEM ${QT_INCLUDES} ${QCA2_INCLUDE_DIR})
 
 find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 
 include_directories(SYSTEM ${ZeroCIce_INCLUDE_DIR})
@@ -87,6 +87,14 @@ add_custom_command(OUTPUT cert
     POST_BUILD
     COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/ca.crt" "${CMAKE_BINARY_DIR}/bin/ca.crt")
 
+add_custom_command(OUTPUT server_cert
+    POST_BUILD
+    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/server.crt" "${CMAKE_BINARY_DIR}/bin/server.crt")
+
+add_custom_command(OUTPUT server_key
+    POST_BUILD
+    COMMAND cmake -E copy "${CMAKE_CURRENT_SOURCE_DIR}/server.key" "${CMAKE_BINARY_DIR}/bin/server.key")
+
 
 # copy executables to bin dir
 add_custom_command(OUTPUT client_binary
@@ -122,6 +130,6 @@ add_subdirectory(plugins)
 
 add_subdirectory(doxygen)
 
-add_custom_target(post_build_steps ALL DEPENDS bin_dir server client ui_files cert client_binary server_binary plugin_dir)
+add_custom_target(post_build_steps ALL DEPENDS bin_dir server client ui_files cert server_cert server_key client_binary server_binary plugin_dir)
 
 add_subdirectory(tests)
