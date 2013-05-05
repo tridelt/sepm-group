@@ -40,7 +40,9 @@ IceServer::IceServer(string pub_key_path, string priv_key_path, string ca_path) 
 
 
 IceServer::~IceServer() {
-  if (ic) ic->destroy();
+  // TODO: investigate crash on ic->destroy()
+  // calling this for some reason causes the server to crash
+  // if (ic) ic->destroy();
 }
 
 

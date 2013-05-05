@@ -59,10 +59,13 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
   if(providedPubkey != "" && providedPubkey != pubkey.get())
     throw sdc::AuthenticationException("public key can't change");
 
+  // TODO: check callback (call echo) provided by identity before logging in
+
   // don't log passwords!
   cout << "Logging in " << u.ID << endl;
   sdc::User user;
   user.ID = u.ID;
+
   // make sure the pubkey from registering is used
   user.publicKey = sdc::ByteSeq(pubkey.get().begin(), pubkey.get().end());
   // TODO: make sure session created here doesn't leak
