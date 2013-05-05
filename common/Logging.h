@@ -91,13 +91,13 @@ public:
    * the source file and line it is coming from
    * @param shouldBeChatty the new chatty setting
    */
-  void chatty(bool shouldBeChatty);
+  void chatty(bool shouldBeChatty) { chatty = shouldBeChatty; }
 
   /**
    * get the current chatty state
    * @return true if currently chatty, false otherwise
    */
-  bool chatty();
+  bool chatty() { return chatty; }
 
   /**
    * intermediate function to handle source file and line information (template
