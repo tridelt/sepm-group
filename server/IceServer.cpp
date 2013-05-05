@@ -30,7 +30,7 @@ IceServer::IceServer(string pub_key_path, string priv_key_path, string ca_path) 
     ic = Ice::initialize(id);
 
     oa = ic->createObjectAdapterWithEndpoints("AuthenticationEndpoint", "ssl -p 1337");
-    oa->add(new AuthenticationImpl(), ic->stringToIdentity("Authentication"));
+    oa->add(new AuthenticationImpl(this), ic->stringToIdentity("Authentication"));
     oa->activate();
   } catch (const Ice::Exception& e) {
     if (ic) ic->destroy();
