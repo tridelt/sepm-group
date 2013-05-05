@@ -4,6 +4,7 @@
 #include "SecureDistributedChat.h"
 #include "IceServer.h"
 #include "SessionImpl.h"
+#include "Logging.h"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -23,7 +24,8 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  cout << "Hello from server" << endl;
+
+  INFO("Hello from server");
 
 
   ExitHandler::i()->setHandler([](int) {
@@ -32,7 +34,7 @@ int main(int argc, char** argv) {
 
     // bad - cout not guaranteed to work, since not reentrant
     // this is just to show the handler is working
-    cout << " Got signal .. terminating" << endl;
+    INFO(" Got signal .. terminating");
   });
 
   IceServer server;

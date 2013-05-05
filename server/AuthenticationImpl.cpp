@@ -4,6 +4,7 @@
 #include "sdcHelper.h"
 #include <boost/optional.hpp>
 #include "SessionImpl.h"
+#include "Logging.h"
 
 using namespace std;
 using namespace soci;
@@ -31,7 +32,7 @@ void AuthenticationImpl::registerUser(const sdc::User &u, const string &pw,
     use(name), use(pw), use(pubkey);
 
   // don't log passwords!
-  cout << "Registered " << u.ID << endl;
+  INFO("Registered ", u.ID);
 }
 
 sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
@@ -62,7 +63,7 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
   // TODO: check callback (call echo) provided by identity before logging in
 
   // don't log passwords!
-  cout << "Logging in " << u.ID << endl;
+  INFO("Logging in ", u.ID);
   sdc::User user;
   user.ID = u.ID;
 

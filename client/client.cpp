@@ -6,6 +6,7 @@
 #include "ExitHandler.h"
 #include "PluginManager.h"
 #include <QtConcurrentRun>
+#include "Logging.h"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -25,7 +26,7 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  cout << "Hello from client" << endl;
+  INFO("Hello from client");
 
 
   try {
@@ -58,7 +59,7 @@ int main(int argc, char** argv) {
 
       // bad - cout not guaranteed to work, since not reentrant
       // this is just to show the handler is working
-      cout << " Got signal .. terminating" << endl;
+      INFO(" Got signal .. terminating");
     });
 
     PluginManager manager;
@@ -68,8 +69,6 @@ int main(int argc, char** argv) {
   } catch(PluginException ex) {
     cerr << ex.what() << endl;
   }
-
-
 
   return 0;
 }
