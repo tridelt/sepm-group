@@ -53,8 +53,9 @@ set(LIBS ${LIBS} pthread)
 # only enable pretty backtraces if libbfd is available
 find_package(bfd)
 if(bfd_FOUND)
-  add_definitions(-DBACKWARD_HAS_BFD)
-  set(LIBS ${LIBS} ${bfd_LIBRARIES})   # for backward pretty stacktracing
+  find_package(ZLIB REQUIRED)
+  add_definitions(-DBACKWARD_HAS_BFD -DPACKAGE -DPACKAGE_VERSION)
+  set(LIBS ${LIBS} ${bfd_LIBRARIES} "-liberty" ${ZLIB_LIBRARIES})   # for backward pretty stacktracing
 endif()
 
 # only enable gccfilter if necessary perl modules are present
