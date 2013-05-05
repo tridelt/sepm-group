@@ -128,7 +128,7 @@ include_directories(${CMAKE_BINARY_DIR}/dependencies/zmq/zmq-3-2-2-prefix/includ
 link_directories(${CMAKE_BINARY_DIR}/dependencies/zmq/zmq-3-2-2-prefix/lib)
 include_directories(${CMAKE_BINARY_DIR}/dependencies/soci/soci-3-2-1-prefix/include)
 
-if(${ARCH} STREQUAL "x86")
+if(${ARCH} STREQUAL "i386")
   link_directories(${CMAKE_BINARY_DIR}/dependencies/soci/soci-3-2-1-prefix/lib)
 endif()
 if(${ARCH} STREQUAL "x86_64")
