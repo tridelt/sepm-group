@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS "-g -Wall -Wextra -Werror -pedantic -std=c++0x")
 
 if (CMAKE_COMPILER_IS_GNUCXX)
     ADD_DEFINITIONS(-Wall -Wcast-align -Wchar-subscripts -Wpointer-arith
-       -Wwrite-strings -Wpacked -Wno-format
+       -Wwrite-strings -Wpacked -Wformat-security -Wno-format
        -Woverloaded-virtual -Wnon-virtual-dtor )
 endif(CMAKE_COMPILER_IS_GNUCXX)
 
@@ -27,13 +27,13 @@ add_definitions(${QT_DEFINITIONS})
 
 find_package(QCA2 REQUIRED)
 
-include_directories(${QT_INCLUDES} ${QCA2_INCLUDE_DIR})
+include_directories(SYSTEM ${QT_INCLUDES} ${QCA2_INCLUDE_DIR})
 
 find_package(Boost COMPONENTS program_options thread filesystem system REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
+include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 
-include_directories(${ZeroCIce_INCLUDE_DIR})
+include_directories(SYSTEM ${ZeroCIce_INCLUDE_DIR})
 set(LIBS ${LIBS} ${ZeroCIceCore_LIBRARY})
 set(LIBS ${LIBS} ${ZeroCIceUtil_LIBRARY})
 set(LIBS ${LIBS} ${ZeroCIceSSL_LIBRARY})
@@ -41,6 +41,8 @@ set(LIBS ${LIBS} ${Boost_LIBRARIES})
 set(LIBS ${LIBS} ${QT_LIBRARIES})
 set(LIBS ${LIBS} ${QT_QTDECLARATIVE_LIBRARY})
 set(LIBS ${LIBS} qca)
+set(LIBS ${LIBS} dl)
+set(LIBS ${LIBS} pthread)
 
 
 # only enable pretty backtraces if libbfd is available

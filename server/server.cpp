@@ -2,6 +2,8 @@
 #include <boost/program_options.hpp>
 #include "ExitHandler.h"
 #include "SecureDistributedChat.h"
+#include "IceServer.h"
+#include "SessionImpl.h"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -32,6 +34,16 @@ int main(int argc, char** argv) {
     // this is just to show the handler is working
     cout << " Got signal .. terminating" << endl;
   });
+
+  IceServer server;
+
+  sdc::User u;
+  SessionImpl session(u);
+
+  server.exposeObject(&session);
+
+  string wait;
+  cin >> wait;
 
   return 0;
 }
