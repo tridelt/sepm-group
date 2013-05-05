@@ -2,6 +2,7 @@
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <dlfcn.h>
+#include "Logging.h"
 
 namespace fs = boost::filesystem;
 
@@ -71,9 +72,9 @@ void PluginManager::removePlugin(string plugin_name) {
 }
 
 void PluginManager::listPlugins() {
-  cout << "=== currently loaded plugins" << endl;
+  INFO("=== currently loaded plugins");
 
   for(auto plugin : plugins.values()) {
-    cout << plugin->name() << endl;
+    INFO(plugin->name());
   }
 }

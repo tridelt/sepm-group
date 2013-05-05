@@ -8,6 +8,7 @@ set(PLUGIN_SRCS hello.cpp)
 add_library("${PLUGIN_NAME}" SHARED ${PLUGIN_SRCS})
 
 target_link_libraries(${PLUGIN_NAME} ${LIBS})
+target_link_libraries(${PLUGIN_NAME} common)
 
 add_custom_command(OUTPUT "copy_plugin_${PLUGIN_NAME}"
     POST_BUILD

@@ -1,6 +1,7 @@
 #include "Plugin.h"
 #include <string>
 #include <iostream>
+#include "Logging.h"
 
 using namespace std;
 
@@ -8,7 +9,7 @@ using namespace std;
 class HelloPlugin : public Plugin {
 public:
   HelloPlugin() {
-    cout << "Constructed HelloPlugin!" << endl;
+    INFO("Constructed HelloPlugin!");
   }
   string name() {
     return "Hello World Plugin";
@@ -16,7 +17,7 @@ public:
 
 protected:
   ~HelloPlugin() {
-    cout << "Destroyed HelloPlugin!" << endl;
+    INFO("Destroyed HelloPlugin!");
   }
 };
 
