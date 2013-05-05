@@ -10,6 +10,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 include(TargetArch)
 target_architecture(ARCH)
 
+if(${ARCH} STREQUAL "i386")
+  add_definitions(-DARCH_X86)
+endif()
+if(${ARCH} STREQUAL "x86_64")
+  add_definitions(-DARCH_X64)
+endif()
+
 
 set(CMAKE_C_COMPILER "gcc-4.6")
 set(CMAKE_CXX_COMPILER "/usr/bin/g++-4.6")

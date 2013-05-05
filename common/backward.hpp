@@ -1940,7 +1940,12 @@ private:
 			} else {
 				fprintf(os, "%s ", indent);
 			}
+#ifdef ARCH_X86
+			fprintf(os, "%4u: %s\n", it->first, it->second.c_str());
+#endif
+#ifdef ARCH_X64
 			fprintf(os, "%4li: %s\n", it->first, it->second.c_str());
+#endif
 			if (it-> first == source_loc.line) {
 				colorize.set_color(Color::reset);
 			}
