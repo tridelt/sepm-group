@@ -10,6 +10,9 @@ namespace po = boost::program_options;
 using namespace std;
 
 int main(int argc, char** argv) {
+  FileSink fileSink(true, Severity::LVL_INFO, "server.log");
+  logger.addSink(&fileSink);
+
   po::options_description desc("Allowed options");
   desc.add_options()
     ("help,h", "produce help message")
@@ -26,6 +29,8 @@ int main(int argc, char** argv) {
 
 
   INFO("Hello from server");
+  WARN("LOOK");
+  ERROR("pretty colors!");
 
 
   ExitHandler::i()->setHandler([](int) {

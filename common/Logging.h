@@ -28,10 +28,15 @@
 
 using namespace std;
 
-#define INFO logger.log<Logger::Severity::LVL_INFO>(__FILE__, __LINE__).print
-#define WARN logger.log<Logger::Severity::LVL_WARN>(__FILE__, __LINE__).print
-#define ERROR logger.log<Logger::Severity::LVL_ERROR>(__FILE__, __LINE__).print
+#define INFO logger.log<Severity::LVL_INFO>(__FILE__, __LINE__).print
+#define WARN logger.log<Severity::LVL_WARN>(__FILE__, __LINE__).print
+#define ERROR logger.log<Severity::LVL_ERROR>(__FILE__, __LINE__).print
 
+enum class Severity {
+  LVL_INFO = 1,
+  LVL_WARN = 2,
+  LVL_ERROR = 3
+};
 
 class LogPrinter {
 public:
@@ -62,42 +67,91 @@ private:
   std::stringstream log_stream;
 };
 
+class LogSink {
+public:
+  enum Color {
+    RED,
+    GREEN,
+    BLUE,
+    YELLOW
+  };
+
+  LogSink(bool chatty, Severity s) : _chatty(chatty), _logLevel(s) {
+  }
+  virtual ~LogSink() { }
+
+  /**
+   * Get the sinks chatty state, used in Logger::write_out to determine how much
+   * to log to this sink
+   * @return the chatty state - true means log more details
+   */
+  bool chatty() { return _chatty; }
+
+  /**
+   * accessor for the severity level of the sink - messages with lower severity
+   * won't be logged to this sink
+   * @return current severity
+   */
+  Severity severity() { return _logLevel; }
+
+  /**
+   * helper function to colorize logging messages. Sinks that support color can
+   * override this to provide color markup.
+   * @param  s     base string
+   * @param  Color desired color
+   * @return       base string, possibly with added color markup
+   */
+  virtual string color(string s, Color) { return s; }
+
+  /**
+   * function to actually write out log message - children must override this
+   * @param s log message to write
+   */
+  virtual void write(string s) = 0;
+protected:
+  bool _chatty;
+  Severity _logLevel;
+};
+
+class OStreamSink : public virtual LogSink {
+public:
+  /**
+   * create a new sink to log to ostreams - this is used by default by the
+   * Logger to log to cout. cerr and other streams are of course possible too.
+   */
+  OStreamSink(bool chatty, Severity l, ostream *s) : LogSink(chatty, l), stream(s) {
+  }
+  void write(string s) { *stream << s << endl; }
+  /**
+   * ostreams support color, so this adds the linux escape codes.
+   * @param  s     base string
+   * @param  Color desired color
+   * @return       base string, possibly with added color markup
+   */
+  string color(string s, Color c);
+protected:
+  ostream *stream;
+};
+
+class FileSink : public virtual LogSink {
+public:
+  /**
+   * creates a new FileSink for logging to a given file. New content is appended
+   * to the end of the file, with 6 new lines added at the beginning.
+   */
+  FileSink(bool chatty, Severity l, string filename) : LogSink(chatty, l) {
+    file.open(filename, ofstream::out | ofstream::app);
+    file << "\n\n\n\n\n" << endl;
+  }
+  ~FileSink() { file.close(); }
+  void write(string s) { file << s << endl; }
+protected:
+  ofstream file;
+};
 
 class Logger {
 public:
-  enum Severity {
-    LVL_INFO = 1,
-    LVL_WARN = 2,
-    LVL_ERROR = 3
-  };
-
   Logger();
-
-  /**
-   * set the current logging level. all messages with a lower severity level are
-   * not displayed
-   * @param l the new logging severity level
-   */
-  void logLevel(Severity l) { _logLevel = l; }
-
-  /**
-   * get the current logging level
-   * @return current log level
-   */
-  Severity logLevel() { return _logLevel; }
-
-  /**
-   * sets if logging should be chatty. if it is, every log message will display
-   * the source file and line it is coming from
-   * @param shouldBeChatty the new chatty setting
-   */
-  void chatty(bool shouldBeChatty) { chatty = shouldBeChatty; }
-
-  /**
-   * get the current chatty state
-   * @return true if currently chatty, false otherwise
-   */
-  bool chatty() { return chatty; }
 
   /**
    * intermediate function to handle source file and line information (template
@@ -107,29 +161,27 @@ public:
   template<Severity severity>
   LogPrinter log(string file, int line);
 
+  /**
+   * add a sink to the internal list. By default, only an OStreamSink for cout
+   * is present.
+   * @param s new sink
+   */
+  void addSink(LogSink *s);
 private:
-  void write_out(string s, string file, int line);
-  string get_logline_header(Severity severity);
+  void write_out(string logLine, Severity s, string file, int line);
+  string get_logline_header(bool chatty, Severity severity, LogSink *s);
   string time_str();
 
   boost::posix_time::ptime program_start;
-  Severity _logLevel;
-  bool chatty;
+  vector<LogSink*> sinks;
 };
 
-
-template< Logger::Severity severity>
+template< Severity severity>
 LogPrinter Logger::log(string file, int line) {
-  if(severity < _logLevel)
-    return LogPrinter([](string){ });
-
   return LogPrinter([this, file, line](string s) {
-    write_out(get_logline_header(severity) + s, file, line);
+    write_out(s, severity, file, line);
   });
 }
-
-
-
 
 template< typename...Args >
 void LogPrinter::print( Args...args ) {
