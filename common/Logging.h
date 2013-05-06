@@ -151,22 +151,6 @@ protected:
   ofstream file;
 };
 
-class DashSink : public virtual LogSink {
-public:
-  /**
-   * creates a new Sink to display logs on the dashboard
-   */
-  DashSink(bool chatty, Severity l) : LogSink(chatty, l) {
-    file.open("server.dash.log", ofstream::out);
-  }
-  ~DashSink() { file.close(); }
-  void write(string s) {
-    file << s << endl;
-    system("../../update_dash.sh log");
-  }
-protected:
-  ofstream file;
-};
 
 class Logger {
 public:

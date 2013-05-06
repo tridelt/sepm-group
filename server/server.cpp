@@ -11,9 +11,7 @@ using namespace std;
 
 int main(int argc, char** argv) {
   FileSink fileSink(true, Severity::LVL_INFO, "server.log");
-  DashSink dashSink(true, Severity::LVL_INFO);
   logger.addSink(&fileSink);
-  logger.addSink(&dashSink);
 
   po::options_description desc("Allowed options");
   desc.add_options()
