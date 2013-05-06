@@ -3,6 +3,8 @@
 
 namespace fs = boost::filesystem;
 
+Logger logger;
+
 Logger::Logger() : thread_counter(0) {
   program_start = boost::posix_time::microsec_clock::local_time();
   addSink(new OStreamSink(true, Severity::LVL_INFO, &cout));
@@ -25,8 +27,7 @@ void Logger::write_out(string logLine, Severity s, string file, int line) {
 
   for(auto *sink : sinks) {
     // skip messages lower than the sinks severity level
-    if(s < sink->severity())
-      continue;
+
 
     sink->write(get_logline_header(sink->chatty(), s, sink) +
       logLine + (sink->chatty() ? fileLine.str() : ""));

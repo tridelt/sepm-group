@@ -212,6 +212,6 @@ void LogPrinter::print_impl(First parm1, Rest...parm) {
     print_impl(parm...);
 }
 
-static Logger logger;
+extern Logger logger;
 
 #endif

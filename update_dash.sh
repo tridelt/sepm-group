@@ -1,7 +1,9 @@
+DIR="$( cd "$( dirname "$0" )" && pwd )"
+
 if [ -d "/home/mononofu/sepm-group/" ]; then
   cd /home/mononofu/sepm-group/dashboard
 else
-  cd ../../dashboard
+  cd "$DIR/dashboard"
 fi
 
 case "$1" in
