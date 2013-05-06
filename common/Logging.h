@@ -26,6 +26,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <string>
 #include <ctime>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -146,6 +147,23 @@ public:
   }
   ~FileSink() { file.close(); }
   void write(string s) { file << s << endl; }
+protected:
+  ofstream file;
+};
+
+class DashSink : public virtual LogSink {
+public:
+  /**
+   * creates a new Sink to display logs on the dashboard
+   */
+  DashSink(bool chatty, Severity l) : LogSink(chatty, l) {
+    file.open("server.dash.log", ofstream::out);
+  }
+  ~DashSink() { file.close(); }
+  void write(string s) {
+    file << s << endl;
+    system("../../update_dash.sh log");
+  }
 protected:
   ofstream file;
 };
