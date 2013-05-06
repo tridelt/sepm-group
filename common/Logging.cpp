@@ -27,7 +27,8 @@ void Logger::write_out(string logLine, Severity s, string file, int line) {
 
   for(auto *sink : sinks) {
     // skip messages lower than the sinks severity level
-
+    if(s < sink->severity())
+      continue;
 
     sink->write(get_logline_header(sink->chatty(), s, sink) +
       logLine + (sink->chatty() ? fileLine.str() : ""));
