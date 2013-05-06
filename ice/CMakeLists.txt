@@ -27,4 +27,5 @@ endforeach()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-add_library (ice ${ICE_CPP_FILES})
+add_library (ice SHARED ${ICE_CPP_FILES})
+target_link_libraries(ice ${LIBS})

@@ -4,11 +4,15 @@
 #include "SecureDistributedChat.h"
 #include "IceServer.h"
 #include "SessionImpl.h"
+#include "Logging.h"
 
 namespace po = boost::program_options;
 using namespace std;
 
 int main(int argc, char** argv) {
+  FileSink fileSink(true, Severity::LVL_INFO, "server.log");
+  logger.addSink(&fileSink);
+
   po::options_description desc("Allowed options");
   desc.add_options()
     ("help,h", "produce help message")
@@ -23,7 +27,10 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  cout << "Hello from server" << endl;
+
+  INFO("Hello from server");
+  WARN("LOOK");
+  ERROR("pretty colors!");
 
 
   ExitHandler::i()->setHandler([](int) {
@@ -32,7 +39,7 @@ int main(int argc, char** argv) {
 
     // bad - cout not guaranteed to work, since not reentrant
     // this is just to show the handler is working
-    cout << " Got signal .. terminating" << endl;
+    INFO(" Got signal .. terminating");
   });
 
   IceServer server;
