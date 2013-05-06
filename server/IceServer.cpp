@@ -2,6 +2,7 @@
 #include <IceSSL/IceSSL.h>
 #include "SecureDistributedChat.h"
 #include "AuthenticationImpl.h"
+#include "ThreadHook.h"
 
 IceServer::IceServer(string pub_key_path, string priv_key_path, string ca_path) {
   int argc = 1;
@@ -27,6 +28,7 @@ IceServer::IceServer(string pub_key_path, string priv_key_path, string ca_path) 
     // Initialize a communicator with these properties.
     Ice::InitializationData id;
     id.properties = props;
+    id.threadHook = new ThreadHook();
     ic = Ice::initialize(id);
 
     oa = ic->createObjectAdapterWithEndpoints("AuthenticationEndpoint", "ssl -p 1337");

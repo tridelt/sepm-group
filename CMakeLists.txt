@@ -42,7 +42,7 @@ find_package(QCA2 REQUIRED)
 
 include_directories(SYSTEM ${QT_INCLUDES} ${QCA2_INCLUDE_DIR})
 
-find_package(Boost COMPONENTS program_options filesystem system REQUIRED)
+find_package(Boost COMPONENTS program_options filesystem system thread REQUIRED)
 include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 
 

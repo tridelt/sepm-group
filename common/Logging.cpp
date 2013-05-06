@@ -3,23 +3,25 @@
 
 namespace fs = boost::filesystem;
 
-Logger::Logger() {
+Logger::Logger() : thread_counter(0) {
   program_start = boost::posix_time::microsec_clock::local_time();
   addSink(new OStreamSink(true, Severity::LVL_INFO, &cout));
+  thread_name.reset(new string("MainThread"));
 }
-
 
 void Logger::addSink(LogSink *s) {
   sinks.push_back(s);
 }
 
 void Logger::write_out(string logLine, Severity s, string file, int line) {
+  boost::lock_guard<boost::mutex> lock(mutex);
   std::stringstream fileLine;
   fileLine.str("");
 
+  string thread = thread_name.get() == NULL ? "???thread" : *(thread_name.get());
   boost::filesystem::path path(file);
   fileLine << " (" << path.filename().string() << ":";
-  fileLine << line << ")";
+  fileLine << line << ", " << thread << ")";
 
   for(auto *sink : sinks) {
     // skip messages lower than the sinks severity level
