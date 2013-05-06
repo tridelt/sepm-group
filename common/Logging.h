@@ -21,10 +21,12 @@
 // strongly inspired by http://www.drdobbs.com/cpp/a-lightweight-logger-for-c/240147505?pgno=1
 
 #include <boost/thread.hpp>
+#include <boost/thread/tss.hpp>
 #include <boost/date_time.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <string>
 #include <ctime>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -149,6 +151,7 @@ protected:
   ofstream file;
 };
 
+
 class Logger {
 public:
   Logger();
@@ -167,13 +170,28 @@ public:
    * @param s new sink
    */
   void addSink(LogSink *s);
+
+  void registerThread() {
+    boost::lock_guard<boost::mutex> lock(mutex);
+    thread_name.reset(new string(string("Thread") + to_string(thread_counter++)));
+  }
+
+  void removeThread() {
+    boost::lock_guard<boost::mutex> lock(mutex);
+    if(thread_name.get() != NULL)
+      delete thread_name.release();
+  }
+
 private:
   void write_out(string logLine, Severity s, string file, int line);
   string get_logline_header(bool chatty, Severity severity, LogSink *s);
   string time_str();
 
+  boost::mutex mutex;
   boost::posix_time::ptime program_start;
   vector<LogSink*> sinks;
+  boost::thread_specific_ptr<string> thread_name;
+  int thread_counter;
 };
 
 template< Severity severity>
@@ -194,6 +212,6 @@ void LogPrinter::print_impl(First parm1, Rest...parm) {
     print_impl(parm...);
 }
 
-static Logger logger;
+extern Logger logger;
 
 #endif
