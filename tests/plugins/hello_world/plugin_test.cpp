@@ -9,6 +9,6 @@ TEST(PluginTest, CanCreatePlugin) {
 
 TEST(PluginTest, HasName) {
   auto plugin = make_plugin();
-  EXPECT_STREQ(plugin->name().c_str(), "Hello World Plugin");
+  ASSERT_STREQ(plugin->name().c_str(), "Hello World Plugin");
   plugin->destroy();
 }

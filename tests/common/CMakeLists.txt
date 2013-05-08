@@ -3,6 +3,7 @@ add_executable(test_common_exec
     basic_tests.cpp
     more_tests.cpp
     notify_pipe.cpp
+    logging.cpp
 )
 
 target_link_libraries(test_common_exec gtest gtest_main pthread ${LIBS} common)
