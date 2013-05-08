@@ -171,6 +171,13 @@ public:
    */
   void addSink(LogSink *s);
 
+  /**
+   * remove all logging sinks;
+   */
+  void clearSinks() {
+    sinks.clear();
+  }
+
   void registerThread() {
     boost::lock_guard<boost::mutex> lock(mutex);
     thread_name.reset(new string(string("Thread") + to_string(thread_counter++)));
