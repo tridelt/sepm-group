@@ -41,6 +41,11 @@ public:
   Ice::ObjectPrx exposeObject(const Ice::ObjectPtr &o,
                               const string &name = IceUtil::generateUUID());
 
+
+
+  shared_ptr<ChatClientCallbackInd> callbackForID(const Ice::Identity &callbackID,
+                                const Ice::ConnectionPtr &con);
+
   /**
    * hangs until the ice server has shutdown
    */

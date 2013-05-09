@@ -38,7 +38,7 @@ void AuthenticationImpl::registerUser(const sdc::User &u, const string &pw,
 }
 
 sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
-    const Ice::Identity&, const Ice::Current&) {
+    const Ice::Identity &callbackID, const Ice::Current &cur) {
   // Be conservative in what you send, be liberal in what you accept
   string name = u.ID;
   if(sdc::sdcHelper::isValidID(u.ID))
@@ -64,6 +64,9 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
     throw sdc::AuthenticationException("public key can't change");
 
   // TODO: check callback provided by identity before logging in (call echo)
+  auto callback = server->callbackForID(callbackID, cur.con);
+  if(callback->echo("42") != "42")
+    throw sdc::AuthenticationException("echo not working");
 
   // don't log passwords!
   INFO("Logging in ", u.ID);

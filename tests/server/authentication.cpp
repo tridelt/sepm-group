@@ -5,7 +5,7 @@
 #include "Logging.h"
 #include "IceMocks.h"
 
-Ice::ObjectPrx magicProxy;
+
 using namespace soci;
 using ::testing::_;
 using ::testing::Return;
@@ -30,7 +30,7 @@ class AuthenticationTest : public ::testing::Test {
   }
 
   DBPool *pool;
-  CurrentMock curr;
+  Ice::Current curr;
   Ice::Identity id;
   string password;
   sdc::User u;
@@ -44,16 +44,16 @@ TEST_F(AuthenticationTest, CanEcho) {
 
 
 TEST_F(AuthenticationTest, CanRegisterAndLogin) {
+  Ice::ObjectPrx magicProxy;
+
   auth->registerUser(u, password, curr);
 
-  IceConnectionMock connection_mock;
   CallbackMock callback_mock;
-
-  curr.con = &connection_mock;
+  auto callback_fake = shared_ptr<ChatClientCallbackInd>(new CallbackFake(&callback_mock));
 
   // login() should test the validity of the connection before allowing a login
   // first it has to create a proxy for the connection
-  EXPECT_CALL(connection_mock, createProxy(id)).WillOnce(Return(callback_mock));
+  EXPECT_CALL(server_mock, callbackForID(_, _)).WillOnce(Return(callback_fake));
   // then call echo on the client callback
   EXPECT_CALL(callback_mock, echo(_)).Times(AtLeast(1));
 
@@ -61,7 +61,7 @@ TEST_F(AuthenticationTest, CanRegisterAndLogin) {
   EXPECT_CALL(server_mock, exposeObject(_, _)).WillOnce(Return(magicProxy));
 
   // check that the magicProxy specified above is returned here
-  ASSERT_EQ(magicProxy, auth->login(u, password, id, curr));
+  auth->login(u, password, id, curr);
 }
 
 TEST_F(AuthenticationTest, CantRegisterTwice) {
