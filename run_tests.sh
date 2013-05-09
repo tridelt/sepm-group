@@ -6,6 +6,7 @@ set -e
 cd build
 rm -f tests/reports/*.xml
 cmake ..
+make
 make test
 make doc
 
