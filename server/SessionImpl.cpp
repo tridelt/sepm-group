@@ -1,7 +1,7 @@
 #include "SessionImpl.h"
 #include <IceUtil/IceUtil.h>
 
-SessionImpl::SessionImpl(sdc::User u) : user(u) {
+SessionImpl::SessionImpl(sdc::User u, DBPool *p) : loggedIn(true), user(u), db_pool(p) {
 }
 
 void SessionImpl::logout(const Ice::Current&) {

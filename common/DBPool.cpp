@@ -1,16 +1,5 @@
 #include "DBPool.h"
 
-DBPool* DBPool::instance;
-boost::mutex DBPool::mutex;
-
-DBPool* DBPool::i() {
-if(instance == NULL) {
-    boost::lock_guard<boost::mutex> lock(mutex);
-    if(instance == NULL)
-      instance = new DBPool();
-  }
-  return instance;
-}
 
 DBPool::DBPool() : pool_size(10),
   pool(soci::connection_pool(pool_size)) {

@@ -5,6 +5,7 @@
 #include <boost/optional.hpp>
 #include "SessionImpl.h"
 #include "Logging.h"
+#include "IceServer.h"
 
 using namespace std;
 using namespace soci;
@@ -16,7 +17,7 @@ void AuthenticationImpl::registerUser(const sdc::User &u, const string &pw,
   if(sdc::sdcHelper::isValidID(u.ID))
      name = sdc::sdcHelper::getNameFromID(u.ID);
 
-  session sql(DBPool::i()->getPool());
+  session sql(db_pool->getPool());
 
   sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, pubkey text)";
 
@@ -43,7 +44,7 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
   if(sdc::sdcHelper::isValidID(u.ID))
      name = sdc::sdcHelper::getNameFromID(u.ID);
 
-  session sql(DBPool::i()->getPool());
+  session sql(db_pool->getPool());
 
   sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, pubkey text)";
 
@@ -73,6 +74,6 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
   user.publicKey = sdc::ByteSeq(pubkey.get().begin(), pubkey.get().end());
 
   // TODO: make sure session created here doesn't leak
-  auto proxy = server->exposeObject(new SessionImpl(user));
+  auto proxy = server->exposeObject(new SessionImpl(user, db_pool));
   return sdc::SessionIPrx::checkedCast(proxy);
 }

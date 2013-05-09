@@ -50,11 +50,6 @@ int main(int argc, char** argv) {
     INFO("Got signal ", sig, " .. terminating");
   });
 
-  sdc::User u;
-  SessionImpl session(u);
-
-  server.exposeObject(&session);
-
   server.wait();
 
   INFO("normal exit");

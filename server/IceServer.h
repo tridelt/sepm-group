@@ -4,6 +4,7 @@
 #include <Ice/Ice.h>
 #include <IceUtil/IceUtil.h>
 #include <string>
+#include "DBPool.h"
 using namespace std;
 
 class IceServer {
@@ -54,6 +55,7 @@ public:
 private:
   Ice::CommunicatorPtr ic;
   Ice::ObjectAdapterPtr oa;
+  DBPool db_pool;
 };
 
 #endif
