@@ -14,7 +14,7 @@ function start {
   stop
   mkdir -p ./log
   mv ./server.log "./log/server-$(date +%Y%m%d%S).log"
-  ./server -q &
+  nohup ./server -q &
   disown
   SERVER_PID=$!
   echo "Started server with $SERVER_PID"
