@@ -63,7 +63,7 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
   if(providedPubkey != "" && providedPubkey != pubkey.get())
     throw sdc::AuthenticationException("public key can't change");
 
-  // TODO: check callback provided by identity before logging in (call echo)
+
   auto callback = server->callbackForID(callbackID, cur.con);
   if(callback->echo("42") != "42")
     throw sdc::AuthenticationException("echo not working");
