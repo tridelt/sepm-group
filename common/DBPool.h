@@ -4,6 +4,8 @@
 #include "soci/soci.h"
 #include <boost/thread.hpp>
 
+using namespace std;
+
 class DBPool {
 public:
   /**
@@ -11,7 +13,7 @@ public:
    * as which database to use (SQLite for development, PostgreSQL on the
    * production server), how many concurrent connections to use, etc.
    */
-  DBPool();
+  DBPool(string db_name = "mydb");
 
   /**
    * get global connection pool to construct thread local connection

@@ -5,9 +5,11 @@
 #include <IceUtil/IceUtil.h>
 #include <string>
 #include "DBPool.h"
+#include "IceServerI.h"
+
 using namespace std;
 
-class IceServer {
+class IceServer : public virtual IceServerI {
 public:
   /**
    * create a new ice server, listening on port 1337
