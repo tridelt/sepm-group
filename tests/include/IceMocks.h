@@ -1,6 +1,11 @@
+#ifndef ICE_MOCKS_H
+#define ICE_MOCKS_H
 
 #include "IceServerI.h"
 #include "gmock/gmock.h"
+
+using ::testing::Invoke;
+using ::testing::_;
 
 class IceServerMock : public IceServerI {
 public:
@@ -26,7 +31,38 @@ public:
   MOCK_CONST_METHOD0(getInfo, Ice::ConnectionInfoPtr ());
 };
 
+class CallbackFake {
+public:
+  string echo(const string &s) { return s; }
+};
 
 class CallbackMock : public sdc::ChatClientCallbackIPrx {
-  string echo(string s) { return s; }
+public:
+  MOCK_METHOD1(echo, string (string));
+
+  // redirect calls to fake object
+  CallbackMock() {
+    ON_CALL(*this, echo(_))
+            .WillByDefault(Invoke(&_fake, &CallbackFake::echo));
+  }
+  // explicitly allow copying
+  CallbackMock(const CallbackMock &o) : IceInternal::ProxyHandle<IceProxy::sdc::ChatClientCallbackI>(o) {}
+private:
+  CallbackFake _fake;
 };
+
+
+// necessary to avoid the annoying smart pointer ref-counting on con
+struct CurrentMock : public Ice::Current
+{
+  Ice::ObjectAdapterPtr adapter;
+  Ice::Connection* con;
+  Ice::Identity id;
+  std::string facet;
+  std::string operation;
+  Ice::OperationMode mode;
+  Ice::Context ctx;
+  Ice::Int requestId;
+};
+
+#endif

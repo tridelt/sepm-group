@@ -9,7 +9,7 @@ Ice::ObjectPrx magicProxy;
 using namespace soci;
 using ::testing::_;
 using ::testing::Return;
-
+using ::testing::AtLeast;
 
 class AuthenticationTest : public ::testing::Test {
  protected:
@@ -30,7 +30,7 @@ class AuthenticationTest : public ::testing::Test {
   }
 
   DBPool *pool;
-  Ice::Current curr;
+  CurrentMock curr;
   Ice::Identity id;
   string password;
   sdc::User u;
@@ -49,8 +49,13 @@ TEST_F(AuthenticationTest, CanRegisterAndLogin) {
   IceConnectionMock connection_mock;
   CallbackMock callback_mock;
 
+  curr.con = &connection_mock;
+
   // login() should test the validity of the connection before allowing a login
+  // first it has to create a proxy for the connection
   EXPECT_CALL(connection_mock, createProxy(id)).WillOnce(Return(callback_mock));
+  // then call echo on the client callback
+  EXPECT_CALL(callback_mock, echo(_)).Times(AtLeast(1));
 
   // login has to call exposeObject to expose the SessionI
   EXPECT_CALL(server_mock, exposeObject(_, _)).WillOnce(Return(magicProxy));
