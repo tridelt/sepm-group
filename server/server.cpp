@@ -10,11 +10,9 @@ namespace po = boost::program_options;
 using namespace std;
 
 int main(int argc, char** argv) {
-  FileSink fileSink(true, Severity::LVL_INFO, "server.log");
-  logger.addSink(&fileSink);
-
   po::options_description desc("Allowed options");
   desc.add_options()
+    ("quiet,q", "don't log to stdout")
     ("help,h", "produce help message")
   ;
 
@@ -27,30 +25,39 @@ int main(int argc, char** argv) {
     return 1;
   }
 
+  if(vm.count("quiet")) {
+    logger.clearSinks();
+  }
+
+  FileSink fileSink(true, Severity::LVL_INFO, "server.log");
+  logger.addSink(&fileSink);
 
   INFO("Hello from server");
   WARN("LOOK");
   ERROR("pretty colors!");
 
 
-  ExitHandler::i()->setHandler([](int) {
+  IceServer server;
+
+  ExitHandler::i()->setHandler([&server](int sig) {
     // called when SIGINT (eg by Ctrl+C) is received
     // do cleanup
 
+    server.exit();
+
     // bad - cout not guaranteed to work, since not reentrant
     // this is just to show the handler is working
-    INFO(" Got signal .. terminating");
+    INFO("Got signal ", sig, " .. terminating");
   });
-
-  IceServer server;
 
   sdc::User u;
   SessionImpl session(u);
 
   server.exposeObject(&session);
 
-  string wait;
-  cin >> wait;
+  server.wait();
+
+  INFO("normal exit");
 
   return 0;
 }

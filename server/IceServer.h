@@ -37,6 +37,20 @@ public:
    */
   Ice::ObjectPrx exposeObject(const Ice::ObjectPtr &o,
                               const string &name = IceUtil::generateUUID());
+
+  /**
+   * hangs until the ice server has shutdown
+   */
+  void wait() {
+    ic->waitForShutdown();
+  }
+
+  /**
+   * tells the ice server to shutdown
+   */
+  void exit() {
+    ic->shutdown();
+  }
 private:
   Ice::CommunicatorPtr ic;
   Ice::ObjectAdapterPtr oa;
