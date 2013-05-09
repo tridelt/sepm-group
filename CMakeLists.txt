@@ -127,6 +127,8 @@ add_custom_command(OUTPUT plugin_dir
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/common)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/dependencies)
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/gmock/include)
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/gmock/gtest/include)
 
 
 add_definitions(-DSOCI_USE_BOOST)
