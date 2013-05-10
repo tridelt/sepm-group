@@ -4,7 +4,7 @@
 #include "gmock/gmock.h"
 #include "Logging.h"
 #include "IceMocks.h"
-
+#include <boost/optional.hpp>
 
 using namespace soci;
 using ::testing::_;
@@ -67,4 +67,26 @@ TEST_F(AuthenticationTest, CanRegisterAndLogin) {
 TEST_F(AuthenticationTest, CantRegisterTwice) {
   auth->registerUser(u, "secret", curr);
   ASSERT_THROW(auth->registerUser(u, password, curr), sdc::AuthenticationException);
+}
+
+TEST_F(AuthenticationTest, AvoidCleartextPasswords) {
+  auth->registerUser(u, password, curr);
+
+  session sql(pool->getPool());
+
+  boost::optional<string> id;
+  sql << "SELECT id FROM users WHERE pw = :pw",
+    into(id), use(password);
+
+  ASSERT_FALSE(id.is_initialized());
+}
+
+TEST_F(AuthenticationTest, NoLoginWithoutRegister) {
+  ASSERT_THROW(auth->login(u, password, id, curr), sdc::AuthenticationException);
+}
+
+TEST_F(AuthenticationTest, NoLoginWithBadPassword) {
+  auth->registerUser(u, password, curr);
+  ASSERT_THROW(auth->login(u, "", id, curr), sdc::AuthenticationException);
+  ASSERT_THROW(auth->login(u, "password", id, curr), sdc::AuthenticationException);
 }
