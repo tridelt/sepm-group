@@ -3,6 +3,7 @@
 #include "SecureDistributedChat.h"
 #include "AuthenticationImpl.h"
 #include "ThreadHook.h"
+#include "ChatClientCallbackWrapper.h"
 
 IceServer::IceServer(string pub_key_path, string priv_key_path, string ca_path) {
   int argc = 1;
@@ -32,7 +33,7 @@ IceServer::IceServer(string pub_key_path, string priv_key_path, string ca_path) 
     ic = Ice::initialize(id);
 
     oa = ic->createObjectAdapterWithEndpoints("AuthenticationEndpoint", "ssl -p 1337");
-    oa->add(new AuthenticationImpl(this), ic->stringToIdentity("Authentication"));
+    oa->add(new AuthenticationImpl(this, &db_pool), ic->stringToIdentity("Authentication"));
     oa->activate();
   } catch (const Ice::Exception& e) {
     if (ic) ic->destroy();
@@ -57,4 +58,12 @@ Ice::ObjectPrx IceServer::exposeObject(const Ice::ObjectPtr &o, const string &na
   oa->activate();
 
   return proxy;
+}
+
+
+shared_ptr<ChatClientCallbackInd> IceServer::callbackForID(const Ice::Identity &callbackID,
+                                const Ice::ConnectionPtr &con) {
+  Ice::ObjectPrx callbackProxy = con->createProxy(callbackID);
+  return shared_ptr<ChatClientCallbackInd>(
+    new ChatClientCallbackWrapper(sdc::ChatClientCallbackIPrx::checkedCast(callbackProxy)));
 }

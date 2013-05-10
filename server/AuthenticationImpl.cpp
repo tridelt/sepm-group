@@ -5,6 +5,7 @@
 #include <boost/optional.hpp>
 #include "SessionImpl.h"
 #include "Logging.h"
+#include "IceServer.h"
 
 using namespace std;
 using namespace soci;
@@ -16,7 +17,7 @@ void AuthenticationImpl::registerUser(const sdc::User &u, const string &pw,
   if(sdc::sdcHelper::isValidID(u.ID))
      name = sdc::sdcHelper::getNameFromID(u.ID);
 
-  session sql(DBPool::i()->getPool());
+  session sql(db_pool->getPool());
 
   sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, pubkey text)";
 
@@ -37,13 +38,13 @@ void AuthenticationImpl::registerUser(const sdc::User &u, const string &pw,
 }
 
 sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
-    const Ice::Identity&, const Ice::Current&) {
+    const Ice::Identity &callbackID, const Ice::Current &cur) {
   // Be conservative in what you send, be liberal in what you accept
   string name = u.ID;
   if(sdc::sdcHelper::isValidID(u.ID))
      name = sdc::sdcHelper::getNameFromID(u.ID);
 
-  session sql(DBPool::i()->getPool());
+  session sql(db_pool->getPool());
 
   sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, pubkey text)";
 
@@ -62,7 +63,10 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
   if(providedPubkey != "" && providedPubkey != pubkey.get())
     throw sdc::AuthenticationException("public key can't change");
 
-  // TODO: check callback provided by identity before logging in (call echo)
+
+  auto callback = server->callbackForID(callbackID, cur.con);
+  if(callback->echo("42") != "42")
+    throw sdc::AuthenticationException("echo not working");
 
   // don't log passwords!
   INFO("Logging in ", u.ID);
@@ -73,6 +77,6 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
   user.publicKey = sdc::ByteSeq(pubkey.get().begin(), pubkey.get().end());
 
   // TODO: make sure session created here doesn't leak
-  auto proxy = server->exposeObject(new SessionImpl(user));
+  auto proxy = server->exposeObject(new SessionImpl(user, db_pool));
   return sdc::SessionIPrx::checkedCast(proxy);
 }

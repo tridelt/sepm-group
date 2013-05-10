@@ -1,5 +1,7 @@
 add_custom_target(test)
 
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include")
+
 add_subdirectory(common)
 add_subdirectory(client)
 add_subdirectory(server)

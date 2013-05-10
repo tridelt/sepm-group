@@ -4,9 +4,12 @@
 #include <Ice/Ice.h>
 #include <IceUtil/IceUtil.h>
 #include <string>
+#include "DBPool.h"
+#include "IceServerI.h"
+
 using namespace std;
 
-class IceServer {
+class IceServer : public virtual IceServerI {
 public:
   /**
    * create a new ice server, listening on port 1337
@@ -38,6 +41,11 @@ public:
   Ice::ObjectPrx exposeObject(const Ice::ObjectPtr &o,
                               const string &name = IceUtil::generateUUID());
 
+
+
+  shared_ptr<ChatClientCallbackInd> callbackForID(const Ice::Identity &callbackID,
+                                const Ice::ConnectionPtr &con);
+
   /**
    * hangs until the ice server has shutdown
    */
@@ -54,6 +62,7 @@ public:
 private:
   Ice::CommunicatorPtr ic;
   Ice::ObjectAdapterPtr oa;
+  DBPool db_pool;
 };
 
 #endif
