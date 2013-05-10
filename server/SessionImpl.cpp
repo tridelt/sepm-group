@@ -6,7 +6,7 @@ SessionImpl::SessionImpl(sdc::User u, DBPool *p) : loggedIn(true), user(u), db_p
 }
 
 void SessionImpl::logout(const Ice::Current&) {
-  INFO("<stub> logging in ", user.ID);
+  INFO("<stub> logging out ", user.ID);
   this->loggedIn = false;
 }
 
