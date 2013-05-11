@@ -4,6 +4,7 @@ include_directories("${CMAKE_SOURCE_DIR}/server")
 add_executable(test_server_exec
     basic_tests.cpp
     authentication.cpp
+    session.cpp
 )
 
 target_link_libraries(test_server_exec gtest gtest_main pthread ${LIBS} common)
