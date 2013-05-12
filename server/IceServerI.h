@@ -4,6 +4,7 @@
 #include <Ice/Ice.h>
 #include <IceUtil/IceUtil.h>
 #include <string>
+#include <boost/shared_ptr.hpp>
 #include "ChatClientCallbackInd.h"
 
 using namespace std;

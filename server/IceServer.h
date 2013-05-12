@@ -62,7 +62,7 @@ public:
 private:
   Ice::CommunicatorPtr ic;
   Ice::ObjectAdapterPtr oa;
-  DBPool db_pool;
+  DBPool *db_pool;
 };
 
 #endif

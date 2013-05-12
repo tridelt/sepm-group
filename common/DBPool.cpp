@@ -1,7 +1,15 @@
 #include "DBPool.h"
 
 
-DBPool::DBPool(string db_name) : pool_size(10),
+DBPool* DBPool::TestPool() {
+  return new DBPool(":memory:", 1);
+}
+
+DBPool* DBPool::ProdPool() {
+  return new DBPool("mydb", 10);
+}
+
+DBPool::DBPool(string db_name, int size) : pool_size(size),
   pool(soci::connection_pool(pool_size)) {
   for(size_t i = 0; i < pool_size; ++i) {
     soci::session &sql = pool.at(i);

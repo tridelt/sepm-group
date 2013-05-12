@@ -6,14 +6,16 @@
 
 using namespace std;
 
+
+/**
+ * the connection pool manager is responsible for details such
+ * as which database to use (SQLite for development, PostgreSQL on the
+ * production server), how many concurrent connections to use, etc.
+ */
 class DBPool {
 public:
-  /**
-   * the global connection pool manager is responsible for details such
-   * as which database to use (SQLite for development, PostgreSQL on the
-   * production server), how many concurrent connections to use, etc.
-   */
-  DBPool(string db_name = "mydb");
+  static DBPool* TestPool(); /**< pool for unit tests */
+  static DBPool* ProdPool(); /**< pool for normal code */
 
   /**
    * get global connection pool to construct thread local connection
@@ -29,6 +31,7 @@ public:
    */
   soci::connection_pool& getPool();
 private:
+  DBPool(string db_name, int size);
   size_t pool_size;
   soci::connection_pool pool;
 };
