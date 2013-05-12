@@ -108,3 +108,43 @@ TEST_F(SessionTest, CanRetrieveLoglist) {
   ASSERT_EQ(1, loglist.size());
   ASSERT_EQ(entry, loglist[0]);
 }
+
+TEST_F(SessionTest, CanDeleteOwnAccount) {
+  auth->registerUser(u, password, curr);
+  session->deleteUser(u, curr);
+
+  Ice::ObjectPrx magicProxy;
+
+  CallbackMock callback_mock;
+  auto callback_fake = shared_ptr<ChatClientCallbackInd>(new CallbackFake(&callback_mock));
+
+  // login() should test the validity of the connection before allowing a login
+  // first it has to create a proxy for the connection
+  ON_CALL(server_mock, callbackForID(_, _)).WillByDefault(Return(callback_fake));
+  EXPECT_CALL(server_mock, callbackForID(_, _)).Times(0);
+  // then call echo on the client callback
+  EXPECT_CALL(callback_mock, echo(_)).Times(0);
+  // neither should be called since the account was deleted
+
+  // therefore, it also shouldn't call exposeObject to expose the SessionI
+  ON_CALL(server_mock, exposeObject(_, _)).WillByDefault(Return(magicProxy));
+  EXPECT_CALL(server_mock, exposeObject(_, _)).Times(0);
+
+  ASSERT_THROW(auth->login(u, password, id, curr), sdc::AuthenticationException);
+}
+
+TEST_F(SessionTest, CantDeleteOtherAccount) {
+  sdc::User u2;
+  u2.ID = "world";
+
+  auth->registerUser(u, password, curr);
+  auth->registerUser(u2, password, curr);
+
+  ASSERT_THROW(session->deleteUser(u2, curr), sdc::UserHandlingException);
+}
+
+TEST_F(SessionTest, CanRetrieveUser) {
+  auth->registerUser(u, password, curr);
+
+  ASSERT_EQ(u, session->retrieveUser(u.ID, curr));
+}
