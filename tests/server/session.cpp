@@ -149,3 +149,7 @@ TEST_F(SessionTest, CanRetrieveUser) {
 
   ASSERT_EQ(u, session->retrieveUser(u.ID, curr));
 }
+
+TEST_F(SessionTest, CantLeaveChatUserIsNotIn) {
+  ASSERT_THROW(session->leaveChat("chan@" + Config::hostname(), curr), sdc::SessionException);
+}
