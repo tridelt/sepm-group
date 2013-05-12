@@ -14,7 +14,8 @@ using ::testing::AtLeast;
 class AuthenticationTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    pool = new DBPool("test_db");
+    // important - in-memory db is much faster
+    pool = DBPool::TestPool();
     // make sure tests are quiet
     logger.clearSinks();
     session sql(pool->getPool());

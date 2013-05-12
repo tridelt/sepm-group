@@ -15,7 +15,8 @@ using ::testing::AtLeast;
 class SessionTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    pool = new DBPool("test_db");
+    // important - in-memory db is much faster
+    pool = DBPool::TestPool();
     // make sure tests are quiet
     logger.clearSinks();
     soci::session sql(pool->getPool());
@@ -74,4 +75,36 @@ TEST_F(SessionTest, CanSaveContactList) {
   session->saveContactList(contacts, curr);
 
   ASSERT_EQ(contacts, session->retrieveContactList(curr));
+}
+
+TEST_F(SessionTest, CanSaveLog) {
+  string a = "my data";
+  string b = "my signature";
+  auto log_entry = sdc::SecureContainer {
+    sdc::ByteSeq(a.begin(), a.end()),
+    sdc::ByteSeq(b.begin(), b.end())
+  };
+
+  session->saveLog("chan", 10, log_entry, curr);
+
+  ASSERT_EQ(log_entry, session->retrieveLog("chan", 10, curr));
+}
+
+
+TEST_F(SessionTest, CanRetrieveLoglist) {
+  string a = "my data";
+  string b = "my signature";
+  auto log_entry = sdc::SecureContainer {
+    sdc::ByteSeq(a.begin(), a.end()),
+    sdc::ByteSeq(b.begin(), b.end())
+  };
+
+  sdc::ChatlogEntry entry { "chan", 10 };
+
+  session->saveLog("chan", 10, log_entry, curr);
+
+  auto loglist = session->retrieveLoglist(curr);
+
+  ASSERT_EQ(1, loglist.size());
+  ASSERT_EQ(entry, loglist[0]);
 }
