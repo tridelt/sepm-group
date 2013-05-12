@@ -5,6 +5,7 @@
 #include "IceServer.h"
 #include "SessionImpl.h"
 #include "Logging.h"
+#include "config.h"
 
 namespace po = boost::program_options;
 using namespace std;
@@ -35,6 +36,7 @@ int main(int argc, char** argv) {
   INFO("Hello from server");
   WARN("LOOK");
   ERROR("pretty colors!");
+  INFO("my hostname: ", Config::hostname());
 
 
   IceServer server;

@@ -5,6 +5,7 @@
 #include "Logging.h"
 #include "IceMocks.h"
 #include <boost/optional.hpp>
+#include "config.h"
 
 using namespace soci;
 using ::testing::_;
@@ -14,13 +15,14 @@ using ::testing::AtLeast;
 class AuthenticationTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
-    pool = new DBPool("test_db");
+    // important - in-memory db is much faster
+    pool = DBPool::TestPool();
     // make sure tests are quiet
     logger.clearSinks();
     session sql(pool->getPool());
     sql << "DROP TABLE IF EXISTS users;";
     password = "secret";
-    u.ID = "hello";
+    u.ID = "hello@" + Config::hostname();
     auth = new AuthenticationImpl(&server_mock, pool);
   }
 

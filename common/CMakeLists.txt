@@ -1,4 +1,4 @@
-add_library (common SHARED FileWatcher.cpp NotifyPipe.cpp ViewRefresher.cpp ExitHandler.cpp PluginManager.cpp sdcHelper.cpp Security.cpp DBPool.cpp Logging.cpp ${chat_HEADERS_MOC})
+add_library (common SHARED FileWatcher.cpp NotifyPipe.cpp ViewRefresher.cpp ExitHandler.cpp PluginManager.cpp sdcHelper.cpp Security.cpp DBPool.cpp Logging.cpp config.cpp ${chat_HEADERS_MOC})
 
 add_dependencies(common ice)
 add_dependencies(common soci-3-2-1)
