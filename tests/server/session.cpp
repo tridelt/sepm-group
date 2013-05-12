@@ -6,6 +6,7 @@
 #include "Logging.h"
 #include "IceMocks.h"
 #include <boost/optional.hpp>
+#include "config.h"
 
 using namespace soci;
 using ::testing::_;
@@ -22,7 +23,7 @@ class SessionTest : public ::testing::Test {
     soci::session sql(pool->getPool());
     sql << "DROP TABLE IF EXISTS users;";
     password = "secret";
-    u.ID = "hello";
+    u.ID = "hello@" + Config::hostname();
     auth = new AuthenticationImpl(&server_mock, pool);
     session = new SessionImpl(u, pool);
   }
@@ -50,15 +51,15 @@ TEST_F(SessionTest, ThrowAfterLogout) {
     sdc::ByteSeq(), sdc::ByteSeq()
   };
 
-  ASSERT_THROW(session->retrieveUser("someone", curr), sdc::SessionException);
+  ASSERT_THROW(session->retrieveUser("someone@" + Config::hostname(), curr), sdc::SessionException);
   ASSERT_THROW(session->initChat(curr), sdc::SessionException);
-  ASSERT_THROW(session->leaveChat("some", curr), sdc::SessionException);
-  ASSERT_THROW(session->invite(u, "some", sdc::ByteSeq(), curr), sdc::SessionException);
-  ASSERT_THROW(session->sendMessage(sdc::ByteSeq(), "some", curr), sdc::SessionException);
+  ASSERT_THROW(session->leaveChat("some@" + Config::hostname(), curr), sdc::SessionException);
+  ASSERT_THROW(session->invite(u, "some@" + Config::hostname(), sdc::ByteSeq(), curr), sdc::SessionException);
+  ASSERT_THROW(session->sendMessage(sdc::ByteSeq(), "some@" + Config::hostname(), curr), sdc::SessionException);
   ASSERT_THROW(session->deleteUser(u, curr), sdc::SessionException);
-  ASSERT_THROW(session->saveLog("some", 4, container, curr), sdc::SessionException);
+  ASSERT_THROW(session->saveLog("some@" + Config::hostname(), 4, container, curr), sdc::SessionException);
   ASSERT_THROW(session->retrieveLoglist(curr), sdc::SessionException);
-  ASSERT_THROW(session->retrieveLog("some", 4, curr), sdc::SessionException);
+  ASSERT_THROW(session->retrieveLog("some@" + Config::hostname(), 4, curr), sdc::SessionException);
   ASSERT_THROW(session->saveContactList(container, curr), sdc::SessionException);
   ASSERT_THROW(session->retrieveContactList(curr), sdc::SessionException);
 }
@@ -85,9 +86,9 @@ TEST_F(SessionTest, CanSaveLog) {
     sdc::ByteSeq(b.begin(), b.end())
   };
 
-  session->saveLog("chan", 10, log_entry, curr);
+  session->saveLog("chan@" + Config::hostname(), 10, log_entry, curr);
 
-  ASSERT_EQ(log_entry, session->retrieveLog("chan", 10, curr));
+  ASSERT_EQ(log_entry, session->retrieveLog("chan@" + Config::hostname(), 10, curr));
 }
 
 
@@ -99,9 +100,9 @@ TEST_F(SessionTest, CanRetrieveLoglist) {
     sdc::ByteSeq(b.begin(), b.end())
   };
 
-  sdc::ChatlogEntry entry { "chan", 10 };
+  sdc::ChatlogEntry entry { "chan@" + Config::hostname(), 10 };
 
-  session->saveLog("chan", 10, log_entry, curr);
+  session->saveLog("chan@" + Config::hostname(), 10, log_entry, curr);
 
   auto loglist = session->retrieveLoglist(curr);
 
@@ -135,7 +136,7 @@ TEST_F(SessionTest, CanDeleteOwnAccount) {
 
 TEST_F(SessionTest, CantDeleteOtherAccount) {
   sdc::User u2;
-  u2.ID = "world";
+  u2.ID = "world@" + Config::hostname();
 
   auth->registerUser(u, password, curr);
   auth->registerUser(u2, password, curr);

@@ -5,6 +5,7 @@
 #include "Logging.h"
 #include "IceMocks.h"
 #include <boost/optional.hpp>
+#include "config.h"
 
 using namespace soci;
 using ::testing::_;
@@ -21,7 +22,7 @@ class AuthenticationTest : public ::testing::Test {
     session sql(pool->getPool());
     sql << "DROP TABLE IF EXISTS users;";
     password = "secret";
-    u.ID = "hello";
+    u.ID = "hello@" + Config::hostname();
     auth = new AuthenticationImpl(&server_mock, pool);
   }
 
