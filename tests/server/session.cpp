@@ -131,7 +131,21 @@ TEST_F(SessionTest, CanDeleteOwnAccount) {
   ON_CALL(server_mock, exposeObject(_, _)).WillByDefault(Return(magicProxy));
   EXPECT_CALL(server_mock, exposeObject(_, _)).Times(0);
 
+  // shouldn't be able to login anymore - account was just deleted
   ASSERT_THROW(auth->login(u, password, id, curr), sdc::AuthenticationException);
+
+  // also shouldn't be able to do anything else
+  ASSERT_THROW(session->retrieveUser("someone@" + Config::hostname(), curr), sdc::SessionException);
+  ASSERT_THROW(session->initChat(curr), sdc::SessionException);
+  ASSERT_THROW(session->leaveChat("some@" + Config::hostname(), curr), sdc::SessionException);
+  ASSERT_THROW(session->invite(u, "some@" + Config::hostname(), sdc::ByteSeq(), curr), sdc::SessionException);
+  ASSERT_THROW(session->sendMessage(sdc::ByteSeq(), "some@" + Config::hostname(), curr), sdc::SessionException);
+  ASSERT_THROW(session->deleteUser(u, curr), sdc::SessionException);
+  ASSERT_THROW(session->saveLog("some@" + Config::hostname(), 4, container, curr), sdc::SessionException);
+  ASSERT_THROW(session->retrieveLoglist(curr), sdc::SessionException);
+  ASSERT_THROW(session->retrieveLog("some@" + Config::hostname(), 4, curr), sdc::SessionException);
+  ASSERT_THROW(session->saveContactList(container, curr), sdc::SessionException);
+  ASSERT_THROW(session->retrieveContactList(curr), sdc::SessionException);
 }
 
 TEST_F(SessionTest, CantDeleteOtherAccount) {

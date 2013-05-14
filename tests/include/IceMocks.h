@@ -38,7 +38,6 @@ public:
   void appendMessageToChat(const sdc::ByteSeq &, const string &, const sdc::User &) {}
 
   CallbackFake(CallbackMock* m) : _mock(m) {}
-  CallbackFake(const CallbackFake* o) : _mock(o->_mock) {}
 private:
   CallbackMock* _mock;
 };
