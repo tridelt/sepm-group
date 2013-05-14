@@ -134,6 +134,11 @@ TEST_F(SessionTest, CanDeleteOwnAccount) {
   // shouldn't be able to login anymore - account was just deleted
   ASSERT_THROW(auth->login(u, password, id, curr), sdc::AuthenticationException);
 
+
+  auto container = sdc::SecureContainer {
+    sdc::ByteSeq(), sdc::ByteSeq()
+  };
+
   // also shouldn't be able to do anything else
   ASSERT_THROW(session->retrieveUser("someone@" + Config::hostname(), curr), sdc::SessionException);
   ASSERT_THROW(session->initChat(curr), sdc::SessionException);
