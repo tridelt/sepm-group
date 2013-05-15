@@ -6,6 +6,7 @@
 #include "SessionImpl.h"
 #include "Logging.h"
 #include "IceServer.h"
+#include "PwdHash.h"
 
 using namespace std;
 using namespace soci;
@@ -19,7 +20,7 @@ void AuthenticationImpl::registerUser(const sdc::User &u, const string &pw,
 
   session sql(db_pool->getPool());
 
-  sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, pubkey text)";
+  sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, salt text, pubkey text)";
 
   boost::optional<string> id;
   sql << "SELECT id FROM users WHERE id = :id",
@@ -28,10 +29,17 @@ void AuthenticationImpl::registerUser(const sdc::User &u, const string &pw,
   if(id.is_initialized())
     throw sdc::AuthenticationException("ID already exists");
 
-  // TODO: properly hash the password (bcrypt)
-  string pubkey(u.publicKey.begin(), u.publicKey.end());
-  sql << "INSERT INTO users(id, pw, pubkey) VALUES (:id, :pw, :pubkey)",
-    use(name), use(pw), use(pubkey);
+  string pubkey(u.publicKey.begin(), u.publicKey.end()), salt(gensalt()), hash;
+
+  try {
+    hash = makehash(pw, salt);
+  }
+  catch(...) {
+    throw sdc::AuthenticationException("can't register right now");
+  }
+
+  sql << "INSERT INTO users(id, pw, salt, pubkey) VALUES (:id, :pw, :salt, :pubkey)",
+    use(name), use(hash), use(salt), use(pubkey);
 
   // don't log passwords!
   INFO("Registered ", u.ID);
@@ -46,17 +54,25 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
 
   session sql(db_pool->getPool());
 
-  sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, pubkey text)";
+  sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, salt text, pubkey text)";
 
-  boost::optional<string> id, storedPw, pubkey;
-  sql << "SELECT id, pw, pubkey FROM users WHERE id = :id",
-    into(id), into(storedPw), into(pubkey), use(name);
+  boost::optional<string> id, storedPw, salt, pubkey;
+  sql << "SELECT id, pw, salt, pubkey FROM users WHERE id = :id",
+    into(id), into(storedPw), into(salt), into(pubkey), use(name);
 
   if(!id.is_initialized())
     throw sdc::AuthenticationException("unknown ID");
 
-  // TODO: proper password hashing
-  if(pw != storedPw.get())
+  bool validpass = false;
+  try {
+    validpass = checkhash(pw, storedPw.get(), salt.get());
+  }
+  catch(...) {
+    // check failure separately to avoid confusing users
+    throw sdc::AuthenticationException("internal failure");
+  }
+
+  if(!validpass)
     throw sdc::AuthenticationException("invalid password");
 
   string providedPubkey(u.publicKey.begin(), u.publicKey.end());
