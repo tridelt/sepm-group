@@ -6,7 +6,8 @@
 
 #define RANDOMNESS_SIZE 256
 #define RANDOMNESS_SOURCE "/dev/urandom"
-#define CRYPT_ITERATIONS 8
+#define CRYPT_ITERATIONS 8    // actual iteration count is 2^n
+#define HASH_METHOD "$2a$"    // bcrypt
 
 string gensetting() {
   FILE *source = fopen("/dev/urandom", "r");
@@ -22,7 +23,7 @@ string gensetting() {
     throw;
   }
 
-  char *setting = crypt_gensalt_ra("$2a$", CRYPT_ITERATIONS, randomness, RANDOMNESS_SIZE);
+  char *setting = crypt_gensalt_ra(HASH_METHOD, CRYPT_ITERATIONS, randomness, RANDOMNESS_SIZE);
   if(!setting)  {
     WARN("crypt_gensalt_ra failed: " + string(strerror(errno)));
     throw;

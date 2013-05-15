@@ -1,4 +1,4 @@
-add_definitions(-D__SKIP_GNU)	# for ow-crypt (don't redeclare crypt(3))
+add_definitions(-D__SKIP_GNU)   # for ow-crypt (don't redeclare crypt(3))
 
 add_library(server_lib SHARED backward.cpp IceServer.cpp AuthenticationImpl.cpp SessionImpl.cpp PwdHash.cpp)
 
