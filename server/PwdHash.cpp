@@ -41,7 +41,6 @@ string genhash(const string &input, const string &setting)
   void *nil = NULL;
   int size = 0;
   char *hash = crypt_ra(input.c_str(), setting.c_str(), &nil, &size);
-  free(nil);
   if(!hash)  {
     WARN("crypt_ra failed: " + string(strerror(errno)));
     throw;
