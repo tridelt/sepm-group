@@ -6,6 +6,7 @@
 #include "SessionImpl.h"
 #include "Logging.h"
 #include "IceServer.h"
+#include "config.h"
 
 using namespace std;
 using namespace soci;
