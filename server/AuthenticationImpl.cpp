@@ -20,7 +20,7 @@ void AuthenticationImpl::registerUser(const sdc::User &u, const string &pw,
 
   session sql(db_pool->getPool());
 
-  sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, salt text, pubkey text)";
+  sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, pubkey text)";
 
   boost::optional<string> id;
   sql << "SELECT id FROM users WHERE id = :id",
@@ -29,17 +29,17 @@ void AuthenticationImpl::registerUser(const sdc::User &u, const string &pw,
   if(id.is_initialized())
     throw sdc::AuthenticationException("ID already exists");
 
-  string pubkey(u.publicKey.begin(), u.publicKey.end()), salt(gensalt()), hash;
+  string pubkey(u.publicKey.begin(), u.publicKey.end()), hash;
 
   try {
-    hash = makehash(pw, salt);
+    hash = genhash(pw, gensetting());
   }
   catch(...) {
     throw sdc::AuthenticationException("can't register right now");
   }
 
-  sql << "INSERT INTO users(id, pw, salt, pubkey) VALUES (:id, :pw, :salt, :pubkey)",
-    use(name), use(hash), use(salt), use(pubkey);
+  sql << "INSERT INTO users(id, pw, pubkey) VALUES (:id, :pw, :pubkey)",
+    use(name), use(hash), use(pubkey);
 
   // don't log passwords!
   INFO("Registered ", u.ID);
@@ -54,18 +54,18 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
 
   session sql(db_pool->getPool());
 
-  sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, salt text, pubkey text)";
+  sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, pubkey text)";
 
-  boost::optional<string> id, storedPw, salt, pubkey;
-  sql << "SELECT id, pw, salt, pubkey FROM users WHERE id = :id",
-    into(id), into(storedPw), into(salt), into(pubkey), use(name);
+  boost::optional<string> id, storedPw, pubkey;
+  sql << "SELECT id, pw, pubkey FROM users WHERE id = :id",
+    into(id), into(storedPw), into(pubkey), use(name);
 
   if(!id.is_initialized())
     throw sdc::AuthenticationException("unknown ID");
 
   bool validpass = false;
   try {
-    validpass = checkhash(pw, storedPw.get(), salt.get());
+    validpass = checkhash(pw, storedPw.get());
   }
   catch(...) {
     // check failure separately to avoid confusing users

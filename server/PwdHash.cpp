@@ -8,7 +8,7 @@
 #define RANDOMNESS_SOURCE "/dev/urandom"
 #define CRYPT_ITERATIONS 8
 
-string gensalt() {
+string gensetting() {
   FILE *source = fopen("/dev/urandom", "r");
   if(!source) {
     WARN("failed to read from randomness source " RANDOMNESS_SOURCE ": " + string(strerror(errno)));
@@ -28,21 +28,20 @@ string gensalt() {
     throw;
   }
 
-
   fclose(source);
 
-  //FIXME: copy and free original
   string ret(setting);
   free(setting);
 
   return ret;
 }
 
-string makehash(const string &input, const string &salt)
+string genhash(const string &input, const string &setting)
 {
   void *nil = NULL;
   int size = 0;
-  char *hash = crypt_ra(input.c_str(), salt.c_str(), &nil, &size);
+  char *hash = crypt_ra(input.c_str(), setting.c_str(), &nil, &size);
+  free(nil);
   if(!hash)  {
     WARN("crypt_ra failed: " + string(strerror(errno)));
     throw;
@@ -54,8 +53,8 @@ string makehash(const string &input, const string &salt)
   return ret;
 }
 
-bool checkhash(const string &input, const string &hash, const string &salt)
+bool checkhash(const string &input, const string &hash)
 {
-  return makehash(input, salt) == hash;
+  return genhash(input, hash) == hash;
 }
 

@@ -5,8 +5,8 @@
 
 using namespace std;
 
-extern string gensalt();
-extern string makehash(const string &input, const string &salt);
-extern bool checkhash(const string &input, const string &hash, const string &salt);
+extern string gensetting();
+extern string genhash(const string &input, const string &setting);
+extern bool checkhash(const string &input, const string &hash);
 
 #endif
