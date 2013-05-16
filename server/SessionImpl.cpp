@@ -47,7 +47,7 @@ void SessionImpl::deleteUser(const sdc::User &u, const Ice::Current&) {
 
 string SessionImpl::initChat(const Ice::Current&) {
   INFO("initChat by ", user.ID);
-  return cmng.newChat();
+  return cmng->newChat();
 }
 
 void SessionImpl::leaveChat(const string &chat, const Ice::Current&) {

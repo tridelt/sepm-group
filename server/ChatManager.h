@@ -2,14 +2,15 @@
 #define CHATMANAGER_H
 
 #include "SecureDistributedChat.h"
+#include "Chat.h"
 using namespace std;
 
 class ChatManager {
   public:
-    String newChat();
-    void rmChat(String);    
+    string newChat();
+    void rmChat(string);    
   private:
-    map <String, Chat> chats;
+    map <string, shared_ptr<Chat>> chats;
     int i;
 };
 

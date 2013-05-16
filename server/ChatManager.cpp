@@ -2,11 +2,12 @@
 #include "Chat.h"
 
 using namespace std;
-String ChatManager::newChat(){
-  Chat c;
-  c.setName("Chat"+(i++));
-  chats[c.getName()] = c;
-  return c.getName();
+string ChatManager::newChat(){
+  Chat *c= new Chat;
+  c->setName("Chat"+(i++));
+  chats[c->getName()].reset(c);
+  return c->getName();
 }
-
-void ChatManager::rmChat(){}
+void ChatManager::rmChat(string){
+	//TODO implement rmChat
+}
