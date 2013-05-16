@@ -9,7 +9,8 @@
 using namespace std;
 using namespace soci;
 
-SessionImpl::SessionImpl(sdc::User u, DBPool *p) : loggedIn(true), user(u), db_pool(p) {
+SessionImpl::SessionImpl(sdc::User u, DBPool *p, ChatManager *mgr) :
+  loggedIn(true), user(u), db_pool(p), chat_mgr(mgr) {
 }
 
 void SessionImpl::logout(const Ice::Current&) {
@@ -47,7 +48,7 @@ void SessionImpl::deleteUser(const sdc::User &u, const Ice::Current&) {
 
 string SessionImpl::initChat(const Ice::Current&) {
   INFO("initChat by ", user.ID);
-  auto cp = cmng->newChat();
+  auto cp = chat_mgr->newChat();
   cp->addUser(user);
   return cp->getName();
 }

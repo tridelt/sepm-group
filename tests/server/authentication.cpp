@@ -23,12 +23,14 @@ class AuthenticationTest : public ::testing::Test {
     sql << "DROP TABLE IF EXISTS users;";
     password = "secret";
     u.ID = "hello@" + Config::hostname();
-    auth = new AuthenticationImpl(&server_mock, pool);
+    mgr = new ChatManager();
+    auth = new AuthenticationImpl(&server_mock, pool, mgr);
   }
 
   virtual void TearDown() {
     delete pool;
     delete auth;
+    delete mgr;
   }
 
   DBPool *pool;
@@ -37,6 +39,7 @@ class AuthenticationTest : public ::testing::Test {
   string password;
   sdc::User u;
   AuthenticationImpl *auth;
+  ChatManager *mgr;
   IceServerMock server_mock;  // used by auth to expose the SessionI
 };
 

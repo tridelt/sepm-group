@@ -6,6 +6,7 @@
 #include <string>
 #include "DBPool.h"
 #include "IceServerI.h"
+#include "ChatManager.h"
 
 using namespace std;
 
@@ -63,6 +64,7 @@ private:
   Ice::CommunicatorPtr ic;
   Ice::ObjectAdapterPtr oa;
   DBPool *db_pool;
+  ChatManager *chat_mgr;
 };
 
 #endif

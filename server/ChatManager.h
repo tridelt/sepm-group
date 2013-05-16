@@ -8,6 +8,7 @@ using namespace std;
 
 class ChatManager {
   public:
+    ChatManager();
     shared_ptr<Chat> newChat();
     void rmChat(string);
     //TODO getChat

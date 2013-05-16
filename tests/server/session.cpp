@@ -24,14 +24,16 @@ class SessionTest : public ::testing::Test {
     sql << "DROP TABLE IF EXISTS users;";
     password = "secret";
     u.ID = "hello@" + Config::hostname();
-    auth = new AuthenticationImpl(&server_mock, pool);
-    session = new SessionImpl(u, pool);
+    mgr = new ChatManager();
+    auth = new AuthenticationImpl(&server_mock, pool, mgr);
+    session = new SessionImpl(u, pool, mgr);
   }
 
   virtual void TearDown() {
     delete pool;
     delete auth;
     delete session;
+    delete mgr;
   }
 
   DBPool *pool;
@@ -41,6 +43,7 @@ class SessionTest : public ::testing::Test {
   sdc::User u;
   AuthenticationImpl *auth;
   SessionImpl *session;
+  ChatManager *mgr;
   IceServerMock server_mock;  // used by auth to expose the SessionI
 };
 
@@ -171,4 +174,13 @@ TEST_F(SessionTest, CanRetrieveUser) {
 
 TEST_F(SessionTest, CantLeaveChatUserIsNotIn) {
   ASSERT_THROW(session->leaveChat("chan@" + Config::hostname(), curr), sdc::SessionException);
+}
+
+TEST_F(SessionTest, ChatNamesShouldBeUnique) {
+  ASSERT_NE(session->initChat(curr), session->initChat(curr));
+}
+
+
+TEST_F(SessionTest, CanOnlySendToExistingChannels) {
+  ASSERT_THROW(session->sendMessage(sdc::ByteSeq(), "someChan", curr), sdc::MessageException);
 }

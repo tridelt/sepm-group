@@ -116,6 +116,6 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
   user.publicKey = sdc::ByteSeq(pubkey.get().begin(), pubkey.get().end());
 
   // TODO: make sure session created here doesn't leak
-  auto proxy = server->exposeObject(new SessionImpl(user, db_pool));
+  auto proxy = server->exposeObject(new SessionImpl(user, db_pool, chat_mgr));
   return sdc::SessionIPrx::checkedCast(proxy);
 }

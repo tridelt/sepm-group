@@ -9,7 +9,7 @@ class DBPool;
 
 class SessionImpl : public virtual sdc::SessionI {
 public:
-  SessionImpl(sdc::User, DBPool *p);
+  SessionImpl(sdc::User, DBPool *p, ChatManager *mgr);
   void logout(const Ice::Current&);
   sdc::User retrieveUser(const string&, const Ice::Current&) { return sdc::User(); }
   std::string initChat(const Ice::Current&);
@@ -26,7 +26,7 @@ private:
   bool loggedIn;
   sdc::User user;
   DBPool *db_pool;
-  ChatManager *cmng;
+  ChatManager *chat_mgr;
 };
 
 #endif
