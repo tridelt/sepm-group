@@ -1,6 +1,6 @@
 add_definitions(-D__SKIP_GNU)   # for ow-crypt (don't redeclare crypt(3))
 
-add_library(server_lib SHARED backward.cpp IceServer.cpp AuthenticationImpl.cpp SessionImpl.cpp PwdHash.cpp)
+add_library(server_lib SHARED backward.cpp IceServer.cpp AuthenticationImpl.cpp SessionImpl.cpp PwdHash.cpp Chat.cpp ChatManager.cpp)
 
 add_executable(server server.cpp ${out_file} ${copy_deps})
 

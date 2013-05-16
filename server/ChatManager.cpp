@@ -2,8 +2,13 @@
 #include "Chat.h"
 
 using namespace std;
-ChatManager::addChat(Chat c){
-  chats["Chat"+i] = c;
-  c.setName("Chat"+i);
-  i++;
+
+shared_ptr<Chat> ChatManager::newChat(){
+	shared_ptr<Chat> cp(new Chat("Chat"+(i++)));
+  chats[cp->getName()]=cp;
+  return cp;
+}
+
+void ChatManager::rmChat(string){
+	//TODO implement rmChat
 }

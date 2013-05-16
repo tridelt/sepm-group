@@ -2,18 +2,23 @@
 #define CHAT_H
 
 #include "SecureDistributedChat.h"
-#include "UserManager.h"
+
+//#include "UserManager.h"
 
 using namespace std;
 class Chat{
   public:
-    String getName();
-    void setName();
-    void addUser(const &User);
-    void rmUser(const &User);
-    User getUser(const &String);
+    Chat(string);
+    string getName();
+    void addUser(const sdc::User&);
+    void rmUser(const sdc::User&);
+    sdc::User getUser(const string&);
+    //TODO vector<sdc::User> getUsers()
   private:
-    String name;
-    map<String,sdc::User> users;
-    UserManager *usermng;
+    string name;
+    map<string,sdc::User> users;
+    //UserManager *usermng;
+    //TODO UserManager implementation
 };
+
+#endif
