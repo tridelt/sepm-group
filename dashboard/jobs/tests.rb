@@ -4,6 +4,8 @@ max_length = 25
 
 SCHEDULER.every '60m', :first_in => 0 do |job|
   tests = Array.new
+  no_tests = 0
+  no_failed = 0
 
   Dir.glob("/var/lib/jenkins/jobs/sepm/builds/*") { |fn|
     build_name = File.basename(fn)
@@ -13,20 +15,13 @@ SCHEDULER.every '60m', :first_in => 0 do |job|
           contents = file.read
           no_tests = contents.scan("<case>").length
           no_failed = contents.scan("<errorDetails>").length
-
-          tests.push({
-            name: Integer(build_name),
-            total: no_tests,
-            failed: no_failed
-          })
         }
-      else
-        tests.push({
-            name: Integer(build_name),
-            total: 0,
-            failed: 0
-          })
       end
+      tests.push({
+        name: Integer(build_name),
+        total: no_tests,
+        failed: no_failed
+      })
     end
   }
 
