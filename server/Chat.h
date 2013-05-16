@@ -11,5 +11,11 @@ class Chat{
     String name;
     map<String,sdc::User> users;
     UserManager *usermng;
+<<<<<<< Updated upstream
 
 };
+=======
+};
+
+#endif
+>>>>>>> Stashed changes

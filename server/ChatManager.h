@@ -12,3 +12,5 @@ class ChatManager {
   private:
     map <String, Chat> chats;
 };
+
+#endif
