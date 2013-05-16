@@ -6,10 +6,6 @@ string Chat::getName(){
   return name;
 }
 
-void Chat::setName(const string &s){
-  name=s;
-}
-
 void Chat::addUser(const sdc::User &u){
   users[u.ID]=u;
 }

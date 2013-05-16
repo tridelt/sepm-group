@@ -3,8 +3,7 @@
 
 using namespace std;
 string ChatManager::newChat(){
-  Chat *c= new Chat;
-  c->setName("Chat"+(i++));
+  Chat *c= new Chat("Chat"+(i++));
   chats[c->getName()].reset(c);
   return c->getName();
 }

@@ -8,7 +8,6 @@ using namespace std;
 class Chat{
   public:
     string getName();
-    void setName(const string&);
     void addUser(const sdc::User&);
     void rmUser(const sdc::User&);
     sdc::User getUser(const string&);
