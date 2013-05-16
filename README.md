@@ -32,7 +32,7 @@ For an introduction to Google Test, see the [Primer](https://code.google.com/p/g
 
 Libraries (Qt, boost, ZeroC ICE), binaries, etc. needed to compile:
 ```
-sudo apt-get install git cmake make gcc-4.6 g++-4.6 build-essential libqt4-dev libqca2-dev libboost-program-options-dev libboost-filesystem-dev libzeroc-ice34-dev zlib1g-dev libsqlite3-dev
+sudo apt-get install git cmake make gcc-4.6 g++-4.6 build-essential libqt4-dev libqca2-dev libboost-program-options-dev libboost-filesystem-dev libboost-thread-dev libzeroc-ice34-dev zlib1g-dev libsqlite3-dev
 ```
 
 
