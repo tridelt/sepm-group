@@ -7,8 +7,9 @@ using namespace std;
 
 class ChatManager {
   public:
-    string newChat();
-    void rmChat(string);    
+    shared_ptr<Chat> newChat();
+    void rmChat(string);
+    //TODO getChat 
   private:
     map <string, shared_ptr<Chat>> chats;
     int i;
