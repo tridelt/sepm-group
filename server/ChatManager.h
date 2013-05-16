@@ -6,11 +6,11 @@ using namespace std;
 
 class ChatManager {
   public:
-    ChatManager();
-    addChat(Chat);
-    
+    String newChat();
+    void rmChat(String);    
   private:
     map <String, Chat> chats;
+    int i;
 };
 
 #endif
