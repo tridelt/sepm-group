@@ -2,6 +2,10 @@
 #include "SecureDistributedChat.h"
 
 using namespace std;
+Chat::Chat(string s){
+	name=s;
+}
+
 string Chat::getName(){
   return name;
 }
