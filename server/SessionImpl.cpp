@@ -47,8 +47,7 @@ void SessionImpl::deleteUser(const sdc::User &u, const Ice::Current&) {
 
 string SessionImpl::initChat(const Ice::Current&) {
   INFO("initChat by ", user.ID);
-  shared_ptr<Chat> cp;
-  cp=cmng->newChat();
+  auto cp = cmng->newChat();
   cp->addUser(user);
   return cp->getName();
 }
