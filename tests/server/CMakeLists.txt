@@ -9,7 +9,7 @@ add_executable(test_server_exec
 
 target_link_libraries(test_server_exec gtest gtest_main pthread ${LIBS} common)
 
-target_link_libraries(test_server_exec server_lib)
+target_link_libraries(test_server_exec server_lib ow-crypt)
 
 add_dependencies(test_server_exec server_lib)
 

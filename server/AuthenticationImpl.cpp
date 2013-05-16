@@ -7,6 +7,7 @@
 #include "Logging.h"
 #include "IceServer.h"
 #include "config.h"
+#include "PwdHash.h"
 
 using namespace std;
 using namespace soci;
@@ -36,14 +37,23 @@ void AuthenticationImpl::registerUser(const sdc::User &u, const string &pw,
     throw sdc::AuthenticationException("ID already exists");
   }
 
-  // TODO: properly hash the password (bcrypt)
-  string pubkey(u.publicKey.begin(), u.publicKey.end());
+  string pubkey(u.publicKey.begin(), u.publicKey.end()), hash;
+
+  try {
+    hash = genhash(pw, gensetting());
+  }
+  catch(...) {
+    ERROR("internal failure when hashing");
+    throw sdc::AuthenticationException("internal failure, please notify an admin");
+  }
+
   sql << "INSERT INTO users(id, pw, pubkey) VALUES (:id, :pw, :pubkey)",
-    use(name), use(pw), use(pubkey);
+    use(name), use(hash), use(pubkey);
 
   // don't log passwords!
   INFO("Registered ", u.ID);
 }
+
 
 sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
     const Ice::Identity &callbackID, const Ice::Current &cur) {
@@ -70,8 +80,17 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
     throw sdc::AuthenticationException("unknown ID");
   }
 
-  // TODO: proper password hashing
-  if(pw != storedPw.get()) {
+
+  bool validpass = false;
+  try {
+    validpass = checkhash(pw, storedPw.get());
+  } catch(...) {
+    // check failure separately to avoid confusing users
+    ERROR("internal failure when hashing");
+    throw sdc::AuthenticationException("internal failure, please notify an admin");
+  }
+
+  if(!validpass) {
     INFO("rejected login for invalid password");
     throw sdc::AuthenticationException("invalid password");
   }
