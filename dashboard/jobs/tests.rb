@@ -26,7 +26,7 @@ SCHEDULER.every '60m', :first_in => 0 do |job|
       }
     end
     tests.push({
-      name: Integer(build_name),
+      name: build_num,
       total: no_tests,
       failed: no_failed
     })
