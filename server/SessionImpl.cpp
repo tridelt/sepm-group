@@ -4,6 +4,7 @@
 #include "sdcHelper.h"
 #include "SessionImpl.h"
 #include "Logging.h"
+#include "Chat.h"
 
 using namespace std;
 using namespace soci;
@@ -45,6 +46,7 @@ void SessionImpl::deleteUser(const sdc::User &u, const Ice::Current&) {
 }
 
 string SessionImpl::initChat(const Ice::Current&) {
+  c.initChat();
   INFO("<stub> initChat by ", user.ID);
   return "";
 }

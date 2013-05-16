@@ -2,6 +2,7 @@
 #define SESSION_IMPL_H
 
 #include "SecureDistributedChat.h"
+#include "ChatMng.h"
 using namespace std;
 
 class DBPool;
@@ -25,6 +26,7 @@ private:
   bool loggedIn;
   sdc::User user;
   DBPool *db_pool;
+  Chat *c;
 };
 
 #endif
