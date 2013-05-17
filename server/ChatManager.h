@@ -2,6 +2,7 @@
 #define CHATMANAGER_H
 
 #include "SecureDistributedChat.h"
+#include <boost/shared_ptr.hpp>
 #include "Chat.h"
 
 using namespace std;
