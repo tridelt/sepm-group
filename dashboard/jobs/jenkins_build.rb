@@ -46,8 +46,6 @@ job_mapping.each do |title, jenkins_project|
       percent = get_completion_percentage(jenkins_project[:pre_job])
     end
 
-    print current_status
-
     send_event(title, {
       currentResult: current_status,
       lastResult: last_status,
