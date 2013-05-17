@@ -13,8 +13,8 @@ void Chat::addUser(const sdc::User &u){
   users[u.ID]=u;
 }
 
-void Chat::rmUser(const sdc::User &u){
-  users.erase(u.ID);
+bool Chat::rmUser(const sdc::User &u){
+  return users.erase(u.ID) == 1;
 }
 
 sdc::User Chat::getUser(const string &s){

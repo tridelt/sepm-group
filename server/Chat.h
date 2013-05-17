@@ -11,7 +11,10 @@ class Chat{
     Chat(string);
     string getName();
     void addUser(const sdc::User&);
-    void rmUser(const sdc::User&);
+    /**
+     * @return false if user was not in chat, true otherwise
+     */
+    bool rmUser(const sdc::User&);
     sdc::User getUser(const string&);
     //TODO vector<sdc::User> getUsers()
   private:

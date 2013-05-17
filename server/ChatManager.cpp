@@ -14,6 +14,10 @@ shared_ptr<Chat> ChatManager::newChat() {
   return cp;
 }
 
+shared_ptr<Chat> ChatManager::getChat(const string &name) {
+    return chats.at(name);  // possible exception must be caught by caller
+}
+
 void ChatManager::rmChat(string){
 	//TODO implement rmChat
 }

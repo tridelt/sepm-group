@@ -54,7 +54,15 @@ string SessionImpl::initChat(const Ice::Current&) {
 }
 
 void SessionImpl::leaveChat(const string &chat, const Ice::Current&) {
-  INFO("<stub> ", user.ID, " leaves chat ", chat);
+  INFO("leaveChat ", user.ID, " leaves chat ", chat);
+  shared_ptr<Chat> cp;
+  try {
+    cp = chat_mgr->getChat(chat);
+  } catch(...) {
+    //TODO: forward to remote server if chat is not local
+    throw sdc::SessionException("chat " + chat + " does not exist");
+  }
+  if(!cp->rmUser(user)) throw sdc::SessionException("you are not in chat " + chat);
 }
 
 

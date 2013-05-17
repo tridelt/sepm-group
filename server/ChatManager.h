@@ -11,6 +11,7 @@ class ChatManager {
   public:
     ChatManager();
     shared_ptr<Chat> newChat();
+    shared_ptr<Chat> getChat(const string &name);
     void rmChat(string);
     //TODO getChat
   private:
