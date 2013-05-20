@@ -16,10 +16,6 @@
 
 namespace cm{
 
-	ChatManager::ChatManager(){
-		
-	}
-
 	ChatManager::ChatManager(std::string host, int port, std::string cert_path) 
 		throw (ServerUnavailableException, FileNotFoundException):
 		session(NULL) {
@@ -207,17 +203,6 @@ namespace cm{
 			ERROR(e);
 		}
 	}
-
-	/*
-	void ChatManager::sendMessage(const sdc::ByteSeq& msg, const string& chatID) throw (CommunicationException, NotLoggedInException, InvalidChatIDException){
-		//test if currently logged in
-		if(!isLoggedin())
-			throw(NotLoggedInException());
-
-		//TODO: Error handly. check if logged in.
-		session->sendMessage(msg, chatID);
-	}
-	*/
 
 	ChatManager::~ChatManager(){
 

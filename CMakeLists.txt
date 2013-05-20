@@ -34,9 +34,17 @@ set(CMAKE_AUTOMOC TRUE)
 
 find_package(ZeroCIce REQUIRED)
 
-find_package(Qt4 COMPONENTS QtCore REQUIRED)
+find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
+
+#ui files
+file(GLOB GUI_CPP ui/*.cpp)
+file(GLOB GUI_UI ui/*.ui)
+
+QT4_WRAP_UI(GUI_UI_H ${GUI_UI})
+ADD_LIBRARY(GUI SHARED ${GUI_CPP} ${GUI_UI_H})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 find_package(QCA2 REQUIRED)
 

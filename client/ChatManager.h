@@ -66,7 +66,6 @@ namespace cm{
 		
 
 		public:
-			ChatManager();
 			ChatManager(std::string hostname, int port, std::string cert) throw(ServerUnavailableException, FileNotFoundException);
 			void registerUser(sdc::User user, QString pwd) throw (AlreadyRegisteredException, CommunicationException);
 			bool isOnline(void);
