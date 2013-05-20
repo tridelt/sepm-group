@@ -80,13 +80,15 @@ namespace cm{
 
 			//to load existing chats
 			void initChat(const sdc::StringSeq&, const std::string&, const sdc::ByteSeq&, const Ice::Current&);
-			void addChatParticipant(const sdc::User&, const std::string&, const Ice::Current&) {}
-			void removeChatParticipant(const sdc::User&, const std::string&, const Ice::Current&){};
+			void addChatParticipant(const sdc::User&, const std::string&, const Ice::Current&);
+			void removeChatParticipant(const sdc::User&, const std::string&, const Ice::Current&);
 			void appendMessageToChat(const sdc::ByteSeq&, const std::string&, const sdc::User&, const Ice::Current&);
-			void sendMessage(const sdc::ByteSeq&, const std::string&) throw (CommunicationException, NotLoggedInException, InvalidChatIDException);
+			void sendMessage(const sdc::ByteSeq&, const std::string&) throw (CommunicationException, NotLoggedInException);
 
 			std::string echo(const std::string &s, const Ice::Current&) { return s; }
 			~ChatManager();
+		private:
+			ChatInstance* findChat(std::string chatID) throw (InvalidChatIDException);
 	};
 }
 

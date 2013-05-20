@@ -208,6 +208,7 @@ namespace cm{
 		}
 	}
 
+	/*
 	void ChatManager::sendMessage(const sdc::ByteSeq& msg, const string& chatID) throw (CommunicationException, NotLoggedInException, InvalidChatIDException){
 		//test if currently logged in
 		if(!isLoggedin())
@@ -216,6 +217,7 @@ namespace cm{
 		//TODO: Error handly. check if logged in.
 		session->sendMessage(msg, chatID);
 	}
+	*/
 
 	ChatManager::~ChatManager(){
 
@@ -226,5 +228,101 @@ namespace cm{
 		//TODO: free ice
 		if(this->ic)
 			ic->destroy();
+	}
+
+	void ChatManager::initChat(const sdc::StringSeq& users, const std::string& chatID, const sdc::ByteSeq& key, const Ice::Current&){
+
+		//Look for a Chatinstance. If none is found, insert a new Chatinstance into the Hashmap chats.
+		try{
+			findChat(chatID);
+		}catch(InvalidChatIDException& e){
+			chats->insert(QString::fromStdString(chatID), new ChatInstance(users, chatID, key));
+			return;
+		}
+
+		INFO("Chat already initialized");
+
+	}
+
+	
+	void ChatManager::addChatParticipant(const sdc::User& participant, const std::string& chatID, const Ice::Current&){
+
+		ChatInstance *ci;
+
+		try{
+			ci = findChat(chatID);
+		}catch(InvalidChatIDException& e){
+			ERROR(e.what());
+		}		
+		
+		ci->addChatParticipant(participant);
+	}
+
+
+	void ChatManager::removeChatParticipant(const sdc::User& participant, const std::string& chatID, const Ice::Current&){
+
+		ChatInstance *ci;
+
+		try{
+			ci = findChat(chatID);
+		}catch(InvalidChatIDException& e){
+			ERROR(e.what());
+		}
+		
+		ci->removeChatParticipant(participant);
+	}
+
+	
+	void ChatManager::appendMessageToChat(const sdc::ByteSeq& message, const std::string& chatID, const sdc::User& participant, const Ice::Current&){
+		
+		ChatInstance *ci;
+
+		try{
+			ci = findChat(chatID);
+		}catch(InvalidChatIDException& e){
+			ERROR(e.what());
+		}
+
+		ci->appendMessageToChat(message, participant);
+
+	}
+
+	
+	void ChatManager::sendMessage(const sdc::ByteSeq& message, const std::string& chatID) throw (CommunicationException, NotLoggedInException){
+
+		if(!isLoggedin())
+			throw(new NotLoggedInException());
+
+		try{
+			findChat(chatID);
+		}catch(InvalidChatIDException& e){
+			ERROR(e.what());
+		}
+
+		session->sendMessage(message, chatID);
+
+	}
+	
+
+	ChatInstance* ChatManager::findChat(string chatID) throw (InvalidChatIDException){
+
+		QMultiHash<QString, ChatInstance*>::iterator i = chats->find(QString::fromStdString(chatID));
+		
+		ChatInstance *ci;
+
+		//find returns an iterator. Therefor the while-loop.
+		//Break, if the first occurence of the desired chat is found		
+		while(i != chats->end() && i.key() == QString::fromStdString(chatID)) {
+		     ci = i.value();
+		     break;
+		}
+
+		//If no chat is found
+		//TODO checken ,obs so passt
+		if(ci == NULL){
+			throw(new InvalidChatIDException);
+		}
+
+		return ci;
 	}
 }
