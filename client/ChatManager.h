@@ -46,7 +46,7 @@ namespace cm{
 	};
 
 	//TODO: Singleton
-	class ChatManager{
+	class ChatManager : public virtual sdc::ChatClientCallbackI{
 
 		// list of all ChatInstances
 		QMultiHash<QString, ChatInstance*> *chats;
@@ -66,11 +66,12 @@ namespace cm{
 		
 
 		public:
+			ChatManager();
 			ChatManager(std::string hostname, int port, std::string cert) throw(ServerUnavailableException, FileNotFoundException);
 			void registerUser(sdc::User user, QString pwd) throw (AlreadyRegisteredException, CommunicationException);
 			bool isOnline(void);
 			bool isLoggedin(void);
-			void login(sdc::User user, std::string pwd) throw (CommunicationException);
+			void login(sdc::User user, QString pwd) throw (CommunicationException);
 			void logout(void) throw (CommunicationException, NotLoggedInException);
 			//to create a new one
 			QString initChat() throw (CommunicationException, NotLoggedInException, InvalidChatIDException);

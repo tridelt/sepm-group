@@ -16,6 +16,9 @@
 
 namespace cm{
 
+	ChatManager::ChatManager(){
+		
+	}
 
 	ChatManager::ChatManager(std::string host, int port, std::string cert_path) 
 		throw (ServerUnavailableException, FileNotFoundException):
@@ -32,7 +35,7 @@ namespace cm{
 		if (!boost::filesystem::exists(cert_path)){
 	    	ERROR("cert not found! " + cert_path);
 
-	    	throw(new FileNotFoundException());
+	    	throw(FileNotFoundException());
 		}
 
 		///init ice
@@ -59,27 +62,27 @@ namespace cm{
 		  } catch (const Ice::ConnectTimeoutException& e) {
 			ERROR("timeout while establishing connection - check server and port");
 
-			throw(new ServerUnavailableException());
+			throw(ServerUnavailableException());
 		  } catch (const Ice::PluginInitializationException& e) {
 			ERROR("failed to initialize SSL plugin - are you using the correct certificate?");
 
 			//FIXME: find more suitable exception
-			throw(new ServerUnavailableException());
+			throw(ServerUnavailableException());
 		  } catch (const Ice::EndpointParseException& e) {
 			ERROR("Failed to create endpoint, check server and port: " 
 				+ host + "/" 
 				+ boost::lexical_cast<string>(port));
 
-			throw(new ServerUnavailableException());
+			throw(ServerUnavailableException());
 		  } catch (const Ice::DNSException& e) {
 			ERROR("error resolving hostname");
 
-			throw(new ServerUnavailableException());
+			throw(ServerUnavailableException());
 		  }catch (const Ice::Exception& e) {
 		  	//FIXME:exctract message from e
 			ERROR(e);
 
-			throw(new ServerUnavailableException());
+			throw(ServerUnavailableException());
 		  }
 
 		/// try to create Proxy
@@ -101,7 +104,7 @@ namespace cm{
 		} catch(const sdc::AuthenticationException& e){
 			//TODO: log entry
 			//TODO: Errorhandling
-			throw(new AlreadyRegisteredException());
+			throw(AlreadyRegisteredException());
 		}
 	}
 
@@ -147,7 +150,7 @@ namespace cm{
 	 * @param pwd password for authentication purposes
 	 */
 
-	void ChatManager::login(sdc::User user, std::string pwd) throw (CommunicationException){
+	void ChatManager::login(sdc::User user, QString pwd) throw (CommunicationException){
 		try{
 			sdc::AuthenticationIPrx auth = sdc::AuthenticationIPrx::checkedCast(base);
 
@@ -156,11 +159,11 @@ namespace cm{
 			ident.name = IceUtil::generateUUID();
 			ident.category = "";
 
-			adapter->add((sdc::ChatClientCallbackI*)this, ident);
+			adapter->add(this, ident);
 			adapter->activate();
 			base->ice_getConnection()->setAdapter(adapter);
 
-			session = auth->login(user, pwd, ident);
+			session = auth->login(user, pwd.toStdString(), ident);
 		} catch(const sdc::AuthenticationException& e){
 			//FIXME: exctract error message
 			ERROR(e);
@@ -174,7 +177,7 @@ namespace cm{
 
 		//test if currently logged in
 		if(!isLoggedin())
-			throw(new NotLoggedInException());
+			throw(NotLoggedInException());
 
 		//create new Chat
 		try{
@@ -186,7 +189,7 @@ namespace cm{
 
 		//id validation
 		if(chatID == "")
-			throw(new InvalidChatIDException());
+			throw(InvalidChatIDException());
 
 		return QString::fromStdString(chatID);
 	}
@@ -195,7 +198,7 @@ namespace cm{
 	void ChatManager::logout(void) throw (CommunicationException, NotLoggedInException){
 		//test if currently logged in
 		if(!isLoggedin())
-			throw(new NotLoggedInException());
+			throw(NotLoggedInException());
 
 		try{
 			session->logout();
@@ -208,7 +211,7 @@ namespace cm{
 	void ChatManager::sendMessage(const sdc::ByteSeq& msg, const string& chatID) throw (CommunicationException, NotLoggedInException, InvalidChatIDException){
 		//test if currently logged in
 		if(!isLoggedin())
-			throw(new NotLoggedInException());
+			throw(NotLoggedInException());
 
 		//TODO: Error handly. check if logged in.
 		session->sendMessage(msg, chatID);

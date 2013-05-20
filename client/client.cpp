@@ -1,57 +1,124 @@
+
+//std
 #include <iostream>
+
+//boost
 #include <boost/program_options.hpp>
 #include <boost/bind.hpp>
-#include "FileWatcher.h"
-#include "ViewRefresher.h"
+
+//Qt
+#include <QDir>
+
+//helper
+#include "sdcHelper.h"
+#include "Security.h"
+
+//homebrew
+#include "ChatManager.h"
 #include "ExitHandler.h"
-#include "PluginManager.h"
-#include <QtConcurrentRun>
 #include "Logging.h"
+#include "ui_ChatMainWindow.h"
+#include "ui_ChatWelcomeWindow.h"
 
 namespace po = boost::program_options;
 using namespace std;
+using namespace cm;
+
+void shutdown(){
+  QApplication::quit();
+}
 
 int main(int argc, char** argv) {
-  po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help,h", "produce help message")
-  ;
+ QApplication app(argc, argv);
 
-  po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, desc), vm);
-  po::notify(vm);
+  //open main window
+  QMainWindow *mw = new QMainWindow;
+  Ui_ChatMainWindow ui;
 
-  if(vm.count("help")) {
-    cout << desc << "\n";
-    return 1;
+  ui.setupUi(mw);
+  mw->show();
+
+  //start Communication Manager
+  //TODO: Dialog to set host etc if its not already set.
+  QString host("sepm.furidamu.org");
+  int port = 1337;
+  QString cert(QDir::homePath() + "/.config/sdc/ca.crt");
+
+  QString user("dominik@sepm.furidamu.org");
+  QString pw("123");
+
+  //create testuser
+  sdc::User u;
+  u.ID = user.toStdString();
+
+  ChatManager* cm;
+  cm = new ChatManager(host.toStdString(), port, cert.toStdString());
+
+  //test connectivity
+  if(cm->isOnline()){
+    INFO("Connection established");
+  }else{
+    ERROR("Could not connect!");
+    shutdown();
   }
 
-  INFO("Hello from client");
+  //register
+  try{
+    cm->registerUser(u, pw);
+  } catch(AlreadyRegisteredException& e){
+    INFO("already registered");
+  }
 
 
-  try {
+  //login
+  try{
+    cm->login(u, pw);
+  } catch(CommunicationException& e){
+    INFO("already registered");
+  }
 
-    ViewRefresher refresher;
-    FileWatcher watcher("./ui", boost::bind(&ViewRefresher::fileChanged, &refresher, _1, _2, _3));
+  //open login/logout dialog if no active user set
+  if(true){
+    INFO("look, user is active.");
 
-    // create or modify a file in ./ui to see the changes getting picked up
-    FileWatcher demo("./ui", [](string name, bool isDir, FileWatcher::FileEvent e) {
-      switch(e) {
-        case FileWatcher::CREATE:
-          cout << "created ";
-          break;
-        case FileWatcher::MODIFY:
-          cout << "modified ";
-          break;
-        case FileWatcher::DELETE:
-          cout << "deleted ";
-          break;
-        default:
-          cout << "unknown event: ";
-      }
-      cout << (isDir ? "dir " : "file ");
-      cout << name << endl;
-    });
+    //TODO: open active conversations
+    //TODO: load contacts
+  }else{
+    //show welcome dialog
+    //QDialog *wel = new QDialog;
+    //Ui_ChatWelcomeWindow cw_ui;
+    //cw_ui.setupUi(wel);
+    //wel->show();
+
+    //set user in comunicationmanager
+    //entweder register und login oder nur login aufrufen
+
+    //TODO: register
+    //cm->registerUser("christ", "123", "/home/chris/.config/sdc/public_chris@hotz@sepm.furidamu.org.pem");s
+  }
+
+  /*
+   *
+   * login
+   *
+   */
+
+   //add user to props
+   //cm->addUser(u);
+
+   //cm->registerUser(user, pw);
+
+   //cm->login(u, pw);
+
+   //cm->initChat();
+
+   try{
+    cm->logout();
+   }catch(NotLoggedInException& e){
+    ERROR("hey, you are not logged in! ");
+   }
+
+   
 
     ExitHandler::i()->setHandler([](int) {
       // called when SIGINT (eg by Ctrl+C) is received
@@ -60,15 +127,12 @@ int main(int argc, char** argv) {
       // bad - cout not guaranteed to work, since not reentrant
       // this is just to show the handler is working
       INFO(" Got signal .. terminating");
+      shutdown();
+      
     });
 
-    PluginManager manager;
 
-    manager.listPlugins();
-
-  } catch(PluginException ex) {
-    cerr << ex.what() << endl;
-  }
-
-  return 0;
+  return app.exec();
 }
+
+
