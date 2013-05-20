@@ -85,6 +85,12 @@ namespace cm{
 		/// try to create Proxy
 	}
 
+	/**
+	 * registerUser
+	 *
+	 * register new chat user
+	 */
+
 	void ChatManager::registerUser(sdc::User user, QString pwd) throw (AlreadyRegisteredException, CommunicationException){
 		try{
 			sdc::AuthenticationIPrx auth = sdc::AuthenticationIPrx::checkedCast(base);
@@ -100,10 +106,13 @@ namespace cm{
 	}
 
 	/**
-	 * 
+	 * isOnline
 	 *
-	 * @return true if connected
+	 * Helperfunction to test connectivity
+	 *
+	 * @return true if connected, otherwise false
 	 */
+
 	bool ChatManager::isOnline(void){
 		try{
 			base->ice_ping();
@@ -114,6 +123,14 @@ namespace cm{
 		return true;
 	}
 
+	/**
+	 * isLoggedin
+	 *
+	 * Helperfunction to test authentication status
+	 *
+	 * @returns true if a chatuser is loggedin, otherwise false.
+	 */
+
 	bool ChatManager::isLoggedin(void){
 		if(!session)
 			return false;
@@ -121,7 +138,14 @@ namespace cm{
 	}
 
 
-
+	/**
+	 * login
+	 *
+	 * Authentication method for Chat. Requirement for most chat functions.
+	 *
+	 * @param user user-struct
+	 * @param pwd password for authentication purposes
+	 */
 
 	void ChatManager::login(sdc::User user, std::string pwd) throw (CommunicationException){
 		try{
@@ -132,8 +156,6 @@ namespace cm{
 			ident.name = IceUtil::generateUUID();
 			ident.category = "";
 
-			//Callback
-			//auto cb = new ChatClientCallbackImpl;
 			adapter->add((sdc::ChatClientCallbackI*)this, ident);
 			adapter->activate();
 			base->ice_getConnection()->setAdapter(adapter);
