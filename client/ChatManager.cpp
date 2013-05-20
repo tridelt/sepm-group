@@ -11,6 +11,9 @@
 //ice
 #include <IceUtil/IceUtil.h>
 
+//helper
+ #include "Security.h"
+
 //homebrew
 #include "Logging.h"
 
@@ -18,7 +21,7 @@ namespace cm{
 
 	ChatManager::ChatManager(std::string host, int port, std::string cert_path) 
 		throw (ServerUnavailableException, FileNotFoundException):
-		session(NULL) {
+		session(NULL),keysize(512),loggedInUser(NULL){
 		INFO("try to establish connection");
 
 		this->host = host;
@@ -165,6 +168,8 @@ namespace cm{
 			ERROR(e);
 
 		}
+
+		loggedInUser = &user;
 	}
 
 	/** 
@@ -186,13 +191,28 @@ namespace cm{
 		try{
 			chatID = session->initChat();
 		} catch(sdc::SessionException& e){
-			//TODO: exceptionhandling
+			//TODO Exception handling
 		}
-
 
 		//id validation
 		if(chatID == "")
-			throw(InvalidChatIDException());
+			throw(InvalidChatIDException());		
+
+		//Security helper
+		sdc::Security *sec = new sdc::Security();
+
+		//Chat participants
+		sdc::StringSeq users;
+
+		//generate session-key
+		sdc::ByteSeq key = sec->genAESKey(keysize);
+
+		ChatInstance *ci = new ChatInstance(users, chatID, key);
+
+		//add logged in User to the Chat-Participants
+		ci->addChatParticipant(*loggedInUser);
+
+		chats->insert(QString::fromStdString(chatID), ci);
 
 		return QString::fromStdString(chatID);
 	}
@@ -235,6 +255,8 @@ namespace cm{
 			//FIXME: extract error message
 			ERROR(e);
 		}
+
+		//TODO loggedInUser, den man beim login gesetzt hat, wieder auf NULL setzen
 	}
 
 	

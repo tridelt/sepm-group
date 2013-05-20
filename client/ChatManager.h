@@ -63,6 +63,13 @@ namespace cm{
 
 		Ice::ObjectPrx base;
 		sdc::SessionIPrx session;
+
+		// security
+		int keysize;
+
+		//logged in User
+		sdc::User *loggedInUser;
+
 		
 
 		public:
