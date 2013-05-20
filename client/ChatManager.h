@@ -78,6 +78,7 @@ namespace cm{
 			//ChatClientCallbackI
 
 			//to load existing chats
+			//TODO: add throw
 			void initChat(const sdc::StringSeq&, const std::string&, const sdc::ByteSeq&, const Ice::Current&);
 			void addChatParticipant(const sdc::User&, const std::string&, const Ice::Current&);
 			void removeChatParticipant(const sdc::User&, const std::string&, const Ice::Current&);

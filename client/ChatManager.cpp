@@ -247,11 +247,15 @@ namespace cm{
 
 		try{
 			ci = findChat(chatID);
+
+			ci->addChatParticipant(participant);
 		}catch(InvalidChatIDException& e){
 			ERROR(e.what());
-		}		
+		}catch(sdc::ParticipationException& e){
+			ERROR(e.ice_name());
+		}	
 		
-		ci->addChatParticipant(participant);
+		
 	}
 
 	/**
@@ -266,11 +270,15 @@ namespace cm{
 
 		try{
 			ci = findChat(chatID);
+
+			ci->removeChatParticipant(participant);
 		}catch(InvalidChatIDException& e){
 			ERROR(e.what());
+		}catch(sdc::ParticipationException& e){
+			ERROR(e.ice_name());
 		}
 		
-		ci->removeChatParticipant(participant);
+		
 	}
 
 	/**
@@ -285,11 +293,13 @@ namespace cm{
 
 		try{
 			ci = findChat(chatID);
+
+			ci->appendMessageToChat(message, participant);
 		}catch(InvalidChatIDException& e){
 			ERROR(e.what());
+		}catch(sdc::MessageCallbackException& e){
+			ERROR(e.ice_name());
 		}
-
-		ci->appendMessageToChat(message, participant);
 
 	}
 
@@ -302,15 +312,24 @@ namespace cm{
 	void ChatManager::sendMessage(const sdc::ByteSeq& message, const std::string& chatID) throw (CommunicationException, NotLoggedInException){
 
 		if(!isLoggedin())
-			throw(new NotLoggedInException());
+			throw(NotLoggedInException());
 
 		try{
 			findChat(chatID);
+
+			session->sendMessage(message, chatID);
 		}catch(InvalidChatIDException& e){
+			//TODO: throw Exception?!
 			ERROR(e.what());
+		}catch(sdc::MessageException& e){
+			//TODO: throw Communication Exception?!
+			ERROR(e.ice_name());
+		}catch(sdc::InterServerException& e){
+			throw(CommunicationException());
+			ERROR(e.ice_name());
 		}
 
-		session->sendMessage(message, chatID);
+		
 
 	}
 	
@@ -324,7 +343,7 @@ namespace cm{
 
 	ChatInstance* ChatManager::findChat(string chatID) throw (InvalidChatIDException){
 
-		QMultiHash<QString, ChatInstance*>::iterator i = chats->find(QString::fromStdString(chatID));
+		auto i = chats->find(QString::fromStdString(chatID));
 		
 		ChatInstance *ci;
 
@@ -338,7 +357,7 @@ namespace cm{
 		//If no chat is found
 		//TODO checken ,obs so passt
 		if(ci == NULL){
-			throw(new InvalidChatIDException);
+			throw(InvalidChatIDException());
 		}
 
 		return ci;
