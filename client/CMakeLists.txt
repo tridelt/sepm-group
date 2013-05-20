@@ -1,4 +1,4 @@
-add_executable(client client.cpp backward.cpp ChatManager.cpp ${copy_deps})
+add_executable(client client.cpp backward.cpp ChatManager.cpp ChatInstance.cpp ${copy_deps})
 
 set(LIBS ${LIBS})
 target_link_libraries(client common)
