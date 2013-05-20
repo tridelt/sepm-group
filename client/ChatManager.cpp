@@ -37,8 +37,8 @@ namespace cm{
 		///init ice
 
 		try {
-			//TODO props only local?
-			INFO("try");
+			//TODO: props only local?
+
 		    // enable the SSL plugin for secure connections
 		    props->setProperty("Ice.Plugin.IceSSL", "IceSSL:createIceSSL");
 
@@ -75,8 +75,7 @@ namespace cm{
 
 			throw(ServerUnavailableException());
 		  }catch (const Ice::Exception& e) {
-		  	//FIXME:exctract message from e
-			ERROR(e);
+			ERROR(e.ice_name());
 
 			throw(ServerUnavailableException());
 		  }
@@ -96,8 +95,7 @@ namespace cm{
 
 			auth->registerUser(user, pwd.toStdString());
 		} catch(const sdc::AuthenticationException& e){
-			//TODO: log entry
-			//TODO: Errorhandling
+			ERROR(e.ice_name());
 			throw(AlreadyRegisteredException());
 		}
 	}
@@ -159,8 +157,7 @@ namespace cm{
 
 			session = auth->login(user, pwd.toStdString(), ident);
 		} catch(const sdc::AuthenticationException& e){
-			//FIXME: exctract error message
-			ERROR(e);
+			ERROR(e.ice_name());
 
 		}
 	}
@@ -184,7 +181,7 @@ namespace cm{
 		try{
 			chatID = session->initChat();
 		} catch(sdc::SessionException& e){
-			//TODO: exceptionhandling
+			ERROR(e.ice_name());
 		}
 
 
@@ -230,8 +227,7 @@ namespace cm{
 		try{
 			session->logout();
 		} catch(sdc::UserHandlingException& e){
-			//FIXME: extract error message
-			ERROR(e);
+			ERROR(e.what());
 		}
 	}
 
