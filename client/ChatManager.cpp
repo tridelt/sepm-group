@@ -80,8 +80,6 @@ namespace cm{
 
 			throw(ServerUnavailableException());
 		  }
-
-		/// try to create Proxy
 	}
 
 	/**
@@ -354,7 +352,9 @@ namespace cm{
 
 	ChatManager::~ChatManager(){
 
-		//TODO: close connection
+		//TODO: iterate hashmap and delete all ChatInstances
+
+		//TODO: close connection and logout
 
 		//TODO: free member attributes
 
