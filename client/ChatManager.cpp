@@ -90,7 +90,8 @@ namespace cm{
 	 * register new chat user
 	 */
 
-	void ChatManager::registerUser(sdc::User user, QString pwd) throw (AlreadyRegisteredException, CommunicationException){
+	void ChatManager::registerUser(sdc::User user, QString pwd) throw 
+		(AlreadyRegisteredException, CommunicationException){
 		try{
 			sdc::AuthenticationIPrx auth = sdc::AuthenticationIPrx::checkedCast(base);
 
@@ -202,7 +203,8 @@ namespace cm{
 		//generate session-key
 		sdc::ByteSeq key = sec->genAESKey(keysize);
 
-		ChatInstance *ci = new ChatInstance(users, chatID, key);
+		ChatInstance *ci = new ChatInstance(users, chatID, key,
+			boost::bind(&ChatManager::sendMessage, this, _1, _2));
 
 		//add logged in User to the Chat-Participants
 		ci->addChatParticipant(*loggedInUser);
@@ -218,13 +220,20 @@ namespace cm{
 	 * callback if another user creates new chat
 	 */
 
-	void ChatManager::initChat(const sdc::StringSeq& users, const std::string& chatID, const sdc::ByteSeq& key, const Ice::Current&){
+	void ChatManager::initChat(const sdc::StringSeq& users, const std::string& chatID,
+		const sdc::ByteSeq& key, const Ice::Current&){
+
+		INFO("Try to initilize Chat");
 
 		//Look for a Chatinstance. If none is found, insert a new Chatinstance into the Hashmap
 		try{
 			findChat(chatID);
 		}catch(InvalidChatIDException& e){
-			chats->insert(QString::fromStdString(chatID), new ChatInstance(users, chatID, key));
+
+			//If no Chat is found, add a new one to the chats-Hashmap
+			chats->insert(QString::fromStdString(chatID), new ChatInstance(users, chatID, key,
+				boost::bind(&ChatManager::sendMessage, this, _1, _2)));
+			INFO("Chat Initialized");
 			return;
 		}
 
@@ -247,10 +256,10 @@ namespace cm{
 		try{
 			session->logout();
 		} catch(sdc::UserHandlingException& e){
-			ERROR(e.what());
+			ERROR(e.ice_name());
 		}
 
-		//TODO loggedInUser, den man beim login gesetzt hat, wieder auf NULL setzen
+		loggedInUser = NULL;
 	}
 
 	
@@ -259,7 +268,10 @@ namespace cm{
 	 *
 	 * callback to add user to given chat
 	 */
-	void ChatManager::addChatParticipant(const sdc::User& participant, const std::string& chatID, const Ice::Current&){
+	void ChatManager::addChatParticipant(const sdc::User& participant,
+		const std::string& chatID, const Ice::Current&){
+
+		INFO("Try to add Chat-Participant");
 
 		ChatInstance *ci;
 
@@ -273,6 +285,7 @@ namespace cm{
 			ERROR(e.ice_name());
 		}	
 		
+		INFO("Chat-Participant added");
 		
 	}
 
@@ -282,7 +295,10 @@ namespace cm{
 	 * callback to remove participant from given chat
 	 */
 
-	void ChatManager::removeChatParticipant(const sdc::User& participant, const std::string& chatID, const Ice::Current&){
+	void ChatManager::removeChatParticipant(const sdc::User& participant,
+		const std::string& chatID, const Ice::Current&){
+
+		INFO("Try to remove Chat-Participant");
 
 		ChatInstance *ci;
 
@@ -296,7 +312,7 @@ namespace cm{
 			ERROR(e.ice_name());
 		}
 		
-		
+		INFO("Chat Participant removed!");
 	}
 
 	/**
@@ -305,8 +321,11 @@ namespace cm{
 	 * callback to append message to given Chat
 	 */
 
-	void ChatManager::appendMessageToChat(const sdc::ByteSeq& message, const std::string& chatID, const sdc::User& participant, const Ice::Current&){
+	void ChatManager::appendMessageToChat(const sdc::ByteSeq& message, const std::string& chatID,
+		const sdc::User& participant, const Ice::Current&){
 		
+		INFO("Try to append Message to Chat!");
+
 		ChatInstance *ci;
 
 		try{
@@ -319,6 +338,8 @@ namespace cm{
 			ERROR(e.ice_name());
 		}
 
+		INFO("Message appended to CHat!");
+
 	}
 
 	/**
@@ -327,7 +348,10 @@ namespace cm{
 	 * send new message to given chat
 	 */
 
-	void ChatManager::sendMessage(const sdc::ByteSeq& message, const std::string& chatID) throw (CommunicationException, NotLoggedInException){
+	void ChatManager::sendMessage(const sdc::ByteSeq& message, const std::string& chatID)
+		throw (CommunicationException, NotLoggedInException){
+
+		INFO("Try to Send Message!");
 
 		if(!isLoggedin())
 			throw(NotLoggedInException());
@@ -347,8 +371,7 @@ namespace cm{
 			ERROR(e.ice_name());
 		}
 
-		
-
+		INFO("Message sent");
 	}
 	
 	/**
@@ -360,6 +383,10 @@ namespace cm{
 	 */
 
 	ChatInstance* ChatManager::findChat(string chatID) throw (InvalidChatIDException){
+
+
+		INFO("Try to find Chat");
+
 
 		auto i = chats->find(QString::fromStdString(chatID));
 		
@@ -377,6 +404,8 @@ namespace cm{
 		if(ci == NULL){
 			throw(InvalidChatIDException());
 		}
+
+		INFO("Chat found");
 
 		return ci;
 	}
@@ -399,4 +428,6 @@ namespace cm{
 		if(this->ic)
 			ic->destroy();
 	}
+
+	//TODO implement echo()
 }
