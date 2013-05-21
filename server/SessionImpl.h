@@ -3,13 +3,14 @@
 
 #include "SecureDistributedChat.h"
 #include "ChatManager.h"
+#include "ChatClientCallbackInd.h"
 using namespace std;
 
 class DBPool;
 
 class SessionImpl : public virtual sdc::SessionI {
 public:
-  SessionImpl(sdc::User, DBPool *p, ChatManager *mgr);
+  SessionImpl(sdc::User, DBPool *p, ChatManager *mgr, shared_ptr<ChatClientCallbackInd> cb);
   void logout(const Ice::Current&);
   sdc::User retrieveUser(const string&, const Ice::Current&) { return sdc::User(); }
   std::string initChat(const Ice::Current&);
@@ -27,6 +28,7 @@ private:
   sdc::User user;
   DBPool *db_pool;
   ChatManager *chat_mgr;
+  shared_ptr<ChatClientCallbackInd> callback;
 };
 
 #endif

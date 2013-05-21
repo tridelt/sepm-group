@@ -9,8 +9,9 @@
 using namespace std;
 using namespace soci;
 
-SessionImpl::SessionImpl(sdc::User u, DBPool *p, ChatManager *mgr) :
-  loggedIn(true), user(u), db_pool(p), chat_mgr(mgr) {
+SessionImpl::SessionImpl(sdc::User u, DBPool *p, ChatManager *mgr,
+  shared_ptr<ChatClientCallbackInd> cb) :
+  loggedIn(true), user(u), db_pool(p), chat_mgr(mgr), callback(cb) {
 }
 
 void SessionImpl::logout(const Ice::Current&) {
@@ -67,8 +68,10 @@ void SessionImpl::leaveChat(const string &chat, const Ice::Current&) {
 
 
 void SessionImpl::invite(const sdc::User &other, const string &chat,
-  const sdc::ByteSeq &, const Ice::Current&) {
+  const sdc::ByteSeq &pubkey, const Ice::Current&) {
   INFO("<stub> ", user.ID, " invites ", other.ID, " to ", chat);
+  //callback->initChat(chat_mgr->getChat(chat)->getUsers(), chat, pubkey);
+  auto pk = pubkey;	// silence unused parameter warning for now
 }
 
 void SessionImpl::sendMessage(const sdc::ByteSeq &, const string &chat,
