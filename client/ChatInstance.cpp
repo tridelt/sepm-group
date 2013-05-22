@@ -45,6 +45,8 @@
 
 		QString message = cw_ui.txt_message->toPlainText();
 
+		cw_ui.txt_message->setText("");
+
 		sendCallback(sdc::sdcHelper::bStringToByteSeq(message.toLocal8Bit().data(),
 			message.length()), this->chatID);
 	}

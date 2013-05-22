@@ -39,6 +39,8 @@ class ChatInstance : public QObject{
 		void appendMessageToChat(sdc::ByteSeq, sdc::User);
 		~ChatInstance();
 
+		//TODO invite(User participant, string chatID, ByteSeq sessionKey)
+
 	private:
 		int findUser(QString userID);
 		void leaveChat();
