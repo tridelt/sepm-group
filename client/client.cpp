@@ -5,6 +5,7 @@
 //boost
 #include <boost/program_options.hpp>
 #include <boost/bind.hpp>
+#include <boost/filesystem.hpp>
 
 //Qt
 #include <QDir>
@@ -43,18 +44,31 @@ int main(int argc, char** argv) {
   //start Communication Manager
   //TODO: Dialog to set host etc if its not already set.
   QString host("sepm.furidamu.org");
+  QString user("maioran@sepm.furidamu.org");
+  QString pw("123");
   int port = 1337;
   QString cert(QDir::homePath() + "/.config/sdc/ca.crt");
-  //TODO: generate keys
-  QString pubkey(QDir::homePath() + "/.config/sdc/public_chris@hotz@sepm.furidamu.org.pem");
-
-  QString user("albino@sepm.furidamu.org");
-  QString pw("123");
+  QString publicKey_path(QDir::homePath() + "/.config/sdc/public_sepm.furidamu.org.pem");
+  QString privateKey_path(QDir::homePath() + "/.config/sdc/private_sepm.furidamu.org.pem");
 
   //create testuser
   sdc::User u;
   u.ID = user.toStdString();
-  u.publicKey = sec.readPubKey(pubkey);
+  sdc::ByteSeq privateKey;
+  
+
+
+  //check keys
+  if (!boost::filesystem::exists(publicKey_path.toStdString())){
+    sec.genRSAKey(u.publicKey, privateKey);
+
+    //store keys
+    sec.savePrivKey(privateKey, privateKey_path);
+    sec.savePubKey(u.publicKey, publicKey_path);
+
+  } else{
+    u.publicKey = sec.readPubKey(publicKey_path);
+  }
 
   ChatManager* cm;
   cm = new ChatManager(host.toStdString(), port, cert.toStdString());
@@ -68,11 +82,11 @@ int main(int argc, char** argv) {
   }
 
   //register
- /* try{
+  try{
     cm->registerUser(u, pw);
   } catch(AlreadyRegisteredException& e){
     INFO("already registered");
-  }*/
+  }
 
 
   //login
