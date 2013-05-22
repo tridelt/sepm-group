@@ -23,8 +23,8 @@ class SessionManager {
     sessionlist sessions;
 };
 
-#define userCallback(mgr, u, callback) {\
-  auto sl = mgr->getSessions(u);\
+#define userCallback(srv, u, callback) {\
+  auto sl = srv->session_mgr->getSessions(u);\
   for(auto iter = sl.first; iter != sl.second; ++iter) {\
     iter->second->getCallback()->callback;\
   }\

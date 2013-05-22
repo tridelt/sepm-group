@@ -61,12 +61,20 @@ public:
   void exit() {
     ic->shutdown();
   }
-private:
-  Ice::CommunicatorPtr ic;
-  Ice::ObjectAdapterPtr oa;
+
+  /**
+   * determines if the given string is (one of) the hostname(s) of this server
+   */
+  bool isLocal(const string &) {
+    return true;
+  }
+
   DBPool *db_pool;
   ChatManager *chat_mgr;
   SessionManager *session_mgr;
+private:
+  Ice::CommunicatorPtr ic;
+  Ice::ObjectAdapterPtr oa;
 };
 
 #endif

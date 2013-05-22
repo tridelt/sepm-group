@@ -24,7 +24,7 @@ void AuthenticationImpl::registerUser(const sdc::User &u, const string &pw,
     WARN("malformed ID ", u.ID);
   }
 
-  session sql(db_pool->getPool());
+  session sql(server->db_pool->getPool());
 
   sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, pubkey text)";
 
@@ -67,7 +67,7 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
     WARN("malformed ID ", u.ID);
   }
 
-  session sql(db_pool->getPool());
+  session sql(server->db_pool->getPool());
 
   sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, pubkey text)";
 
@@ -116,7 +116,6 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
   user.publicKey = sdc::ByteSeq(pubkey.get().begin(), pubkey.get().end());
 
   // TODO: make sure session created here doesn't leak
-  auto proxy = server->exposeObject(new SessionImpl(user, db_pool, chat_mgr,
-                                                    session_mgr, callback));
+  auto proxy = server->exposeObject(new SessionImpl(user, server, callback));
   return sdc::SessionIPrx::checkedCast(proxy);
 }
