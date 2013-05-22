@@ -14,6 +14,9 @@
 #include <Ice/Ice.h>
 #include <IceSSL/IceSSL.h>
 
+//helper
+ #include "Security.h"
+
 //homebrew
 #include "ChatInstance.h"
 
@@ -51,6 +54,8 @@ namespace cm{
 		// list of all ChatInstances
 		QMultiHash<QString, ChatInstance*> *chats;
 
+		sdc::Security sec;
+
 		// connection information
 		std::string host;
 		std::string cert_path;
@@ -70,7 +75,9 @@ namespace cm{
 		//logged in User
 		sdc::User *loggedInUser;
 
-		
+		//contacts
+		sdc::ContactList contacts;
+
 
 		public:
 			ChatManager(std::string hostname, int port, std::string cert) throw(ServerUnavailableException, FileNotFoundException);
@@ -96,6 +103,9 @@ namespace cm{
 			~ChatManager();
 		private:
 			ChatInstance* findChat(std::string chatID) throw (InvalidChatIDException);
+			//
+			void retrieveContactList() throw(CommunicationException, NotLoggedInException);
+			void saveContactList() throw(CommunicationException, NotLoggedInException);
 	};
 }
 

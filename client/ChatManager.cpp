@@ -11,9 +11,6 @@
 //ice
 #include <IceUtil/IceUtil.h>
 
-//helper
- #include "Security.h"
-
 //homebrew
 #include "Logging.h"
 
@@ -130,8 +127,12 @@ namespace cm{
 	 */
 
 	bool ChatManager::isLoggedin(void){
-		if(!session)
+		try{
+			session->ice_ping();
+		} catch (const Ice::Exception& e) {
 			return false;
+		}
+
 		return true;
 	}
 
@@ -146,6 +147,7 @@ namespace cm{
 	 */
 
 	void ChatManager::login(sdc::User user, QString pwd) throw (CommunicationException){
+		INFO("login " + user.ID);
 		try{
 			sdc::AuthenticationIPrx auth = sdc::AuthenticationIPrx::checkedCast(base);
 
@@ -159,6 +161,10 @@ namespace cm{
 			base->ice_getConnection()->setAdapter(adapter);
 
 			session = auth->login(user, pwd.toStdString(), ident);
+
+			//TODO: retrieveContactList
+
+			//retrieveContactList();
 		} catch(const sdc::AuthenticationException& e){
 			ERROR(e.ice_name());
 
@@ -176,6 +182,8 @@ namespace cm{
 	 */
 
 	QString ChatManager::initChat() throw (CommunicationException, NotLoggedInException, InvalidChatIDException){
+		INFO("initnew Chat");
+
 		std::string chatID;
 
 		//test if currently logged in
@@ -187,20 +195,22 @@ namespace cm{
 			chatID = session->initChat();
 		} catch(sdc::SessionException& e){
 			ERROR(e.ice_name());
+			//TODO: abort
 		}
+
 
 		//id validation
 		if(chatID == "")
 			throw(InvalidChatIDException());		
 
-		//Security helper
-		sdc::Security *sec = new sdc::Security();
-
 		//Chat participants
 		sdc::StringSeq users;
 
+		//add current user
+		//users.push_back(*loggedInUser);
+
 		//generate session-key
-		sdc::ByteSeq key = sec->genAESKey(keysize);
+		sdc::ByteSeq key = sec.genAESKey(keysize);
 
 		ChatInstance *ci = new ChatInstance(users, chatID, key);
 
@@ -210,6 +220,57 @@ namespace cm{
 		chats->insert(QString::fromStdString(chatID), ci);
 
 		return QString::fromStdString(chatID);
+
+	}
+
+	
+	void ChatManager::saveContactList() throw(CommunicationException, NotLoggedInException){
+		sdc::SecureContainer sc;
+		sdc::Security sec;
+
+		sdc::ByteSeq c;
+
+		//serialize
+		Ice::OutputStreamPtr out = Ice::createOutputStream(ic);
+		//FIXME: cast. 
+		out->write((Ice::Byte*) &contacts[0], (Ice::Byte*)&contacts[contacts.size()]);
+		out->endEncapsulation();
+    	out->finished(c);
+
+		//TODO:encryption
+		sc.data = c;
+
+		//sign data
+		sc.signature = sec.signRSA(loggedInUser->publicKey, c);
+	}
+
+	//TOO return value
+	void ChatManager::retrieveContactList() throw(CommunicationException, NotLoggedInException){
+
+		if(!isLoggedin())
+			throw(NotLoggedInException());
+
+		try{
+			sdc::SecureContainer container = session->retrieveContactList();
+			
+			//TODO: check signature
+
+			//TODO: decryption
+			//sdc::ByteSeq data = container.data;
+
+			Ice::InputStreamPtr in = Ice::createInputStream(ic, container.data);
+
+			in->read(contacts);
+
+
+			//TODO: deserialisation
+			//in.read();
+			//in->endEncapsulation();
+
+
+		} catch(sdc::ContactException& e){
+
+		}
 	}
 
 	/**
@@ -247,7 +308,7 @@ namespace cm{
 		try{
 			session->logout();
 		} catch(sdc::UserHandlingException& e){
-			ERROR(e.what());
+			ERROR(e.ice_name());
 		}
 
 		//TODO loggedInUser, den man beim login gesetzt hat, wieder auf NULL setzen
@@ -328,6 +389,7 @@ namespace cm{
 	 */
 
 	void ChatManager::sendMessage(const sdc::ByteSeq& message, const std::string& chatID) throw (CommunicationException, NotLoggedInException){
+		INFO("send Message");
 
 		if(!isLoggedin())
 			throw(NotLoggedInException());
@@ -390,6 +452,8 @@ namespace cm{
 	ChatManager::~ChatManager(){
 
 		//TODO: iterate hashmap and delete all ChatInstances
+
+		//TODO::saveContactList
 
 		//TODO: close connection and logout
 

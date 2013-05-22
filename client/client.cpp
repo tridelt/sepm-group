@@ -31,6 +31,8 @@ void shutdown(){
 int main(int argc, char** argv) {
  QApplication app(argc, argv);
 
+  sdc::Security sec;
+
   //open main window
   QMainWindow *mw = new QMainWindow;
   Ui_ChatMainWindow ui;
@@ -43,13 +45,16 @@ int main(int argc, char** argv) {
   QString host("sepm.furidamu.org");
   int port = 1337;
   QString cert(QDir::homePath() + "/.config/sdc/ca.crt");
+  //TODO: generate keys
+  QString pubkey(QDir::homePath() + "/.config/sdc/public_chris@hotz@sepm.furidamu.org.pem");
 
-  QString user("dominik@sepm.furidamu.org");
+  QString user("albino@sepm.furidamu.org");
   QString pw("123");
 
   //create testuser
   sdc::User u;
   u.ID = user.toStdString();
+  u.publicKey = sec.readPubKey(pubkey);
 
   ChatManager* cm;
   cm = new ChatManager(host.toStdString(), port, cert.toStdString());
@@ -63,19 +68,37 @@ int main(int argc, char** argv) {
   }
 
   //register
-  try{
+ /* try{
     cm->registerUser(u, pw);
   } catch(AlreadyRegisteredException& e){
     INFO("already registered");
-  }
+  }*/
 
 
   //login
   try{
     cm->login(u, pw);
   } catch(CommunicationException& e){
-    INFO("already registered");
+    INFO("could not login!");
   }
+
+  //init new chat
+  //try{
+    std::string chatid = cm->initChat().toStdString();
+  //} catch(){
+
+  //}
+
+  std::string msg = "hi, du";
+
+  sdc::ByteSeq data(msg.begin(), msg.end());
+
+  cm->sendMessage(data ,chatid);
+
+  //catch contact list
+
+
+
 
   //open login/logout dialog if no active user set
   if(true){
