@@ -56,8 +56,6 @@ int main(int argc, char** argv) {
   u.ID = user.toStdString();
   sdc::ByteSeq privateKey;
   
-
-
   //check keys
   if (!boost::filesystem::exists(publicKey_path.toStdString())){
     sec.genRSAKey(u.publicKey, privateKey);
@@ -89,7 +87,11 @@ int main(int argc, char** argv) {
   }
 
 
-  //login
+  /*
+   *
+   * login
+   *
+   */
   try{
     cm->login(u, pw);
   } catch(CommunicationException& e){
@@ -103,51 +105,6 @@ int main(int argc, char** argv) {
 
   //}
 
-  std::string msg = "hi, du";
-
-  sdc::ByteSeq data(msg.begin(), msg.end());
-
-  cm->sendMessage(data ,chatid);
-
-  //catch contact list
-
-
-
-
-  //open login/logout dialog if no active user set
-  if(true){
-    INFO("look, user is active.");
-
-    //TODO: open active conversations
-    //TODO: load contacts
-  }else{
-    //show welcome dialog
-    //QDialog *wel = new QDialog;
-    //Ui_ChatWelcomeWindow cw_ui;
-    //cw_ui.setupUi(wel);
-    //wel->show();
-
-    //set user in comunicationmanager
-    //entweder register und login oder nur login aufrufen
-
-    //TODO: register
-    //cm->registerUser("christ", "123", "/home/chris/.config/sdc/public_chris@hotz@sepm.furidamu.org.pem");s
-  }
-
-  /*
-   *
-   * login
-   *
-   */
-
-   //add user to props
-   //cm->addUser(u);
-
-   //cm->registerUser(user, pw);
-
-   //cm->login(u, pw);
-
-   //cm->initChat();
 
    try{
     cm->logout();
