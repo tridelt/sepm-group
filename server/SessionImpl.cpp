@@ -14,11 +14,15 @@ SessionImpl::SessionImpl(sdc::User u, DBPool *p, ChatManager *mgr,
   loggedIn(true), user(u), db_pool(p), chat_mgr(mgr), callback(cb) {
 }
 
+sdc::User SessionImpl::retrieveUser(const string &id, const Ice::Current&) {
+  INFO("<stub> retrieveUser ", id);
+  return sdc::User();
+}
+
 void SessionImpl::logout(const Ice::Current&) {
   INFO("<stub> logging out ", user.ID);
   this->loggedIn = false;
 }
-
 
 void SessionImpl::deleteUser(const sdc::User &u, const Ice::Current&) {
   //TODO: implement permission model so privileged users can delete others?
@@ -69,9 +73,11 @@ void SessionImpl::leaveChat(const string &chat, const Ice::Current&) {
 
 void SessionImpl::invite(const sdc::User &other, const string &chat,
   const sdc::ByteSeq &pubkey, const Ice::Current&) {
-  INFO("<stub> ", user.ID, " invites ", other.ID, " to ", chat);
-  //callback->initChat(chat_mgr->getChat(chat)->getUsers(), chat, pubkey);
-  auto pk = pubkey;	// silence unused parameter warning for now
+  INFO(user.ID, " invites ", other.ID, " to ", chat);
+
+  auto c = chat_mgr->getChat(chat);
+  //userCallback(other.ID, initChat(c->getUsers(), chat, pubkey);
+  auto pk = pubkey;
 }
 
 void SessionImpl::sendMessage(const sdc::ByteSeq &, const string &chat,
