@@ -104,6 +104,9 @@ namespace cm{
 			void sendMessage(const sdc::ByteSeq&, const std::string&) throw (CommunicationException, NotLoggedInException);
 
 			std::string echo(const std::string &s, const Ice::Current&) { return s; }
+
+			//gui helpers
+			QList<QString>* getContacts(void);
 			~ChatManager();
 		private:
 			ChatInstance* findChat(std::string chatID) throw (InvalidChatIDException);

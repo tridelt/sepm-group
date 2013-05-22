@@ -87,8 +87,6 @@ namespace cm{
 		try{
 			sdc::AuthenticationIPrx auth = sdc::AuthenticationIPrx::checkedCast(base);
 
-			//TODO: test connectivity and maybe throw new CommunicationException
-
 			auth->registerUser(user, pwd.toStdString());
 		} catch(const sdc::AuthenticationException& e){
 			ERROR(e.ice_name());
@@ -191,7 +189,7 @@ namespace cm{
 			chatID = session->initChat();
 		} catch(sdc::SessionException& e){
 			ERROR(e.ice_name());
-			//TODO: abort
+			throw(CommunicationException());
 		}
 
 
@@ -255,13 +253,31 @@ namespace cm{
 		if(!isLoggedin())
 			throw(NotLoggedInException());
 
+		//FIXME: Stub
+		sdc::User a;
+		sdc::User b;
+		sdc::User c;
+		sdc::User d;
+
+		a.ID = "peter";
+		b.ID = "jürgen";
+		c.ID = "ommi";
+		d.ID = "mama";
+
+		contacts.push_back(a);
+		contacts.push_back(b);
+		contacts.push_back(c);
+		contacts.push_back(d);
+
+
+/**
 		try{
 			sdc::SecureContainer container = session->retrieveContactList();
 
 			//TODO: decryption
 			sdc::ByteSeq data = container.data;
 
-			////TODO: check signature
+			////check signature
 			if(!sec.verifyRSA(loggedInUser->publicKey, data, container.signature))
 				throw(SignatureException());
 
@@ -274,12 +290,16 @@ namespace cm{
 			//in.read();
 			//in->endEncapsulation();
 
-
 		} catch(sdc::ContactException& e){
-			//TODO: errorhandling
+			ERROR("ContactException!");
+			throw(CommunicationException());
 		} catch(sdc::SecurityException& e){
-			//TODO: errorhandling
+			ERROR("SecurityException!");
+			throw(CommunicationException());
 		}
+		**/
+
+
 	}
 
 	/**
@@ -428,14 +448,14 @@ namespace cm{
 
 			session->sendMessage(message, chatID);
 		}catch(InvalidChatIDException& e){
-			//TODO: throw Exception?!
 			ERROR(e.what());
-		}catch(sdc::MessageException& e){
-			//TODO: throw Communication Exception?!
-			ERROR(e.ice_name());
-		}catch(sdc::InterServerException& e){
 			throw(CommunicationException());
+		}catch(sdc::MessageException& e){
 			ERROR(e.ice_name());
+			throw(CommunicationException());
+		}catch(sdc::InterServerException& e){
+			ERROR(e.ice_name());
+			throw(CommunicationException());
 		}
 	}
 	
@@ -465,6 +485,22 @@ namespace cm{
 			throw(InvalidChatIDException());
 
 		return ci;
+	}
+
+	/**
+	 * getContacts
+	 *
+	 * @return list of all contacts
+	 */
+
+	QList<QString>* ChatManager::getContacts(void){
+		QList<QString> *list = new QList<QString>();
+
+		for(size_t i; i < contacts.size(); i++){
+			list->append(QString::fromStdString(contacts.at(i).ID));
+		}
+
+		return list;
 	}
 
 	/**
