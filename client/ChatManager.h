@@ -47,6 +47,10 @@ namespace cm{
 			public:
 				InvalidChatIDException() : std::runtime_error("Unknown or invalid ChatID!") { }
 	};
+	class SignatureException : public std::runtime_error {
+			public:
+				SignatureException() : std::runtime_error("Seems to found wrong signation!") { }
+	};
 
 	//TODO: Singleton
 	class ChatManager : public virtual sdc::ChatClientCallbackI{
@@ -105,6 +109,9 @@ namespace cm{
 
 
 			std::string echo(const std::string &s, const Ice::Current&) { return s; }
+
+			//gui helpers
+			QList<QString>* getContacts(void);
 			~ChatManager();
 		private:
 			ChatInstance* findChat(std::string chatID) throw (InvalidChatIDException);

@@ -18,14 +18,9 @@ namespace cm{
 
 	ChatManager::ChatManager(std::string host, int port, std::string cert_path) 
 		throw (ServerUnavailableException, FileNotFoundException):
-		session(NULL),keysize(512),loggedInUser(NULL){
+		host(host), cert_path(cert_path), port(port), session(NULL),keysize(512),loggedInUser(NULL){
+
 		INFO("try to establish connection");
-
-		this->host = host;
-		this->port = port;
-		this->cert_path = cert_path;
-
-		props = Ice::createProperties();
 
 		//try to find file
 		if (!boost::filesystem::exists(cert_path)){
@@ -37,7 +32,7 @@ namespace cm{
 		///init ice
 
 		try {
-			//TODO: props only local?
+			props = Ice::createProperties();
 
 		    // enable the SSL plugin for secure connections
 		    props->setProperty("Ice.Plugin.IceSSL", "IceSSL:createIceSSL");
@@ -91,8 +86,6 @@ namespace cm{
 		(AlreadyRegisteredException, CommunicationException){
 		try{
 			sdc::AuthenticationIPrx auth = sdc::AuthenticationIPrx::checkedCast(base);
-
-			//TODO: test connectivity and maybe throw new CommunicationException
 
 			auth->registerUser(user, pwd.toStdString());
 		} catch(const sdc::AuthenticationException& e){
@@ -196,7 +189,7 @@ namespace cm{
 			chatID = session->initChat();
 		} catch(sdc::SessionException& e){
 			ERROR(e.ice_name());
-			//TODO: abort
+			throw(CommunicationException());
 		}
 
 
@@ -244,7 +237,7 @@ namespace cm{
 		//serialize
 		Ice::OutputStreamPtr out = Ice::createOutputStream(ic);
 		//FIXME: cast. 
-		out->write((Ice::Byte*) &contacts[0], (Ice::Byte*)&contacts[contacts.size()]);
+	//	out->write(&contacts[0], &contacts[contacts.size()]);
 		out->endEncapsulation();
     	out->finished(c);
 
@@ -261,13 +254,33 @@ namespace cm{
 		if(!isLoggedin())
 			throw(NotLoggedInException());
 
+		//FIXME: Stub
+		sdc::User a;
+		sdc::User b;
+		sdc::User c;
+		sdc::User d;
+
+		a.ID = "peter";
+		b.ID = "jürgen";
+		c.ID = "ommi";
+		d.ID = "mama";
+
+		contacts.push_back(a);
+		contacts.push_back(b);
+		contacts.push_back(c);
+		contacts.push_back(d);
+
+
+/**
 		try{
 			sdc::SecureContainer container = session->retrieveContactList();
-			
-			//TODO: check signature
 
 			//TODO: decryption
-			//sdc::ByteSeq data = container.data;
+			sdc::ByteSeq data = container.data;
+
+			////check signature
+			if(!sec.verifyRSA(loggedInUser->publicKey, data, container.signature))
+				throw(SignatureException());
 
 			Ice::InputStreamPtr in = Ice::createInputStream(ic, container.data);
 
@@ -278,10 +291,16 @@ namespace cm{
 			//in.read();
 			//in->endEncapsulation();
 
-
 		} catch(sdc::ContactException& e){
-
+			ERROR("ContactException!");
+			throw(CommunicationException());
+		} catch(sdc::SecurityException& e){
+			ERROR("SecurityException!");
+			throw(CommunicationException());
 		}
+		**/
+
+
 	}
 
 	/**
@@ -432,17 +451,15 @@ namespace cm{
 
 			session->sendMessage(message, chatID);
 		}catch(InvalidChatIDException& e){
-			//TODO: throw Exception?!
 			ERROR(e.what());
-		}catch(sdc::MessageException& e){
-			//TODO: throw Communication Exception?!
-			ERROR(e.ice_name());
-		}catch(sdc::InterServerException& e){
 			throw(CommunicationException());
+		}catch(sdc::MessageException& e){
 			ERROR(e.ice_name());
+			throw(CommunicationException());
+		}catch(sdc::InterServerException& e){
+			ERROR(e.ice_name());
+			throw(CommunicationException());
 		}
-
-		INFO("Message sent");
 	}
 
 	void ChatManager::leaveChat(const string& chatID){
@@ -468,7 +485,7 @@ namespace cm{
 	 */
 
 	ChatInstance* ChatManager::findChat(string chatID) throw (InvalidChatIDException){
-		ChatInstance *ci;
+		ChatInstance *ci = NULL;
 
 		INFO("Try to find Chat");
 
@@ -481,14 +498,26 @@ namespace cm{
 		
 
 		//If no chat is found
-		//TODO checken ,obs so passt
-		if(ci == NULL){
+		if(ci)
 			throw(InvalidChatIDException());
-		}
-
-		INFO("Chat found");
 
 		return ci;
+	}
+
+	/**
+	 * getContacts
+	 *
+	 * @return list of all contacts
+	 */
+
+	QList<QString>* ChatManager::getContacts(void){
+		QList<QString> *list = new QList<QString>();
+
+		for(size_t i; i < contacts.size(); i++){
+			list->append(QString::fromStdString(contacts.at(i).ID));
+		}
+
+		return list;
 	}
 
 	/**
@@ -499,18 +528,21 @@ namespace cm{
 
 	ChatManager::~ChatManager(){
 
-		//TODO: iterate hashmap and delete all ChatInstances
+		//delete all ChatInstances
+		for(int i = 0; i < chats.size(); i++){
+			delete chats.at(i);
+		}
 
 		//TODO::saveContactList
+		//saveContactList();
 
-		//TODO: close connection and logout
+		if(isLoggedin())
+			logout();
 
-		//TODO: free member attributes
+		if(loggedInUser)
+			delete loggedInUser;
 
-		//TODO: free ice
 		if(this->ic)
 			ic->destroy();
 	}
-
-	//TODO implement echo()
 }
