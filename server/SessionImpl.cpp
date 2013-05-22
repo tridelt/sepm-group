@@ -57,6 +57,7 @@ void SessionImpl::deleteUser(const sdc::User &u, const Ice::Current&) {
 string SessionImpl::initChat(const Ice::Current&) {
   INFO("initChat by ", user.ID);
   auto cp = chat_mgr->newChat();
+  //TODO: prevent creation of new chat with exisiting name
   cp->addUser(user);
   return cp->getName();
 }
@@ -79,7 +80,8 @@ void SessionImpl::invite(const sdc::User &other, const string &chat,
   INFO(user.ID, " invites ", other.ID, " to ", chat);
 
   auto c = chat_mgr->getChat(chat);
-  //userCallback(session_mgr, other.ID, initChat(c->getUsers(), chat, pubkey));
+  //TODO: relay to remote server if applicable
+  userCallback(session_mgr, other.ID, initChat(c->getUserList(), chat, pubkey));
   auto pk = pubkey;
 }
 

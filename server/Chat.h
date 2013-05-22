@@ -16,7 +16,8 @@ class Chat{
      */
     bool rmUser(const sdc::User&);
     sdc::User getUser(const string&);
-    //TODO vector<sdc::User> getUsers()
+    vector<sdc::User> getUsers();
+    vector<string> getUserList();
   private:
     string name;
     map<string,sdc::User> users;

@@ -20,3 +20,21 @@ bool Chat::rmUser(const sdc::User &u){
 sdc::User Chat::getUser(const string &s){
   return users[s];
 }
+
+vector<sdc::User> Chat::getUsers() {
+  vector<sdc::User> list;
+  for(map<string, sdc::User>::iterator iter = users.begin();
+      iter != users.end(); ++iter) {
+    list.push_back(iter->second);
+  }
+  return list;
+}
+
+vector<string> Chat::getUserList() {
+  vector<string> list;
+  for(map<string, sdc::User>::iterator iter = users.begin();
+      iter != users.end(); ++iter) {
+    list.push_back(iter->first);
+  }
+  return list;
+}
