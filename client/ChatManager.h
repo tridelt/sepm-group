@@ -7,7 +7,7 @@
 
 //Qt
 #include <QString>
-#include <QMultiHash>
+#include <QList>
 
 //Ice
 #include "SecureDistributedChat.h"
@@ -52,7 +52,7 @@ namespace cm{
 	class ChatManager : public virtual sdc::ChatClientCallbackI{
 
 		// list of all ChatInstances
-		QMultiHash<QString, ChatInstance*> *chats;
+		QList<ChatInstance*> chats;
 
 		sdc::Security sec;
 

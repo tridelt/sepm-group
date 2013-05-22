@@ -225,7 +225,7 @@ namespace cm{
 
 		INFO("DEBUG: insert");
 
-		chats->insert(QString::fromStdString(chatID), NULL);
+		chats.append(ci);
 
 		INFO("DEBUG:final countdown!");
 
@@ -300,7 +300,7 @@ namespace cm{
 		}catch(InvalidChatIDException& e){
 
 			//If no Chat is found, add a new one to the chats-Hashmap
-			chats->insert(QString::fromStdString(chatID), new ChatInstance(users, chatID, key,
+			chats.append(new ChatInstance(users, chatID, key,
 				boost::bind(&ChatManager::sendMessage, this, _1, _2)));
 			INFO("Chat Initialized");
 			return;
@@ -451,21 +451,17 @@ namespace cm{
 	 */
 
 	ChatInstance* ChatManager::findChat(string chatID) throw (InvalidChatIDException){
-
+		ChatInstance *ci;
 
 		INFO("Try to find Chat");
 
-
-		auto i = chats->find(QString::fromStdString(chatID));
-		
-		ChatInstance *ci;
-
-		//find returns an iterator. Therefor the while-loop.
-		//Break, if the first occurence of the desired chat is found		
-		while(i != chats->end() && i.key() == QString::fromStdString(chatID)) {
-		     ci = i.value();
-		     break;
+		for (int i = 0; i < chats.size(); i++) {
+			if(chats.at(i)->id() == chatID){
+				ci = chats.at(i);
+				break;
+			}
 		}
+		
 
 		//If no chat is found
 		//TODO checken ,obs so passt
