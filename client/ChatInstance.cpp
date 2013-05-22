@@ -14,16 +14,15 @@
 #include "sdcHelper.h"
 
 	ChatInstance::ChatInstance(sdc::StringSeq users, string chatID, sdc::ByteSeq key,
-		function<void(sdc::ByteSeq, string)> sendCallback){
-		
-		this->users = users;
-		this->chatID = chatID;
-		this->key  = key;
-		this->sendCallback = sendCallback;
+		function<void(sdc::ByteSeq, string)> sendCallback): 
+		users(users), chatID(chatID), key(key), sendCallback(sendCallback){
 		
 		//UI
 		chatwin = new QDialog;
     	cw_ui.setupUi(chatwin);
+
+    	//set title
+    	chatwin->setWindowTitle(QString::fromStdString(chatID));
     	chatwin->show();
 
     	//Connect Signals to Slots
@@ -146,6 +145,10 @@
 			INFO("User NOT found!");
         	return -1;
         }
+	}
+
+	std::string ChatInstance::id(){
+		return chatID;
 	}
 
 	ChatInstance::~ChatInstance(){

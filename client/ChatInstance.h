@@ -37,6 +37,7 @@ class ChatInstance : public QObject{
 		void addChatParticipant(sdc::User);
 		void removeChatParticipant(sdc::User);
 		void appendMessageToChat(sdc::ByteSeq, sdc::User);
+		std::string id(void);
 		~ChatInstance();
 
 	private:
