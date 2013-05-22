@@ -5,13 +5,15 @@
 #include "SessionImpl.h"
 #include "Logging.h"
 #include "Chat.h"
+#include "SessionManager.h"
 
 using namespace std;
 using namespace soci;
 
 SessionImpl::SessionImpl(sdc::User u, DBPool *p, ChatManager *mgr,
-  shared_ptr<ChatClientCallbackInd> cb) :
-  loggedIn(true), user(u), db_pool(p), chat_mgr(mgr), callback(cb) {
+  SessionManager *smgr, shared_ptr<ChatClientCallbackInd> cb) :
+  loggedIn(true), user(u), db_pool(p), chat_mgr(mgr), session_mgr(smgr), callback(cb) {
+    session_mgr->addSession(shared_ptr<SessionImpl>(this));
 }
 
 sdc::User SessionImpl::retrieveUser(const string &id, const Ice::Current&) {
@@ -20,8 +22,9 @@ sdc::User SessionImpl::retrieveUser(const string &id, const Ice::Current&) {
 }
 
 void SessionImpl::logout(const Ice::Current&) {
-  INFO("<stub> logging out ", user.ID);
+  INFO("logging out ", user.ID);
   this->loggedIn = false;
+  session_mgr->removeSession(user.ID, shared_ptr<SessionImpl>(this));
 }
 
 void SessionImpl::deleteUser(const sdc::User &u, const Ice::Current&) {
@@ -76,7 +79,7 @@ void SessionImpl::invite(const sdc::User &other, const string &chat,
   INFO(user.ID, " invites ", other.ID, " to ", chat);
 
   auto c = chat_mgr->getChat(chat);
-  //userCallback(other.ID, initChat(c->getUsers(), chat, pubkey);
+  //userCallback(session_mgr, other.ID, initChat(c->getUsers(), chat, pubkey));
   auto pk = pubkey;
 }
 

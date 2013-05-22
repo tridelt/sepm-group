@@ -3,7 +3,8 @@
 
 #include "SecureDistributedChat.h"
 #include <boost/shared_ptr.hpp>
-#include "SessionImpl.h"
+
+class SessionImpl;
 
 using namespace std;
 
@@ -22,8 +23,8 @@ class SessionManager {
     sessionlist sessions;
 };
 
-#define userCallback(u, callback) {\
-  auto sl = getSessions(u);\
+#define userCallback(mgr, u, callback) {\
+  auto sl = mgr->getSessions(u);\
   for(auto iter = sl.first; iter != sl.second; ++iter) {\
     iter->second->getCallback()->callback;\
   }\

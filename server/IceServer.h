@@ -7,6 +7,7 @@
 #include "DBPool.h"
 #include "IceServerI.h"
 #include "ChatManager.h"
+#include "SessionManager.h"
 
 using namespace std;
 
@@ -65,6 +66,7 @@ private:
   Ice::ObjectAdapterPtr oa;
   DBPool *db_pool;
   ChatManager *chat_mgr;
+  SessionManager *session_mgr;
 };
 
 #endif

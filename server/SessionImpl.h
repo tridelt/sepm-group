@@ -5,12 +5,13 @@
 #include "ChatManager.h"
 #include "ChatClientCallbackInd.h"
 using namespace std;
+class SessionManager;
 
 class DBPool;
 
 class SessionImpl : public virtual sdc::SessionI {
 public:
-  SessionImpl(sdc::User, DBPool *p, ChatManager *mgr, shared_ptr<ChatClientCallbackInd> cb);
+  SessionImpl(sdc::User, DBPool *p, ChatManager *mgr, SessionManager *smgr, shared_ptr<ChatClientCallbackInd> cb);
   void logout(const Ice::Current&);
   sdc::User retrieveUser(const string&, const Ice::Current&);
   std::string initChat(const Ice::Current&);
@@ -30,6 +31,7 @@ private:
   sdc::User user;
   DBPool *db_pool;
   ChatManager *chat_mgr;
+  SessionManager *session_mgr;
   shared_ptr<ChatClientCallbackInd> callback;
 };
 
