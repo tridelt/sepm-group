@@ -30,10 +30,16 @@ class ChatInstance : public QObject{
 
 	//Callback to ChatManager for send-Message
 	function<void(sdc::ByteSeq, string)> sendCallback;
+	//Callback to ChatManager for leave-Chat
+	function<void(string)> leaveChatCallback;
+	//Callback to ChatManager for invite
+	//function<void(string)> inviteCallback;
+
+	//TODO Callback for Invite-User
 
 	public:
 		ChatInstance();
-		ChatInstance(sdc::StringSeq, string, sdc::ByteSeq, function<void(sdc::ByteSeq, string)>);
+		ChatInstance(sdc::StringSeq, string, sdc::ByteSeq, function<void(sdc::ByteSeq, string)>, function<void(string)>);
 		void addChatParticipant(sdc::User);
 		void removeChatParticipant(sdc::User);
 		void appendMessageToChat(sdc::ByteSeq, sdc::User);
@@ -44,11 +50,12 @@ class ChatInstance : public QObject{
 
 	private:
 		int findUser(QString userID);
-		void leaveChat();
 		
 
 	public slots:
 		void sendMessage();
+		void invite();
+		void leaveChat();
 };
 
 #endif

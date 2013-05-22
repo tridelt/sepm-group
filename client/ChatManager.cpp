@@ -216,7 +216,8 @@ namespace cm{
 		INFO("DEBUG: new chat instance ID: " + chatID);
 
 		ChatInstance *ci = new ChatInstance(users, chatID, key,
-			boost::bind(&ChatManager::sendMessage, this, _1, _2));
+			boost::bind(&ChatManager::sendMessage, this, _1, _2),
+			boost::bind(&ChatManager::leaveChat, this, _1));
 
 		INFO("DEBUG: add participant");
 
@@ -301,7 +302,9 @@ namespace cm{
 
 			//If no Chat is found, add a new one to the chats-Hashmap
 			chats.append(new ChatInstance(users, chatID, key,
-				boost::bind(&ChatManager::sendMessage, this, _1, _2)));
+				boost::bind(&ChatManager::sendMessage, this, _1, _2),
+				boost::bind(&ChatManager::leaveChat, this, _1)
+				));
 			INFO("Chat Initialized");
 			return;
 		}
@@ -441,6 +444,20 @@ namespace cm{
 
 		INFO("Message sent");
 	}
+
+	void ChatManager::leaveChat(const string& chatID){
+
+		INFO("TEST LEAVE CHAT! Passiert noch nichts!" + chatID);
+	}
+
+	/*
+	void ChatManager::invite(const sdc::User participant, const string& chatID, const sdc::ByteSeq& key){
+		
+		//TODO implement invite
+		//TODO call session->invite();
+		//TODO Add participant to user-List(in ChatInstance oder ChatManager???)
+	}
+	*/
 	
 	/**
 	 * findChat

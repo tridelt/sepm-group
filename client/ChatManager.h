@@ -85,9 +85,6 @@ namespace cm{
 			bool isOnline(void);
 			bool isLoggedin(void);
 			void login(sdc::User user, QString pwd) throw (CommunicationException);
-			void logout(void) throw (CommunicationException, NotLoggedInException);
-			//to create a new one
-			QString initChat() throw (CommunicationException, NotLoggedInException, InvalidChatIDException);
 			
 			//ChatClientCallbackI
 
@@ -97,7 +94,15 @@ namespace cm{
 			void addChatParticipant(const sdc::User&, const std::string&, const Ice::Current&);
 			void removeChatParticipant(const sdc::User&, const std::string&, const Ice::Current&);
 			void appendMessageToChat(const sdc::ByteSeq&, const std::string&, const sdc::User&, const Ice::Current&);
+
+			//SessionI
+			void logout(void) throw (CommunicationException, NotLoggedInException);
+			QString initChat(void) throw (CommunicationException, NotLoggedInException, InvalidChatIDException);
+			void leaveChat(const std::string&);
+			//void invite(const sdc::User&, const string&, const sdc::ByteSeq&);
 			void sendMessage(const sdc::ByteSeq&, const std::string&) throw (CommunicationException, NotLoggedInException);
+
+
 
 			std::string echo(const std::string &s, const Ice::Current&) { return s; }
 			~ChatManager();

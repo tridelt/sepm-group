@@ -14,9 +14,12 @@
 #include "sdcHelper.h"
 
 	ChatInstance::ChatInstance(sdc::StringSeq users, string chatID, sdc::ByteSeq key,
-		function<void(sdc::ByteSeq, string)> sendCallback): 
+		function<void(sdc::ByteSeq, string)> sendCallback, function<void(string)> leaveChatCallback): 
 		users(users), chatID(chatID), key(key), sendCallback(sendCallback){
 		
+		//TODO Parameterzuweiseung nach oben verschieben
+		this->leaveChatCallback = leaveChatCallback;
+
 		//UI
 		chatwin = new QDialog;
     	cw_ui.setupUi(chatwin);
@@ -27,6 +30,8 @@
 
     	//Connect Signals to Slots
 		connect(cw_ui.btn_send, SIGNAL(clicked()), this, SLOT(sendMessage()));
+		connect(cw_ui.btn_leave, SIGNAL(clicked()), this, SLOT(leaveChat()));
+		connect(cw_ui.btn_invite, SIGNAL(clicked()), this, SLOT(invite()));
 	}
 
 	/**
@@ -122,9 +127,20 @@
 	}
 
 	void ChatInstance::leaveChat(){
+		
 		//TODO implement
-			//Close Window
-			//send Chat-Messages to Server for saving it??
+		chatwin->done(1);
+		leaveChatCallback(this->chatID);
+		//send Chat-Messages to Server for saving it??
+
+
+
+
+
+	}
+
+	void ChatInstance::invite(){
+		INFO("USER will be added...in the future...maybe!");
 	}
 
 	/**

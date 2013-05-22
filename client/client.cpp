@@ -29,6 +29,12 @@ void shutdown(){
   QApplication::quit();
 }
 
+void addContact(QPushButton button){
+
+  ui->HorizontalLayout->addWidget(button);
+  button->show();
+}
+
 int main(int argc, char** argv) {
  QApplication app(argc, argv);
 
@@ -39,12 +45,16 @@ int main(int argc, char** argv) {
   Ui_ChatMainWindow ui;
 
   ui.setupUi(mw);
+
+
+
+
   mw->show();
 
   //start Communication Manager
   //TODO: Dialog to set host etc if its not already set.
   QString host("sepm.furidamu.org");
-  QString user("maioran@sepm.furidamu.org");
+  QString user("kaesekrainer@sepm.furidamu.org");
   QString pw("123");
   int port = 1337;
   QString cert(QDir::homePath() + "/.config/sdc/ca.crt");
