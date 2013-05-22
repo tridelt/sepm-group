@@ -17,9 +17,9 @@ using namespace std;
 
 class ChatInstance : public QObject{
 
-
 	Q_OBJECT
 
+	//List of Participants
 	sdc::StringSeq users;
 	string chatID;
 	sdc::ByteSeq key;
@@ -37,11 +37,15 @@ class ChatInstance : public QObject{
 		void addChatParticipant(sdc::User);
 		void removeChatParticipant(sdc::User);
 		void appendMessageToChat(sdc::ByteSeq, sdc::User);
+		~ChatInstance();
+
+	private:
+		int findUser(QString userID);
+		void leaveChat();
+		
 
 	public slots:
 		void sendMessage();
-
-	//TODO Destructor
 };
 
 #endif

@@ -277,7 +277,6 @@ namespace cm{
 
 		try{
 			ci = findChat(chatID);
-
 			ci->addChatParticipant(participant);
 		}catch(InvalidChatIDException& e){
 			ERROR(e.what());
