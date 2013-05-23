@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
   //start Communication Manager
   //TODO: Dialog to set host etc if its not already set.
   QString host("sepm.furidamu.org");
-  QString user("monofufu@sepm.furidamu.org");
+  QString user("monofufu2@sepm.furidamu.org");
   QString pw("123");
   int port = 1337;
   QString cert(QDir::homePath() + "/.config/sdc/ca.crt");
@@ -66,6 +66,9 @@ int main(int argc, char** argv) {
   u.ID = user.toStdString();
   sdc::ByteSeq privateKey;
 
+  // don't use raw pointers - not exception safe!
+  ChatManager cm(host.toStdString(), port, cert.toStdString());
+
   //check keys
   if (!boost::filesystem::exists(publicKey_path.toStdString())){
     sec.genRSAKey(u.publicKey, privateKey);
@@ -76,13 +79,11 @@ int main(int argc, char** argv) {
 
   } else{
     u.publicKey = sec.readPubKey(publicKey_path);
+    cm.privateKey = sec.readPubKey(publicKey_path);
   }
 
-  ChatManager* cm;
-  cm = new ChatManager(host.toStdString(), port, cert.toStdString());
-
   //test connectivity
-  if(cm->isOnline()){
+  if(cm.isOnline()){
     INFO("Connection established");
   }else{
     ERROR("Could not connect!");
@@ -91,7 +92,7 @@ int main(int argc, char** argv) {
 
   //register
   try{
-    cm->registerUser(u, pw);
+    cm.registerUser(u, pw);
   } catch(AlreadyRegisteredException& e){
     INFO("already registered");
   }
@@ -103,21 +104,21 @@ int main(int argc, char** argv) {
    *
    */
   try{
-    cm->login(u, pw);
+    cm.login(u, pw);
   } catch(CommunicationException& e){
     INFO("could not login!");
   }
 
   //init new chat
   //try{
-    std::string chatid = cm->initChat().toStdString();
+    std::string chatid = cm.initChat().toStdString();
   //} catch(){
 
   //}
 
 
    try{
-    cm->logout();
+    cm.logout();
    }catch(NotLoggedInException& e){
     ERROR("hey, you are not logged in! ");
    }

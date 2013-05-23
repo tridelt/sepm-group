@@ -64,7 +64,7 @@ namespace cm{
 		std::string host;
 		std::string cert_path;
 		int port;
-		
+
 		// ice
 		Ice::PropertiesPtr props;
 		Ice::CommunicatorPtr ic;
@@ -82,14 +82,16 @@ namespace cm{
 		//contacts
 		sdc::ContactList contacts;
 
-
 		public:
+			sdc::ByteSeq privateKey;
+
+
 			ChatManager(std::string hostname, int port, std::string cert) throw(ServerUnavailableException, FileNotFoundException);
 			void registerUser(sdc::User user, QString pwd) throw (AlreadyRegisteredException, CommunicationException);
 			bool isOnline(void);
 			bool isLoggedin(void);
 			void login(sdc::User user, QString pwd) throw (CommunicationException);
-			
+
 			//ChatClientCallbackI
 
 			//to load existing chats

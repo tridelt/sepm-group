@@ -240,11 +240,15 @@ namespace cm{
 		out->writePendingObjects();
     out->finished(c);
 
-		//TODO:encryption
-		sc.data = c;
+    //TODO:encryption
+    sc.data = c;
+
+    INFO("serialized contacts: ", string(c.begin(), c.end()));
+    INFO("raw key: ", string(privateKey.begin(), privateKey.end()));
+
 
 		//sign data
-		sc.signature = sec.signRSA(loggedInUser->publicKey, c);
+		sc.signature = sec.signRSA(privateKey, c);
 	}
 
 	//TOO return value
@@ -258,6 +262,9 @@ namespace cm{
 
 			//TODO: decryption
 			sdc::ByteSeq data = container.data;
+
+			if(container.signature.size() <= 0)
+				throw Ice::UnmarshalOutOfBoundsException("signature empty", 0);
 
 			////check signature
 			if(!sec.verifyRSA(loggedInUser->publicKey, data, container.signature))
@@ -273,7 +280,7 @@ namespace cm{
 			ERROR("SecurityException!");
 			throw(CommunicationException());
 		} catch(Ice::UnmarshalOutOfBoundsException) {
-			WARNING("Seems like no contact list is stored on the server");
+			WARN("Seems like no contact list is stored on the server");
 			//FIXME: Stub
 			sdc::User a;
 			sdc::User b;
