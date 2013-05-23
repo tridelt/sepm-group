@@ -16,7 +16,7 @@
 
 namespace cm{
 
-	ChatManager::ChatManager(std::string host, int port, std::string cert_path) 
+	ChatManager::ChatManager(std::string host, int port, std::string cert_path)
 		throw (ServerUnavailableException, FileNotFoundException):
 		host(host), cert_path(cert_path), port(port), session(NULL),keysize(512),loggedInUser(NULL){
 
@@ -45,7 +45,7 @@ namespace cm{
 		    id.properties = props;
 		    ic = Ice::initialize(id);
 
-		    base = ic->stringToProxy("Authentication:ssl -h " + host + 
+		    base = ic->stringToProxy("Authentication:ssl -h " + host +
 		    	" -p " + boost::lexical_cast<string>(port));
 
 
@@ -60,8 +60,8 @@ namespace cm{
 			//FIXME: find more suitable exception
 			throw(ServerUnavailableException());
 		  } catch (const Ice::EndpointParseException& e) {
-			ERROR("Failed to create endpoint, check server and port: " 
-				+ host + "/" 
+			ERROR("Failed to create endpoint, check server and port: "
+				+ host + "/"
 				+ boost::lexical_cast<string>(port));
 
 			throw(ServerUnavailableException());
@@ -82,7 +82,7 @@ namespace cm{
 	 * register new chat user
 	 */
 
-	void ChatManager::registerUser(sdc::User user, QString pwd) throw 
+	void ChatManager::registerUser(sdc::User user, QString pwd) throw
 		(AlreadyRegisteredException, CommunicationException){
 		try{
 			sdc::AuthenticationIPrx auth = sdc::AuthenticationIPrx::checkedCast(base);
@@ -158,7 +158,7 @@ namespace cm{
 
 			//TODO: retrieveContactList
 
-			//retrieveContactList();
+			retrieveContactList();
 		} catch(const sdc::AuthenticationException& e){
 			ERROR(e.ice_name());
 
@@ -167,7 +167,7 @@ namespace cm{
 		loggedInUser = &user;
 	}
 
-	/** 
+	/**
 	 * initChat
 	 *
 	 * create new Chat
@@ -195,7 +195,7 @@ namespace cm{
 
 		//id validation
 		if(chatID == "")
-			throw(InvalidChatIDException());		
+			throw(InvalidChatIDException());
 
 		//Chat participants
 		sdc::StringSeq users;
@@ -227,19 +227,18 @@ namespace cm{
 
 	}
 
-	
+
 	void ChatManager::saveContactList() throw(CommunicationException, NotLoggedInException){
 		sdc::SecureContainer sc;
 		sdc::Security sec;
 
 		sdc::ByteSeq c;
 
-		//serialize
+		// serialize
 		Ice::OutputStreamPtr out = Ice::createOutputStream(ic);
-		//FIXME: cast. 
-	//	out->write(&contacts[0], &contacts[contacts.size()]);
-		out->endEncapsulation();
-    	out->finished(c);
+		out->write(contacts);
+		out->writePendingObjects();
+    out->finished(c);
 
 		//TODO:encryption
 		sc.data = c;
@@ -254,24 +253,6 @@ namespace cm{
 		if(!isLoggedin())
 			throw(NotLoggedInException());
 
-		//FIXME: Stub
-		sdc::User a;
-		sdc::User b;
-		sdc::User c;
-		sdc::User d;
-
-		a.ID = "peter";
-		b.ID = "jürgen";
-		c.ID = "ommi";
-		d.ID = "mama";
-
-		contacts.push_back(a);
-		contacts.push_back(b);
-		contacts.push_back(c);
-		contacts.push_back(d);
-
-
-/**
 		try{
 			sdc::SecureContainer container = session->retrieveContactList();
 
@@ -285,21 +266,30 @@ namespace cm{
 			Ice::InputStreamPtr in = Ice::createInputStream(ic, container.data);
 
 			in->read(contacts);
-
-
-			//TODO: deserialisation
-			//in.read();
-			//in->endEncapsulation();
-
 		} catch(sdc::ContactException& e){
 			ERROR("ContactException!");
 			throw(CommunicationException());
 		} catch(sdc::SecurityException& e){
 			ERROR("SecurityException!");
 			throw(CommunicationException());
-		}
-		**/
+		} catch(Ice::UnmarshalOutOfBoundsException) {
+			WARNING("Seems like no contact list is stored on the server");
+			//FIXME: Stub
+			sdc::User a;
+			sdc::User b;
+			sdc::User c;
+			sdc::User d;
 
+			a.ID = "peter";
+			b.ID = "jürgen";
+			c.ID = "ommi";
+			d.ID = "mama";
+
+			contacts.push_back(a);
+			contacts.push_back(b);
+			contacts.push_back(c);
+			contacts.push_back(d);
+		}
 
 	}
 
@@ -353,7 +343,7 @@ namespace cm{
 		loggedInUser = NULL;
 	}
 
-	
+
 	/**
 	 * addChatParticipant
 	 *
@@ -373,10 +363,10 @@ namespace cm{
 			ERROR(e.what());
 		}catch(sdc::ParticipationException& e){
 			ERROR(e.ice_name());
-		}	
-		
+		}
+
 		INFO("Chat-Participant added");
-		
+
 	}
 
 	/**
@@ -401,7 +391,7 @@ namespace cm{
 		}catch(sdc::ParticipationException& e){
 			ERROR(e.ice_name());
 		}
-		
+
 		INFO("Chat Participant removed!");
 	}
 
@@ -413,7 +403,7 @@ namespace cm{
 
 	void ChatManager::appendMessageToChat(const sdc::ByteSeq& message, const std::string& chatID,
 		const sdc::User& participant, const Ice::Current&){
-		
+
 		INFO("Try to append Message to Chat!");
 
 		ChatInstance *ci;
@@ -469,13 +459,13 @@ namespace cm{
 
 	/*
 	void ChatManager::invite(const sdc::User participant, const string& chatID, const sdc::ByteSeq& key){
-		
+
 		//TODO implement invite
 		//TODO call session->invite();
 		//TODO Add participant to user-List(in ChatInstance oder ChatManager???)
 	}
 	*/
-	
+
 	/**
 	 * findChat
 	 *
@@ -495,7 +485,7 @@ namespace cm{
 				break;
 			}
 		}
-		
+
 
 		//If no chat is found
 		if(ci)
@@ -534,7 +524,7 @@ namespace cm{
 		}
 
 		//TODO::saveContactList
-		//saveContactList();
+		saveContactList();
 
 		if(isLoggedin())
 			logout();

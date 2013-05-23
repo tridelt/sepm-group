@@ -29,11 +29,11 @@ void shutdown(){
   QApplication::quit();
 }
 
-void addContact(QPushButton button){
+// void addContact(QPushButton button){
 
-  ui->HorizontalLayout->addWidget(button);
-  button->show();
-}
+//   ui.HorizontalLayout->addWidget(button);
+//   button->show();
+// }
 
 int main(int argc, char** argv) {
  QApplication app(argc, argv);
@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
   //start Communication Manager
   //TODO: Dialog to set host etc if its not already set.
   QString host("sepm.furidamu.org");
-  QString user("kaesekrainer@sepm.furidamu.org");
+  QString user("monofufu@sepm.furidamu.org");
   QString pw("123");
   int port = 1337;
   QString cert(QDir::homePath() + "/.config/sdc/ca.crt");
@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
   sdc::User u;
   u.ID = user.toStdString();
   sdc::ByteSeq privateKey;
-  
+
   //check keys
   if (!boost::filesystem::exists(publicKey_path.toStdString())){
     sec.genRSAKey(u.publicKey, privateKey);
@@ -122,7 +122,7 @@ int main(int argc, char** argv) {
     ERROR("hey, you are not logged in! ");
    }
 
-   
+
 
     ExitHandler::i()->setHandler([](int) {
       // called when SIGINT (eg by Ctrl+C) is received
@@ -132,7 +132,7 @@ int main(int argc, char** argv) {
       // this is just to show the handler is working
       INFO(" Got signal .. terminating");
       shutdown();
-      
+
     });
 
 
