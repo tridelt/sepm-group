@@ -80,7 +80,10 @@ sdc::Loglist SessionImpl::retrieveLoglist(const Ice::Current&) {
 
 sdc::SecureContainer SessionImpl::retrieveLog(const string&, Ice::Long, const Ice::Current&) {
   INFO("<stub> retrieveLog for ", user.ID);
-  return sdc::SecureContainer();
+  auto container = sdc::SecureContainer();
+  container.data = sdc::ByteSeq();
+  container.signature = sdc::ByteSeq();
+  return container;
 }
 
 void SessionImpl::saveContactList(const sdc::SecureContainer&, const Ice::Current&) {
@@ -90,5 +93,8 @@ void SessionImpl::saveContactList(const sdc::SecureContainer&, const Ice::Curren
 
 sdc::SecureContainer SessionImpl::retrieveContactList(const Ice::Current&) {
   INFO("<stub> retrieveContactList for ", user.ID);
-  return sdc::SecureContainer();
+  auto container = sdc::SecureContainer();
+  container.data = sdc::ByteSeq();
+  container.signature = sdc::ByteSeq();
+  return container;
 }
