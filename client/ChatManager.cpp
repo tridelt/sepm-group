@@ -208,9 +208,9 @@ namespace cm{
 
 		INFO("DEBUG: new chat instance ID: " + chatID);
 
-		auto ci = std::shared_ptr<ChatInstance>(new ChatInstance(users, chatID, key,
+		auto ci = std::make_shared<ChatInstance>(users, chatID, key,
 			boost::bind(&ChatManager::sendMessage, this, _1, _2),
-			boost::bind(&ChatManager::leaveChat, this, _1)));
+			boost::bind(&ChatManager::leaveChat, this, _1));
 
 		INFO("DEBUG: add participant");
 
@@ -316,9 +316,9 @@ namespace cm{
 		}catch(InvalidChatIDException& e){
 
 			//If no Chat is found, add a new one to the chats-Hashmap
-			chats.append(std::shared_ptr<ChatInstance>(new ChatInstance(users, chatID, key,
+			chats.append(std::make_shared<ChatInstance>(users, chatID, key,
 				boost::bind(&ChatManager::sendMessage, this, _1, _2),
-				boost::bind(&ChatManager::leaveChat, this, _1))
+				boost::bind(&ChatManager::leaveChat, this, _1)
 				));
 			INFO("Chat Initialized");
 			return;
