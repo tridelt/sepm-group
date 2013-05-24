@@ -9,7 +9,8 @@
 using namespace std;
 using namespace soci;
 
-SessionImpl::SessionImpl(sdc::User u, DBPool *p, ChatManager *mgr) :
+SessionImpl::SessionImpl(sdc::User u, shared_ptr<DBPool> p,
+    shared_ptr<ChatManager> mgr) :
   loggedIn(true), user(u), db_pool(p), chat_mgr(mgr) {
 }
 
