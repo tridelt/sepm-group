@@ -40,6 +40,11 @@ int main(int argc, char** argv) {
 
 
   IceServer server;
+  try {
+    server.init();
+  } catch(Ice::Exception &e) {
+    ERROR("error while initializing server: ", e, ": ", e.ice_name());
+  }
 
   ExitHandler::i()->setHandler([&server](int sig) {
     // called when SIGINT (eg by Ctrl+C) is received
@@ -52,7 +57,11 @@ int main(int argc, char** argv) {
     INFO("Got signal ", sig, " .. terminating");
   });
 
-  server.wait();
+  try {
+    server.wait();
+  } catch(Ice::Exception &e) {
+    ERROR("error in server: ", e, ": ", e.ice_name());
+  }
 
   INFO("normal exit");
 

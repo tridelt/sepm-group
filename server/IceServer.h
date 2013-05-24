@@ -13,20 +13,27 @@ using namespace std;
 class IceServer : public virtual IceServerI {
 public:
   /**
-   * create a new ice server, listening on port 1337
+   * create a new ice server
+   */
+  IceServer();
+  ~IceServer();
+  
+  
+  
+  /**
+   * initialize the new ice server, listening on port 1337
    *
-   * creates a new ice context, sets up the necessary options for ssl
-   * connections and then exposes the AuthenticationI interface
+   * sets up the necessary options for ssl connections and then exposes
+   * the AuthenticationI interface
    *
    * @param pub_key_path    the path to the public key of the server
    * @param priv_key_path   the path to the private key of the server
    * @param ca_path         the path to the certificate authority file, used by
    *                        all groups
    */
-  IceServer(string pub_key_path = "server.crt",
+  void init(string pub_key_path = "server.crt",
             string priv_key_path = "server.key",
             string ca_path = "ca.crt");
-  ~IceServer();
 
   /**
    * expose an object over the object adapter under an optional name
@@ -61,6 +68,7 @@ public:
     ic->shutdown();
   }
 private:
+  bool initialized;
   Ice::CommunicatorPtr ic;
   Ice::ObjectAdapterPtr oa;
   DBPool *db_pool;
