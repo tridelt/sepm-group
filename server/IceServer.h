@@ -12,16 +12,10 @@ using namespace std;
 
 class IceServer : public virtual IceServerI {
 public:
-  /**
-   * create a new ice server
-   */
-  IceServer();
   ~IceServer();
-  
-  
-  
+
   /**
-   * initialize the new ice server, listening on port 1337
+   * create a new ice server, listening on port 1337
    *
    * sets up the necessary options for ssl connections and then exposes
    * the AuthenticationI interface
@@ -31,7 +25,7 @@ public:
    * @param ca_path         the path to the certificate authority file, used by
    *                        all groups
    */
-  void init(string pub_key_path = "server.crt",
+  IceServer(string pub_key_path = "server.crt",
             string priv_key_path = "server.key",
             string ca_path = "ca.crt");
 
@@ -71,8 +65,8 @@ private:
   bool initialized;
   Ice::CommunicatorPtr ic;
   Ice::ObjectAdapterPtr oa;
-  DBPool *db_pool;
-  ChatManager *chat_mgr;
+  shared_ptr<DBPool> db_pool;
+  shared_ptr<ChatManager> chat_mgr;
 };
 
 #endif

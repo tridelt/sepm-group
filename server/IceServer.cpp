@@ -6,27 +6,16 @@
 #include "ChatClientCallbackWrapper.h"
 
 
-IceServer::IceServer() {
-  initialized = false;
-}
-
 IceServer::~IceServer() {
-  delete db_pool;
-  delete chat_mgr;
   // TODO: investigate crash on ic->destroy()
   // calling this for some reason causes the server to crash
   // if (ic) ic->destroy();
 }
 
 
-void IceServer::init(string pub_key_path, string priv_key_path, string ca_path) {
-  if(initialized) {
-    WARN("multiple init calls to IceServer");
-    return;
-  }
-
-  db_pool = DBPool::ProdPool();
-  chat_mgr = new ChatManager();
+IceServer::IceServer(string pub_key_path, string priv_key_path, string ca_path) {
+  db_pool.reset(DBPool::ProdPool());
+  chat_mgr.reset(new ChatManager());
 
   int argc = 1;
   char prog_name[] = "sdc_client";
