@@ -16,30 +16,30 @@ class AuthenticationTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     // important - in-memory db is much faster
-    pool = DBPool::TestPool();
+    pool.reset(DBPool::TestPool());
     // make sure tests are quiet
     logger.clearSinks();
     session sql(pool->getPool());
     sql << "DROP TABLE IF EXISTS users;";
     password = "secret";
     u.ID = "hello@" + Config::hostname();
-    mgr = new ChatManager();
-    auth = new AuthenticationImpl(&server_mock, pool, mgr);
+    mgr.reset(new ChatManager());
+    auth.reset(new AuthenticationImpl(&server_mock, pool, mgr));
   }
 
   virtual void TearDown() {
-    delete pool;
-    delete auth;
-    delete mgr;
+    pool.reset();
+    auth.reset();
+    mgr.reset();
   }
 
-  DBPool *pool;
   Ice::Current curr;
   Ice::Identity id;
   string password;
   sdc::User u;
-  AuthenticationImpl *auth;
-  ChatManager *mgr;
+  shared_ptr<AuthenticationImpl> auth;
+  shared_ptr<DBPool> pool;
+  shared_ptr<ChatManager> mgr;
   IceServerMock server_mock;  // used by auth to expose the SessionI
 };
 

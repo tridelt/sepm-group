@@ -12,7 +12,7 @@ class DBPool;
 
 class SessionImpl : public virtual sdc::SessionI {
 public:
-  SessionImpl(sdc::User, IceServer *srv, shared_ptr<ChatClientCallbackInd> cb);
+  SessionImpl(sdc::User, shared_ptr<IceServer> srv, shared_ptr<ChatClientCallbackInd> cb);
   void logout(const Ice::Current&);
   sdc::User retrieveUser(const string&, const Ice::Current&);
   std::string initChat(const Ice::Current&);
@@ -30,7 +30,7 @@ public:
 private:
   bool loggedIn;
   sdc::User user;
-  IceServer *server;
+  shared_ptr<IceServer> server;
   shared_ptr<ChatClientCallbackInd> callback;
 };
 

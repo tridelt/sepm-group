@@ -10,7 +10,7 @@
 using namespace std;
 using namespace soci;
 
-SessionImpl::SessionImpl(sdc::User u, IceServer *srv, shared_ptr<ChatClientCallbackInd> cb) :
+SessionImpl::SessionImpl(sdc::User u, shared_ptr<IceServer> srv, shared_ptr<ChatClientCallbackInd> cb) :
   loggedIn(true), user(u), server(srv), callback(cb) {
     server->session_mgr->addSession(shared_ptr<SessionImpl>(this));
 }
@@ -101,7 +101,10 @@ sdc::Loglist SessionImpl::retrieveLoglist(const Ice::Current&) {
 
 sdc::SecureContainer SessionImpl::retrieveLog(const string&, Ice::Long, const Ice::Current&) {
   INFO("<stub> retrieveLog for ", user.ID);
-  return sdc::SecureContainer();
+  auto container = sdc::SecureContainer();
+  container.data = sdc::ByteSeq();
+  container.signature = sdc::ByteSeq();
+  return container;
 }
 
 void SessionImpl::saveContactList(const sdc::SecureContainer&, const Ice::Current&) {
@@ -111,5 +114,8 @@ void SessionImpl::saveContactList(const sdc::SecureContainer&, const Ice::Curren
 
 sdc::SecureContainer SessionImpl::retrieveContactList(const Ice::Current&) {
   INFO("<stub> retrieveContactList for ", user.ID);
-  return sdc::SecureContainer();
+  auto container = sdc::SecureContainer();
+  container.data = sdc::ByteSeq();
+  container.signature = sdc::ByteSeq();
+  return container;
 }
