@@ -4,6 +4,7 @@
 //std
 #include <stdexcept>
 #include <string>
+#include <memory>
 
 //Qt
 #include <QString>
@@ -56,7 +57,7 @@ namespace cm{
 	class ChatManager : public virtual sdc::ChatClientCallbackI{
 
 		// list of all ChatInstances
-		QList<ChatInstance*> chats;
+		QList<std::shared_ptr<ChatInstance>> chats;
 
 		sdc::Security sec;
 
@@ -77,7 +78,7 @@ namespace cm{
 		int keysize;
 
 		//logged in User
-		sdc::User *loggedInUser;
+		sdc::User loggedInUser;
 
 		//contacts
 		sdc::ContactList contacts;
@@ -116,7 +117,7 @@ namespace cm{
 			QList<QString>* getContacts(void);
 			~ChatManager();
 		private:
-			ChatInstance* findChat(std::string chatID) throw (InvalidChatIDException);
+			std::shared_ptr<ChatInstance> findChat(std::string chatID) throw (InvalidChatIDException);
 			//
 			void retrieveContactList() throw(CommunicationException, NotLoggedInException);
 			void saveContactList() throw(CommunicationException, NotLoggedInException);

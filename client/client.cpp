@@ -54,7 +54,7 @@ int main(int argc, char** argv) {
   //start Communication Manager
   //TODO: Dialog to set host etc if its not already set.
   QString host("sepm.furidamu.org");
-  QString user("monofufu2@sepm.furidamu.org");
+  QString user("monofufu3@sepm.furidamu.org");
   QString pw("123");
   int port = 1337;
   QString cert(QDir::homePath() + "/.config/sdc/ca.crt");
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
 
   } else{
     u.publicKey = sec.readPubKey(publicKey_path);
-    cm.privateKey = sec.readPubKey(publicKey_path);
+    cm.privateKey = sec.readPrivKey(privateKey_path);
   }
 
   //test connectivity

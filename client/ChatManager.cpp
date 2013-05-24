@@ -18,7 +18,7 @@ namespace cm{
 
 	ChatManager::ChatManager(std::string host, int port, std::string cert_path)
 		throw (ServerUnavailableException, FileNotFoundException):
-		host(host), cert_path(cert_path), port(port), session(NULL),keysize(512),loggedInUser(NULL){
+		host(host), cert_path(cert_path), port(port), session(NULL),keysize(512) {
 
 		INFO("try to establish connection");
 
@@ -164,7 +164,7 @@ namespace cm{
 
 		}
 
-		loggedInUser = &user;
+		loggedInUser = user;
 	}
 
 	/**
@@ -208,14 +208,14 @@ namespace cm{
 
 		INFO("DEBUG: new chat instance ID: " + chatID);
 
-		ChatInstance *ci = new ChatInstance(users, chatID, key,
+		auto ci = std::shared_ptr<ChatInstance>(new ChatInstance(users, chatID, key,
 			boost::bind(&ChatManager::sendMessage, this, _1, _2),
-			boost::bind(&ChatManager::leaveChat, this, _1));
+			boost::bind(&ChatManager::leaveChat, this, _1)));
 
 		INFO("DEBUG: add participant");
 
 		//add logged in User to the Chat-Participants
-		ci->addChatParticipant(*loggedInUser);
+		ci->addChatParticipant(loggedInUser);
 
 		INFO("DEBUG: insert");
 
@@ -246,9 +246,8 @@ namespace cm{
     INFO("serialized contacts: ", string(c.begin(), c.end()));
     INFO("raw key: ", string(privateKey.begin(), privateKey.end()));
 
-
 		//sign data
-		sc.signature = sec.signRSA(privateKey, c);
+		sc.signature = sec.signRSA(privateKey, privateKey);
 	}
 
 	//TOO return value
@@ -267,7 +266,7 @@ namespace cm{
 				throw Ice::UnmarshalOutOfBoundsException("signature empty", 0);
 
 			////check signature
-			if(!sec.verifyRSA(loggedInUser->publicKey, data, container.signature))
+			if(!sec.verifyRSA(loggedInUser.publicKey, data, container.signature))
 				throw(SignatureException());
 
 			Ice::InputStreamPtr in = Ice::createInputStream(ic, container.data);
@@ -317,9 +316,9 @@ namespace cm{
 		}catch(InvalidChatIDException& e){
 
 			//If no Chat is found, add a new one to the chats-Hashmap
-			chats.append(new ChatInstance(users, chatID, key,
+			chats.append(std::shared_ptr<ChatInstance>(new ChatInstance(users, chatID, key,
 				boost::bind(&ChatManager::sendMessage, this, _1, _2),
-				boost::bind(&ChatManager::leaveChat, this, _1)
+				boost::bind(&ChatManager::leaveChat, this, _1))
 				));
 			INFO("Chat Initialized");
 			return;
@@ -346,8 +345,6 @@ namespace cm{
 		} catch(sdc::UserHandlingException& e){
 			ERROR(e.ice_name());
 		}
-
-		loggedInUser = NULL;
 	}
 
 
@@ -361,10 +358,8 @@ namespace cm{
 
 		INFO("Try to add Chat-Participant");
 
-		ChatInstance *ci;
-
 		try{
-			ci = findChat(chatID);
+			auto ci = findChat(chatID);
 			ci->addChatParticipant(participant);
 		}catch(InvalidChatIDException& e){
 			ERROR(e.what());
@@ -387,11 +382,8 @@ namespace cm{
 
 		INFO("Try to remove Chat-Participant");
 
-		ChatInstance *ci;
-
 		try{
-			ci = findChat(chatID);
-
+			auto ci = findChat(chatID);
 			ci->removeChatParticipant(participant);
 		}catch(InvalidChatIDException& e){
 			ERROR(e.what());
@@ -413,11 +405,8 @@ namespace cm{
 
 		INFO("Try to append Message to Chat!");
 
-		ChatInstance *ci;
-
 		try{
-			ci = findChat(chatID);
-
+			auto ci = findChat(chatID);
 			ci->appendMessageToChat(message, participant);
 		}catch(InvalidChatIDException& e){
 			ERROR(e.what());
@@ -481,24 +470,16 @@ namespace cm{
 	 * @return ChatInstance
 	 */
 
-	ChatInstance* ChatManager::findChat(string chatID) throw (InvalidChatIDException){
-		ChatInstance *ci = NULL;
-
+	std::shared_ptr<ChatInstance> ChatManager::findChat(string chatID) throw (InvalidChatIDException){
 		INFO("Try to find Chat");
 
 		for (int i = 0; i < chats.size(); i++) {
 			if(chats.at(i)->id() == chatID){
-				ci = chats.at(i);
-				break;
+				return chats.at(i);
 			}
 		}
 
-
-		//If no chat is found
-		if(ci)
-			throw(InvalidChatIDException());
-
-		return ci;
+		throw InvalidChatIDException();
 	}
 
 	/**
@@ -524,22 +505,13 @@ namespace cm{
 	 */
 
 	ChatManager::~ChatManager(){
-
-		//delete all ChatInstances
-		for(int i = 0; i < chats.size(); i++){
-			delete chats.at(i);
-		}
-
 		//TODO::saveContactList
 		saveContactList();
 
 		if(isLoggedin())
 			logout();
 
-		if(loggedInUser)
-			delete loggedInUser;
-
-		if(this->ic)
-			ic->destroy();
+		// if(this->ic)
+		// 	ic->destroy();
 	}
 }
