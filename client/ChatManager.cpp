@@ -340,7 +340,6 @@ namespace cm{
 		if(session){
 			try{
 				session->logout();
-				session->reset();
 			} catch(sdc::UserHandlingException& e){
 				ERROR(e.ice_name());
 			}

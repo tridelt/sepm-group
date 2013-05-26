@@ -3,6 +3,8 @@
 
 #include "SecureDistributedChat.h"
 
+#include <memory>
+
 //std
 #include <string>
 
@@ -25,7 +27,7 @@ class ChatInstance : public QObject{
 	sdc::ByteSeq key;
 
 	//UI
-	QDialog *chatwin;
+	shared_ptr<QDialog> chatwin;
 	Ui_ChatMessageWindow cw_ui;
 
 	//Callback to ChatManager for send-Message

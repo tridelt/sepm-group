@@ -21,8 +21,8 @@
 		this->leaveChatCallback = leaveChatCallback;
 
 		//UI
-		chatwin = new QDialog;
-    	cw_ui.setupUi(chatwin);
+		chatwin = std::make_shared<QDialog>();
+    	cw_ui.setupUi(chatwin.get());
 
     	//set title
     	chatwin->setWindowTitle(QString::fromStdString(chatID));
