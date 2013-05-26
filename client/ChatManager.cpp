@@ -307,21 +307,17 @@ namespace cm{
 		INFO("Try to initilize Chat");
 
 		//Look for a Chatinstance. If none is found, insert a new Chatinstance into the Hashmap
-		try{
-			findChat(chatID);
-		}catch(InvalidChatIDException& e){
-
+		
+		if(!findChat(chatID)){
 			//If no Chat is found, add a new one to the chats-Hashmap
 			chats.append(std::make_shared<ChatInstance>(users, chatID, key,
 				boost::bind(&ChatManager::sendMessage, this, _1, _2),
 				boost::bind(&ChatManager::leaveChat, this, _1)
 				));
 			INFO("Chat Initialized");
-			return;
+		}else{
+			INFO("Chat already initialized");
 		}
-
-		INFO("Chat already initialized");
-
 	}
 
 
@@ -354,17 +350,15 @@ namespace cm{
 
 		INFO("Try to add Chat-Participant");
 
-		try{
-			auto ci = findChat(chatID);
-			ci->addChatParticipant(participant);
-		}catch(InvalidChatIDException& e){
-			ERROR(e.what());
-		}catch(sdc::ParticipationException& e){
-			ERROR(e.ice_name());
+		auto ci = findChat(chatID);
+
+		if(ci){
+			//TODO Exception, if additions fails
+			(*ci)->addChatParticipant(participant);
+			INFO("Chat-Participant added");
+		}else{
+			INFO("Could not add Participant. wrong chat id");
 		}
-
-		INFO("Chat-Participant added");
-
 	}
 
 	/**
@@ -378,16 +372,15 @@ namespace cm{
 
 		INFO("Try to remove Chat-Participant");
 
-		try{
-			auto ci = findChat(chatID);
-			ci->removeChatParticipant(participant);
-		}catch(InvalidChatIDException& e){
-			ERROR(e.what());
-		}catch(sdc::ParticipationException& e){
-			ERROR(e.ice_name());
-		}
+		auto ci = findChat(chatID);
 
-		INFO("Chat Participant removed!");
+		if(ci){
+			//TODO Exception, if remove fails
+			(*ci)->removeChatParticipant(participant);
+			INFO("Chat-Participant removed");
+		}else{
+			INFO("Could not remove Participant. wrong chat id");
+		}
 	}
 
 	/**
@@ -401,17 +394,16 @@ namespace cm{
 
 		INFO("Try to append Message to Chat!");
 
-		try{
-			auto ci = findChat(chatID);
-			ci->appendMessageToChat(message, participant);
-		}catch(InvalidChatIDException& e){
-			ERROR(e.what());
-		}catch(sdc::MessageCallbackException& e){
-			ERROR(e.ice_name());
+		auto ci = findChat(chatID);
+
+
+		if(ci){
+			//TODO Exception, if append fails
+			(*ci)->appendMessageToChat(message, participant);
+			INFO("Message appended to Chat!");
+		}else{
+			INFO("Could not append Message!");
 		}
-
-		INFO("Message appended to CHat!");
-
 	}
 
 	/**
@@ -425,23 +417,27 @@ namespace cm{
 
 		INFO("Try to Send Message!");
 
+		auto ci = findChat(chatID);
+
 		if(!isLoggedin())
 			throw(NotLoggedInException());
 
-		try{
-			findChat(chatID);
+		if(ci){
 
-			session->sendMessage(message, chatID);
-		}catch(InvalidChatIDException& e){
-			ERROR(e.what());
-			throw(CommunicationException());
-		}catch(sdc::MessageException& e){
-			ERROR(e.ice_name());
-			throw(CommunicationException());
-		}catch(sdc::InterServerException& e){
-			ERROR(e.ice_name());
-			throw(CommunicationException());
+			try{
+				session->sendMessage(message, chatID);
+			}catch(sdc::MessageException& e){
+				ERROR(e.ice_name());
+				throw(CommunicationException());
+			}
+
+			INFO("Message sent");
+
+		}else{
+			INFO("Could not send Message");
 		}
+
+		
 	}
 
 	void ChatManager::leaveChat(const string& chatID){
@@ -466,16 +462,16 @@ namespace cm{
 	 * @return ChatInstance
 	 */
 
-	std::shared_ptr<ChatInstance> ChatManager::findChat(string chatID) throw (InvalidChatIDException){
+	boost::optional<ChatInstancePtr> ChatManager::findChat(string chatID) throw(){
 		INFO("Try to find Chat");
 
 		for (int i = 0; i < chats.size(); i++) {
 			if(chats.at(i)->id() == chatID){
-				return chats.at(i);
+				return { chats.at(i) };
 			}
 		}
 
-		throw InvalidChatIDException();
+		return { };
 	}
 
 	/**
