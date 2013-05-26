@@ -103,7 +103,7 @@ namespace cm{
 			void appendMessageToChat(const sdc::ByteSeq&, const std::string&, const sdc::User&, const Ice::Current&);
 
 			//SessionI
-			void logout(void) throw (CommunicationException, NotLoggedInException);
+			void logout(void) throw ();
 			QString initChat(void) throw (CommunicationException, NotLoggedInException, InvalidChatIDException);
 			void leaveChat(const std::string&);
 			//void invite(const sdc::User&, const string&, const sdc::ByteSeq&);

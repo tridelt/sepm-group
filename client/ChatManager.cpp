@@ -335,16 +335,17 @@ namespace cm{
 	 * logout current user
 	 */
 
-	void ChatManager::logout(void) throw (CommunicationException, NotLoggedInException){
-		//test if currently logged in
-		if(!isLoggedin())
-			throw(NotLoggedInException());
-
-		try{
-			session->logout();
-		} catch(sdc::UserHandlingException& e){
-			ERROR(e.ice_name());
+	void ChatManager::logout(void) throw(){
+		
+		if(session){
+			try{
+				session->logout();
+				session->reset();
+			} catch(sdc::UserHandlingException& e){
+				ERROR(e.ice_name());
+			}
 		}
+		
 	}
 
 
