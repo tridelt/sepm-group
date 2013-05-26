@@ -3,10 +3,12 @@
 
 #include "SecureDistributedChat.h"
 
-#include <memory>
+//boost
+#include <boost/optional/optional.hpp>
 
 //std
 #include <string>
+#include <memory>
 
 //Qt
 #include "QObject"
@@ -51,7 +53,7 @@ class ChatInstance : public QObject{
 		//TODO invite(User participant, string chatID, ByteSeq sessionKey)
 
 	private:
-		int findUser(QString userID);
+		boost::optional<int> findUser(QString userID);
 		
 
 	public slots:

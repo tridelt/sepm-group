@@ -87,15 +87,13 @@
 
 		INFO("Try to Remove User from Participant-List");
 
-		//Position of the User in Participant-List. -1 if not included
-		int index = findUser(QString::fromStdString(participant.ID));
+		boost::optional<int> index = findUser(QString::fromStdString(participant.ID));
 
-		if(index == -1){
-			INFO("User is not Participant!");
-		}else{
+		if(index){
 			INFO("User will be removed from Participant List");
-
-			users.erase(users.begin(),users.begin()+index);
+			users.erase(users.begin(),users.begin() + *index);			
+		}else{
+			INFO("User is not Participant!");
 		}
 	}
 
@@ -150,19 +148,18 @@
 	 *
 	 * @return -1 if no users is found, index of User in participant lists otherwise
 	 */
-	int ChatInstance::findUser(QString userID){
+
+	boost::optional<int> ChatInstance::findUser(QString userID){
 
 		INFO("Try to find User ins Participant List and return Position");
 
 		int index = find(users.begin(), users.end(), userID.toStdString()) - users.begin();
 
-		if(index < (int)users.size()){
-			INFO("User found at Index: ", index);
-			return index;
-		}else{
-			INFO("User NOT found!");
-        	return -1;
-        }
+		if(index < (int)users.size()) {
+			return { index };
+		} else {
+			return { };
+		}
 	}
 
 	std::string ChatInstance::id(){
