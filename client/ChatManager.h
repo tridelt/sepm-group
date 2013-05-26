@@ -23,6 +23,8 @@
 
 namespace cm{
 
+	typedef shared_ptr<QList<QString>> StrListPtr;
+
 	//Exceptions
 	class ServerUnavailableException : public std::runtime_error {
 			public:
@@ -114,7 +116,7 @@ namespace cm{
 			std::string echo(const std::string &s, const Ice::Current&) { return s; }
 
 			//gui helpers
-			QList<QString>* getContacts(void);
+			StrListPtr getContacts(void);
 			~ChatManager();
 		private:
 			std::shared_ptr<ChatInstance> findChat(std::string chatID) throw (InvalidChatIDException);

@@ -1,8 +1,4 @@
 
-/**
- * servernotrespinding on timeout or login failure
- */
-
 #include "ChatManager.h"
 
 //boost
@@ -488,8 +484,8 @@ namespace cm{
 	 * @return list of all contacts
 	 */
 
-	QList<QString>* ChatManager::getContacts(void){
-		QList<QString> *list = new QList<QString>();
+	StrListPtr ChatManager::getContacts(void){
+		StrListPtr list = make_shared<QList<QString>>();
 
 		for(size_t i; i < contacts.size(); i++){
 			list->append(QString::fromStdString(contacts.at(i).ID));
