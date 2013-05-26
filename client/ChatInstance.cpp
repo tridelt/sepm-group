@@ -157,7 +157,7 @@
 		int index = find(users.begin(), users.end(), userID.toStdString()) - users.begin();
 
 		if(index < (int)users.size()){
-			INFO("User found at Index: " + boost::lexical_cast<string>(index));
+			INFO("User found at Index: ", index);
 			return index;
 		}else{
 			INFO("User NOT found!");
