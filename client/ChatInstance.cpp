@@ -13,7 +13,7 @@
 //helper
 #include "sdcHelper.h"
 
-	ChatInstance::ChatInstance(sdc::StringSeq users, string chatID, sdc::ByteSeq key,
+	ChatInstance::ChatInstance(const sdc::StringSeq &users, const string &chatID, const sdc::ByteSeq &key,
 		function<void(sdc::ByteSeq, string)> sendCallback, function<void(string)> leaveChatCallback): 
 		users(users), chatID(chatID), key(key), sendCallback(sendCallback){
 		
@@ -61,7 +61,7 @@
 	 * Add Chat-Participant to Chat
 	 *
 	 */
-	void ChatInstance::addChatParticipant(sdc::User participant){
+	void ChatInstance::addChatParticipant(const sdc::User &participant){
 
 		INFO("Try to add Participant to Chat");
 
@@ -81,7 +81,7 @@
 	 * Remove Chat-Participant from Chat
 	 *
 	 */
-	void ChatInstance::removeChatParticipant(sdc::User participant){
+	void ChatInstance::removeChatParticipant(const sdc::User &participant){
 		
 		//TODO Excpetion, if no user found
 
@@ -103,7 +103,7 @@
 	 * append Message to Chat-Window
 	 *
 	 */
-	void ChatInstance::appendMessageToChat(sdc::ByteSeq message, sdc::User participant){
+	void ChatInstance::appendMessageToChat(const sdc::ByteSeq &message, const sdc::User &participant){
 
 		INFO("Try to append Message to Chat-Window!");
 
@@ -149,7 +149,7 @@
 	 * @return -1 if no users is found, index of User in participant lists otherwise
 	 */
 
-	boost::optional<int> ChatInstance::findUser(QString userID){
+	boost::optional<int> ChatInstance::findUser(const QString &userID){
 
 		INFO("Try to find User ins Participant List and return Position");
 

@@ -43,17 +43,17 @@ class ChatInstance : public QObject{
 
 	public:
 		ChatInstance();
-		ChatInstance(sdc::StringSeq, string, sdc::ByteSeq, function<void(sdc::ByteSeq, string)>, function<void(string)>);
-		void addChatParticipant(sdc::User);
-		void removeChatParticipant(sdc::User);
-		void appendMessageToChat(sdc::ByteSeq, sdc::User);
+		ChatInstance(const sdc::StringSeq&, const string&, const sdc::ByteSeq&, function<void(sdc::ByteSeq, string)>, function<void(string)>);
+		void addChatParticipant(const sdc::User&);
+		void removeChatParticipant(const sdc::User&);
+		void appendMessageToChat(const sdc::ByteSeq&, const sdc::User&);
 		std::string id(void);
 		~ChatInstance();
 
 		//TODO invite(User participant, string chatID, ByteSeq sessionKey)
 
 	private:
-		boost::optional<int> findUser(QString userID);
+		boost::optional<int> findUser(const QString&);
 		
 
 	public slots:

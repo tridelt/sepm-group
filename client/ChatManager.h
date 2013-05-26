@@ -59,6 +59,9 @@ namespace cm{
 	//TODO: Singleton
 	class ChatManager : public virtual sdc::ChatClientCallbackI{
 
+
+		//TODO use map to store chats
+
 		// list of all ChatInstances
 		QList<std::shared_ptr<ChatInstance>> chats;
 
@@ -90,11 +93,11 @@ namespace cm{
 			sdc::ByteSeq privateKey;
 
 
-			ChatManager(std::string hostname, int port, std::string cert) throw(ServerUnavailableException, FileNotFoundException);
-			void registerUser(sdc::User user, QString pwd) throw (AlreadyRegisteredException, CommunicationException);
+			ChatManager(const std::string&, const int&, const std::string&) throw(ServerUnavailableException, FileNotFoundException);
+			void registerUser(const sdc::User&, const QString&) throw (AlreadyRegisteredException, CommunicationException);
 			bool isOnline(void);
 			bool isLoggedin(void);
-			void login(sdc::User user, QString pwd) throw (CommunicationException);
+			void login(const sdc::User&, const QString&) throw (CommunicationException);
 
 			//ChatClientCallbackI
 
@@ -120,7 +123,7 @@ namespace cm{
 			StrListPtr getContacts(void);
 			~ChatManager();
 		private:
-			boost::optional<ChatInstancePtr> findChat(std::string chatID) throw ();
+			boost::optional<ChatInstancePtr> findChat(const std::string&) throw ();
 			//
 			void retrieveContactList() throw(CommunicationException, NotLoggedInException);
 			void saveContactList() throw(CommunicationException, NotLoggedInException);

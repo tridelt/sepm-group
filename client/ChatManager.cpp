@@ -12,7 +12,7 @@
 
 namespace cm{
 
-	ChatManager::ChatManager(std::string host, int port, std::string cert_path)
+	ChatManager::ChatManager(const std::string &host, const int &port, const std::string &cert_path)
 		throw (ServerUnavailableException, FileNotFoundException):
 		host(host), cert_path(cert_path), port(port), session(NULL),keysize(512) {
 
@@ -78,7 +78,7 @@ namespace cm{
 	 * register new chat user
 	 */
 
-	void ChatManager::registerUser(sdc::User user, QString pwd) throw
+	void ChatManager::registerUser(const sdc::User &user, const QString &pwd) throw
 		(AlreadyRegisteredException, CommunicationException){
 		try{
 			sdc::AuthenticationIPrx auth = sdc::AuthenticationIPrx::checkedCast(base);
@@ -136,7 +136,7 @@ namespace cm{
 	 * @param pwd password for authentication purposes
 	 */
 
-	void ChatManager::login(sdc::User user, QString pwd) throw (CommunicationException){
+	void ChatManager::login(const sdc::User &user, const QString &pwd) throw (CommunicationException){
 		INFO("login " + user.ID);
 		try{
 			sdc::AuthenticationIPrx auth = sdc::AuthenticationIPrx::checkedCast(base);
@@ -462,7 +462,7 @@ namespace cm{
 	 * @return ChatInstance
 	 */
 
-	boost::optional<ChatInstancePtr> ChatManager::findChat(string chatID) throw(){
+	boost::optional<ChatInstancePtr> ChatManager::findChat(const string& chatID) throw(){
 		INFO("Try to find Chat");
 
 		for (int i = 0; i < chats.size(); i++) {
