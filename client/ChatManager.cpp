@@ -234,16 +234,16 @@ namespace cm{
 		Ice::OutputStreamPtr out = Ice::createOutputStream(ic);
 		out->write(contacts);
 		out->writePendingObjects();
-    out->finished(c);
+	    out->finished(c);
 
-    //TODO:encryption
-    sc.data = c;
+	    //TODO:encryption
+	    sc.data = c;
 
-    INFO("serialized contacts: ", string(c.begin(), c.end()));
-    INFO("raw key: ", string(privateKey.begin(), privateKey.end()));
+	    INFO("serialized contacts: ", string(c.begin(), c.end()));
+	    INFO("raw key: ", string(privateKey.begin(), privateKey.end()));
 
 		//sign data
-		sc.signature = sec.signRSA(privateKey, privateKey);
+		sc.signature = sec.signRSA(privateKey, sc.data);
 	}
 
 	//TOO return value
