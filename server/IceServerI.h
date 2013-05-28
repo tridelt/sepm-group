@@ -9,6 +9,7 @@
 #include "DBPool.h"
 #include "ChatManager.h"
 #include "SessionManager.h"
+#include "InterServerManager.h"
 
 using namespace std;
 
@@ -25,6 +26,7 @@ public:
   virtual shared_ptr<DBPool> getDBPool() = 0;
   virtual shared_ptr<ChatManager> getChats() = 0;
   virtual shared_ptr<SessionManager> getSessions() = 0;
+  virtual shared_ptr<InterServerManager> getISManager() = 0;
 };
 
 #endif

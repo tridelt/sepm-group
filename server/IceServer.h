@@ -73,6 +73,7 @@ public:
   shared_ptr<DBPool> getDBPool() { return db_pool; }
   shared_ptr<ChatManager> getChats() { return chat_mgr; }
   shared_ptr<SessionManager> getSessions() { return session_mgr; }
+  shared_ptr<InterServerManager> getISManager() { return is_mgr; }
 
 private:
   bool initialized;
@@ -81,6 +82,7 @@ private:
   shared_ptr<DBPool> db_pool;
   shared_ptr<ChatManager> chat_mgr;
   shared_ptr<SessionManager> session_mgr;
+  shared_ptr<InterServerManager> is_mgr;
 };
 
 #endif

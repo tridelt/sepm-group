@@ -110,7 +110,7 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
   // don't log passwords!
   INFO("Logging in ", u.ID);
   sdc::User user;
-  user.ID = name;
+  user.ID = u.ID;
 
   // make sure the pubkey from registering is used, not some other key
   user.publicKey = sdc::ByteSeq(pubkey.get().begin(), pubkey.get().end());

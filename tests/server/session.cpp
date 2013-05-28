@@ -26,7 +26,8 @@ class SessionTest : public ::testing::Test {
     u.ID = "hello@" + Config::hostname();
     cmgr.reset(new ChatManager());
     smgr.reset(new SessionManager());
-    server_mock = new ::testing::NiceMock<IceServerMock>(pool, cmgr, smgr);
+    ismgr.reset(new InterServerManager("ca.crt"));
+    server_mock = new ::testing::NiceMock<IceServerMock>(pool, cmgr, smgr, ismgr);
     auth.reset(new AuthenticationImpl(server_mock));
     CallbackMock callback_mock;
     auto callback_fake = shared_ptr<ChatClientCallbackInd>(new CallbackFake(&callback_mock));
@@ -40,6 +41,7 @@ class SessionTest : public ::testing::Test {
     session.reset();
     cmgr.reset();
     smgr.reset();
+    ismgr.reset();
   }
 
   Ice::Current curr;
@@ -51,6 +53,7 @@ class SessionTest : public ::testing::Test {
   shared_ptr<ChatManager> cmgr;
   shared_ptr<SessionManager> smgr;
   shared_ptr<SessionImpl> session;
+  shared_ptr<InterServerManager> ismgr;
   ::testing::NiceMock<IceServerMock> *server_mock;  // used by auth to expose the SessionI
 };
 

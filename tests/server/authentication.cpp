@@ -25,7 +25,8 @@ class AuthenticationTest : public ::testing::Test {
     u.ID = "hello@" + Config::hostname();
     cmgr.reset(new ChatManager());
     smgr.reset(new SessionManager());
-    server_mock = new ::testing::NiceMock<IceServerMock>(pool, cmgr, smgr);
+    ismgr.reset(new InterServerManager("ca.crt"));
+    server_mock = new ::testing::NiceMock<IceServerMock>(pool, cmgr, smgr, ismgr);
     auth.reset(new AuthenticationImpl(server_mock));
   }
 
@@ -35,6 +36,7 @@ class AuthenticationTest : public ::testing::Test {
     auth.reset();
     cmgr.reset();
     smgr.reset();
+    ismgr.reset();
   }
 
   Ice::Current curr;
@@ -45,6 +47,7 @@ class AuthenticationTest : public ::testing::Test {
   shared_ptr<DBPool> pool;
   shared_ptr<ChatManager> cmgr;
   shared_ptr<SessionManager> smgr;
+  shared_ptr<InterServerManager> ismgr;
   ::testing::NiceMock<IceServerMock> *server_mock;  // used by auth to expose the SessionI
 };
 

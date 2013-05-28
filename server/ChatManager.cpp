@@ -1,5 +1,6 @@
 #include "ChatManager.h"
 #include "Chat.h"
+#include "config.h"
 #include <boost/format.hpp>
 
 using namespace std;
@@ -8,8 +9,8 @@ ChatManager::ChatManager() : i(0) {
 }
 
 shared_ptr<Chat> ChatManager::newChat() {
-  auto name = boost::format("Chat%1%") % (i++);
-	shared_ptr<Chat> cp(new Chat(name.str()));
+  auto name = boost::format("Chat%1%@%2%") % (i++) % Config::hostname();
+  shared_ptr<Chat> cp(new Chat(name.str()));
   chats[cp->getName()]=cp;
   return cp;
 }

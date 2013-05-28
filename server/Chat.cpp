@@ -1,4 +1,5 @@
 #include "Chat.h"
+#include "Logging.h"
 #include "SecureDistributedChat.h"
 
 using namespace std;

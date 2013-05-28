@@ -9,13 +9,14 @@ using ::testing::_;
 
 class IceServerMock : public IceServerI {
 public:
-  IceServerMock(shared_ptr<DBPool> pool, shared_ptr<ChatManager> cmgr, shared_ptr<SessionManager> smgr)
-    : db_pool(pool), chat_mgr(cmgr), session_mgr(smgr) {
+  IceServerMock(shared_ptr<DBPool> pool, shared_ptr<ChatManager> cmgr, shared_ptr<SessionManager> smgr, shared_ptr<InterServerManager> ismgr)
+    : db_pool(pool), chat_mgr(cmgr), session_mgr(smgr), is_mgr(ismgr) {
     //TODO: may have to return false for InterServer tests
     ON_CALL(*this, isLocal(_)).WillByDefault(testing::Return(true));
     ON_CALL(*this, getDBPool()).WillByDefault(testing::Return(db_pool));
     ON_CALL(*this, getChats()).WillByDefault(testing::Return(chat_mgr));
     ON_CALL(*this, getSessions()).WillByDefault(testing::Return(session_mgr));
+    ON_CALL(*this, getISManager()).WillByDefault(testing::Return(is_mgr));
   }
 
   MOCK_METHOD2(exposeObject, Ice::ObjectPrx (const Ice::ObjectPtr &o,
@@ -29,10 +30,12 @@ public:
   MOCK_METHOD0(getDBPool, shared_ptr<DBPool>());
   MOCK_METHOD0(getChats, shared_ptr<ChatManager>());
   MOCK_METHOD0(getSessions, shared_ptr<SessionManager>());
+  MOCK_METHOD0(getISManager, shared_ptr<InterServerManager>());
 
   shared_ptr<DBPool> db_pool;
   shared_ptr<ChatManager> chat_mgr;
   shared_ptr<SessionManager> session_mgr;
+  shared_ptr<InterServerManager> is_mgr;
 };
 
 
