@@ -20,8 +20,16 @@ sdc::User SessionImpl::retrieveUser(const string &id, const Ice::Current&) {
   return sdc::User();
 }
 
-void SessionImpl::logout(const Ice::Current&) {
+void SessionImpl::logout(const Ice::Current &cur) {
   INFO("logging out ", user.ID);
+  
+  // remove user from all their chats
+  //TODO: also notify chats on remote servers
+  auto chats = server->getChats()->getChats();
+  for(auto iter = chats->begin(); iter != chats->end(); ++iter) {
+    if(iter->second->hasUser(user.ID)) leaveChat(iter->second->getName(), cur);
+  }
+
   this->loggedIn = false;
   server->getSessions()->removeSession(user.ID, this);
 }
@@ -89,15 +97,15 @@ void SessionImpl::invite(const sdc::User &other, const string &chat,
 void SessionImpl::sendMessage(const sdc::ByteSeq &msg, const string &chat,
   const Ice::Current&) {
   INFO(user.ID, " posts to ", chat, ": ", &msg);
-  /*shared_ptr<Chat> cp;
+  shared_ptr<Chat> cp;
   try {
-    cp = server->chat_mgr->getChat(chat);
+    cp = server->getChats()->getChat(chat);
   } catch(...) {
     //TODO: forward to remote server if chat is not local
     //remote->sendMessage(user, msg, chat);
     throw sdc::MessageException("chat " + chat + " does not exist");
   }
-  chatBroadcastCallback(cp, server, appendMessageToChat(msg, chat, user), clientAppendMessageToChat(_c, msg, chat, user));*/
+  chatBroadcastCallback(cp, server, appendMessageToChat(msg, chat, user), clientAppendMessageToChat(_c, msg, chat, user));
 }
 
 void SessionImpl::saveLog(const string&, Ice::Long, const sdc::SecureContainer&, const Ice::Current&) {

@@ -3,8 +3,6 @@
 
 #include "SecureDistributedChat.h"
 
-//#include "UserManager.h"
-
 using namespace std;
 class Chat{
   public:
@@ -16,13 +14,12 @@ class Chat{
      */
     bool rmUser(const sdc::User&);
     sdc::User getUser(const string&);
+    bool hasUser(const string&);
     vector<sdc::User> getUsers();
     vector<string> getUserList();
   private:
     string name;
     map<string,sdc::User> users;
-    //UserManager *usermng;
-    //TODO UserManager implementation
 };
 
 /**
