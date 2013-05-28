@@ -39,20 +39,24 @@ int main(int argc, char** argv) {
   INFO("my hostname: ", Config::hostname());
 
 
-  IceServer server;
+  try {
+    IceServer server;
 
-  ExitHandler::i()->setHandler([&server](int sig) {
-    // called when SIGINT (eg by Ctrl+C) is received
-    // do cleanup
+    ExitHandler::i()->setHandler([&server](int sig) {
+      // called when SIGINT (eg by Ctrl+C) is received
+      // do cleanup
 
-    server.exit();
+      server.exit();
 
-    // bad - cout not guaranteed to work, since not reentrant
-    // this is just to show the handler is working
-    INFO("Got signal ", sig, " .. terminating");
-  });
+      // bad - cout not guaranteed to work, since not reentrant
+      // this is just to show the handler is working
+      INFO("Got signal ", sig, " .. terminating");
+    });
 
-  server.wait();
+    server.wait();
+  } catch(Ice::Exception &e) {
+    ERROR("error in server: ", e, ": ", e.ice_name());
+  }
 
   INFO("normal exit");
 

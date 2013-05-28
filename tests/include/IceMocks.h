@@ -9,11 +9,30 @@ using ::testing::_;
 
 class IceServerMock : public IceServerI {
 public:
+  IceServerMock(shared_ptr<DBPool> pool, shared_ptr<ChatManager> cmgr, shared_ptr<SessionManager> smgr)
+    : db_pool(pool), chat_mgr(cmgr), session_mgr(smgr) {
+    //TODO: may have to return false for InterServer tests
+    ON_CALL(*this, isLocal(_)).WillByDefault(testing::Return(true));
+    ON_CALL(*this, getDBPool()).WillByDefault(testing::Return(db_pool));
+    ON_CALL(*this, getChats()).WillByDefault(testing::Return(chat_mgr));
+    ON_CALL(*this, getSessions()).WillByDefault(testing::Return(session_mgr));
+  }
+
   MOCK_METHOD2(exposeObject, Ice::ObjectPrx (const Ice::ObjectPtr &o,
                                 const string &id));
 
   MOCK_METHOD2(callbackForID, shared_ptr<ChatClientCallbackInd> (
     const Ice::Identity &callbackID, const Ice::ConnectionPtr &con));
+
+  MOCK_METHOD1(isLocal, bool(const string&));
+
+  MOCK_METHOD0(getDBPool, shared_ptr<DBPool>());
+  MOCK_METHOD0(getChats, shared_ptr<ChatManager>());
+  MOCK_METHOD0(getSessions, shared_ptr<SessionManager>());
+
+  shared_ptr<DBPool> db_pool;
+  shared_ptr<ChatManager> chat_mgr;
+  shared_ptr<SessionManager> session_mgr;
 };
 
 
@@ -38,7 +57,6 @@ public:
   void appendMessageToChat(const sdc::ByteSeq &, const string &, const sdc::User &) {}
 
   CallbackFake(CallbackMock* m) : _mock(m) {}
-  CallbackFake(const CallbackFake* o) : _mock(o->_mock) {}
 private:
   CallbackMock* _mock;
 };

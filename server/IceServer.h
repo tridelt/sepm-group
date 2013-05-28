@@ -6,16 +6,20 @@
 #include <string>
 #include "DBPool.h"
 #include "IceServerI.h"
+#include "ChatManager.h"
+#include "SessionManager.h"
 
 using namespace std;
 
 class IceServer : public virtual IceServerI {
 public:
+  ~IceServer();
+
   /**
    * create a new ice server, listening on port 1337
    *
-   * creates a new ice context, sets up the necessary options for ssl
-   * connections and then exposes the AuthenticationI interface
+   * sets up the necessary options for ssl connections and then exposes
+   * the AuthenticationI interface
    *
    * @param pub_key_path    the path to the public key of the server
    * @param priv_key_path   the path to the private key of the server
@@ -25,7 +29,6 @@ public:
   IceServer(string pub_key_path = "server.crt",
             string priv_key_path = "server.key",
             string ca_path = "ca.crt");
-  ~IceServer();
 
   /**
    * expose an object over the object adapter under an optional name
@@ -59,10 +62,25 @@ public:
   void exit() {
     ic->shutdown();
   }
+
+  /**
+   * determines if the given string is (one of) the hostname(s) of this server
+   */
+  bool isLocal(const string &) {
+    return true;
+  }
+  
+  shared_ptr<DBPool> getDBPool() { return db_pool; }
+  shared_ptr<ChatManager> getChats() { return chat_mgr; }
+  shared_ptr<SessionManager> getSessions() { return session_mgr; }
+
 private:
+  bool initialized;
   Ice::CommunicatorPtr ic;
   Ice::ObjectAdapterPtr oa;
-  DBPool *db_pool;
+  shared_ptr<DBPool> db_pool;
+  shared_ptr<ChatManager> chat_mgr;
+  shared_ptr<SessionManager> session_mgr;
 };
 
 #endif

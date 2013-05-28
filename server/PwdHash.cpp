@@ -12,20 +12,20 @@
 string gensetting() {
   FILE *source = fopen("/dev/urandom", "r");
   if(!source) {
-    WARN("failed to read from randomness source " RANDOMNESS_SOURCE ": " + string(strerror(errno)));
+    WARN("failed to read from randomness source ", RANDOMNESS_SOURCE, ": ", strerror(errno));
     throw;
   }
 
   char randomness[RANDOMNESS_SIZE];
   size_t read = fread(&randomness, 1, RANDOMNESS_SIZE, source);
   if(read != RANDOMNESS_SIZE) {
-    WARN("failed to read sufficient random data for salt: " + string(strerror(errno)));
+    WARN("failed to read sufficient random data for salt: ", strerror(errno));
     throw;
   }
 
   char *setting = crypt_gensalt_ra(HASH_METHOD, CRYPT_ITERATIONS, randomness, RANDOMNESS_SIZE);
   if(!setting)  {
-    WARN("crypt_gensalt_ra failed: " + string(strerror(errno)));
+    WARN("crypt_gensalt_ra failed: ", strerror(errno));
     throw;
   }
 
@@ -43,10 +43,10 @@ string genhash(const string &input, const string &setting)
   int size = 0;
   char *hash = crypt_ra(input.c_str(), setting.c_str(), &nil, &size);
   if(!hash)  {
-    WARN("crypt_ra failed: " + string(strerror(errno)));
+    WARN("crypt_ra failed: ", strerror(errno));
     throw;
   }
-  
+
   string ret(hash);
   free(hash);
 

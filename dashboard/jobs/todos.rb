@@ -19,12 +19,16 @@ SCHEDULER.every '60m', :first_in => 0 do |job|
         while (line = file.gets)
           lineno = lineno + 1
 
+          if line.nil?
+            next
+          end
+
           if line.include?('TODO')
-            line = line[line.index('TODO:') + 6, line.length]
+            line = line[line.index('TODO') + 5, line.length]
           elsif line.include?('FIXME')
-            line = line[line.index('FIXME:') + 7, line.length]
+            line = line[line.index('FIXME') + 6, line.length]
           elsif line.include?('BUG')
-            line = line[line.index('BUG:') + 5, line.length]
+            line = line[line.index('BUG') + 4, line.length]
           else
             next
           end

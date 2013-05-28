@@ -1,57 +1,129 @@
+
+//std
 #include <iostream>
+
+//boost
 #include <boost/program_options.hpp>
 #include <boost/bind.hpp>
-#include "FileWatcher.h"
-#include "ViewRefresher.h"
+#include <boost/filesystem.hpp>
+
+//Qt
+#include <QDir>
+
+//helper
+#include "sdcHelper.h"
+#include "Security.h"
+
+//homebrew
+#include "ChatManager.h"
 #include "ExitHandler.h"
-#include "PluginManager.h"
-#include <QtConcurrentRun>
 #include "Logging.h"
+#include "ui_ChatMainWindow.h"
+#include "ui_ChatWelcomeWindow.h"
 
 namespace po = boost::program_options;
 using namespace std;
+using namespace cm;
+
+void shutdown(){
+  QApplication::quit();
+}
+
+// void addContact(QPushButton button){
+
+//   ui.HorizontalLayout->addWidget(button);
+//   button->show();
+// }
 
 int main(int argc, char** argv) {
-  po::options_description desc("Allowed options");
-  desc.add_options()
-    ("help,h", "produce help message")
-  ;
+ QApplication app(argc, argv);
 
-  po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, desc), vm);
-  po::notify(vm);
+  sdc::Security sec;
 
-  if(vm.count("help")) {
-    cout << desc << "\n";
-    return 1;
+  //open main window
+  QMainWindow *mw = new QMainWindow;
+  Ui_ChatMainWindow ui;
+
+  ui.setupUi(mw);
+
+
+
+
+  mw->show();
+
+  //start Communication Manager
+  //TODO: Dialog to set host etc if its not already set.
+  QString host("sepm.furidamu.org");
+  QString user("monofufu3@sepm.furidamu.org");
+  QString pw("123");
+  int port = 1337;
+  QString cert(QDir::homePath() + "/.config/sdc/ca.crt");
+  QString publicKey_path(QDir::homePath() + "/.config/sdc/public_sepm.furidamu.org.pem");
+  QString privateKey_path(QDir::homePath() + "/.config/sdc/private_sepm.furidamu.org.pem");
+
+  //create testuser
+  sdc::User u;
+  u.ID = user.toStdString();
+  sdc::ByteSeq privateKey;
+
+  // don't use raw pointers - not exception safe!
+  ChatManager cm(host.toStdString(), port, cert.toStdString());
+
+  //check keys
+  if (!boost::filesystem::exists(publicKey_path.toStdString())){
+    sec.genRSAKey(u.publicKey, privateKey);
+
+    //store keys
+    sec.savePrivKey(privateKey, privateKey_path);
+    sec.savePubKey(u.publicKey, publicKey_path);
+
+  } else{
+    u.publicKey = sec.readPubKey(publicKey_path);
+    cm.privateKey = sec.readPrivKey(privateKey_path);
   }
 
-  INFO("Hello from client");
+  //test connectivity
+  if(cm.isOnline()){
+    INFO("Connection established");
+  }else{
+    ERROR("Could not connect!");
+    shutdown();
+  }
+
+  //register
+  try{
+    cm.registerUser(u, pw);
+  } catch(AlreadyRegisteredException& e){
+    INFO("already registered");
+  }
 
 
-  try {
+  /*
+   *
+   * login
+   *
+   */
+  try{
+    cm.login(u, pw);
+  } catch(CommunicationException& e){
+    INFO("could not login!");
+  }
 
-    ViewRefresher refresher;
-    FileWatcher watcher("./ui", boost::bind(&ViewRefresher::fileChanged, &refresher, _1, _2, _3));
+  //init new chat
+  //try{
+    std::string chatid = cm.initChat().toStdString();
+  //} catch(){
 
-    // create or modify a file in ./ui to see the changes getting picked up
-    FileWatcher demo("./ui", [](string name, bool isDir, FileWatcher::FileEvent e) {
-      switch(e) {
-        case FileWatcher::CREATE:
-          cout << "created ";
-          break;
-        case FileWatcher::MODIFY:
-          cout << "modified ";
-          break;
-        case FileWatcher::DELETE:
-          cout << "deleted ";
-          break;
-        default:
-          cout << "unknown event: ";
-      }
-      cout << (isDir ? "dir " : "file ");
-      cout << name << endl;
-    });
+  //}
+
+
+   try{
+    cm.logout();
+   }catch(NotLoggedInException& e){
+    ERROR("hey, you are not logged in! ");
+   }
+
+
 
     ExitHandler::i()->setHandler([](int) {
       // called when SIGINT (eg by Ctrl+C) is received
@@ -60,15 +132,12 @@ int main(int argc, char** argv) {
       // bad - cout not guaranteed to work, since not reentrant
       // this is just to show the handler is working
       INFO(" Got signal .. terminating");
+      shutdown();
+
     });
 
-    PluginManager manager;
 
-    manager.listPlugins();
-
-  } catch(PluginException ex) {
-    cerr << ex.what() << endl;
-  }
-
-  return 0;
+  return app.exec();
 }
+
+

@@ -16,28 +16,36 @@ class AuthenticationTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     // important - in-memory db is much faster
-    pool = DBPool::TestPool();
+    pool.reset(DBPool::TestPool());
     // make sure tests are quiet
     logger.clearSinks();
     session sql(pool->getPool());
     sql << "DROP TABLE IF EXISTS users;";
     password = "secret";
     u.ID = "hello@" + Config::hostname();
-    auth = new AuthenticationImpl(&server_mock, pool);
+    cmgr.reset(new ChatManager());
+    smgr.reset(new SessionManager());
+    server_mock = new ::testing::NiceMock<IceServerMock>(pool, cmgr, smgr);
+    auth.reset(new AuthenticationImpl(server_mock));
   }
 
   virtual void TearDown() {
-    delete pool;
-    delete auth;
+    delete server_mock;
+    pool.reset();
+    auth.reset();
+    cmgr.reset();
+    smgr.reset();
   }
 
-  DBPool *pool;
   Ice::Current curr;
   Ice::Identity id;
   string password;
   sdc::User u;
-  AuthenticationImpl *auth;
-  IceServerMock server_mock;  // used by auth to expose the SessionI
+  shared_ptr<AuthenticationImpl> auth;
+  shared_ptr<DBPool> pool;
+  shared_ptr<ChatManager> cmgr;
+  shared_ptr<SessionManager> smgr;
+  ::testing::NiceMock<IceServerMock> *server_mock;  // used by auth to expose the SessionI
 };
 
 TEST_F(AuthenticationTest, CanEcho) {
@@ -55,12 +63,12 @@ TEST_F(AuthenticationTest, CanRegisterAndLogin) {
 
   // login() should test the validity of the connection before allowing a login
   // first it has to create a proxy for the connection
-  EXPECT_CALL(server_mock, callbackForID(_, _)).WillOnce(Return(callback_fake));
+  EXPECT_CALL(*server_mock, callbackForID(_, _)).WillOnce(Return(callback_fake));
   // then call echo on the client callback
   EXPECT_CALL(callback_mock, echo(_)).Times(AtLeast(1));
 
   // login has to call exposeObject to expose the SessionI
-  EXPECT_CALL(server_mock, exposeObject(_, _)).WillOnce(Return(magicProxy));
+  EXPECT_CALL(*server_mock, exposeObject(_, _)).WillOnce(Return(magicProxy));
 
   // check that the magicProxy specified above is returned here
   auth->login(u, password, id, curr);

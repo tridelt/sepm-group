@@ -5,9 +5,20 @@
 #include "InterServerImpl.h"
 #include "ThreadHook.h"
 #include "ChatClientCallbackWrapper.h"
+#include "SessionManager.h"
+
+
+IceServer::~IceServer() {
+  // TODO: investigate crash on ic->destroy()
+  // calling this for some reason causes the server to crash
+  // if (ic) ic->destroy();
+}
+
 
 IceServer::IceServer(string pub_key_path, string priv_key_path, string ca_path) {
-  db_pool = DBPool::ProdPool();
+  db_pool.reset(DBPool::ProdPool());
+  chat_mgr.reset(new ChatManager());
+  session_mgr.reset(new SessionManager());
 
   int argc = 1;
   char prog_name[] = "sdc_client";
@@ -36,23 +47,15 @@ IceServer::IceServer(string pub_key_path, string priv_key_path, string ca_path) 
     ic = Ice::initialize(id);
 
     oa = ic->createObjectAdapterWithEndpoints("ServerEndpoint", "ssl -p 1337");
-    oa->add(new AuthenticationImpl(this, db_pool), ic->stringToIdentity("Authentication"));
+    oa->add(new AuthenticationImpl(this), ic->stringToIdentity("Authentication"));
     oa->add(new InterServerImpl(), ic->stringToIdentity("InterServer"));
     oa->activate();
   } catch (const Ice::Exception& e) {
     if (ic) ic->destroy();
     throw;
   }
+  initialized = true;
 }
-
-
-IceServer::~IceServer() {
-  delete db_pool;
-  // TODO: investigate crash on ic->destroy()
-  // calling this for some reason causes the server to crash
-  // if (ic) ic->destroy();
-}
-
 
 Ice::ObjectPrx IceServer::exposeObject(const Ice::ObjectPtr &o, const string &name) {
   Ice::Identity adapter_ident;

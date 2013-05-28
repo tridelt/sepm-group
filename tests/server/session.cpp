@@ -17,31 +17,41 @@ class SessionTest : public ::testing::Test {
  protected:
   virtual void SetUp() {
     // important - in-memory db is much faster
-    pool = DBPool::TestPool();
+    pool.reset(DBPool::TestPool());
     // make sure tests are quiet
     logger.clearSinks();
     soci::session sql(pool->getPool());
     sql << "DROP TABLE IF EXISTS users;";
     password = "secret";
     u.ID = "hello@" + Config::hostname();
-    auth = new AuthenticationImpl(&server_mock, pool);
-    session = new SessionImpl(u, pool);
+    cmgr.reset(new ChatManager());
+    smgr.reset(new SessionManager());
+    server_mock = new ::testing::NiceMock<IceServerMock>(pool, cmgr, smgr);
+    auth.reset(new AuthenticationImpl(server_mock));
+    CallbackMock callback_mock;
+    auto callback_fake = shared_ptr<ChatClientCallbackInd>(new CallbackFake(&callback_mock));
+    session.reset(new SessionImpl(u, server_mock, callback_fake));
   }
 
   virtual void TearDown() {
-    delete pool;
-    delete auth;
-    delete session;
+    delete server_mock;
+    pool.reset();
+    auth.reset();
+    session.reset();
+    cmgr.reset();
+    smgr.reset();
   }
 
-  DBPool *pool;
   Ice::Current curr;
   Ice::Identity id;
   string password;
   sdc::User u;
-  AuthenticationImpl *auth;
-  SessionImpl *session;
-  IceServerMock server_mock;  // used by auth to expose the SessionI
+  shared_ptr<AuthenticationImpl> auth;
+  shared_ptr<DBPool> pool;
+  shared_ptr<ChatManager> cmgr;
+  shared_ptr<SessionManager> smgr;
+  shared_ptr<SessionImpl> session;
+  ::testing::NiceMock<IceServerMock> *server_mock;  // used by auth to expose the SessionI
 };
 
 TEST_F(SessionTest, ThrowAfterLogout) {
@@ -121,17 +131,36 @@ TEST_F(SessionTest, CanDeleteOwnAccount) {
 
   // login() should test the validity of the connection before allowing a login
   // first it has to create a proxy for the connection
-  ON_CALL(server_mock, callbackForID(_, _)).WillByDefault(Return(callback_fake));
-  EXPECT_CALL(server_mock, callbackForID(_, _)).Times(0);
+  ON_CALL(*server_mock, callbackForID(_, _)).WillByDefault(Return(callback_fake));
+  EXPECT_CALL(*server_mock, callbackForID(_, _)).Times(0);
   // then call echo on the client callback
   EXPECT_CALL(callback_mock, echo(_)).Times(0);
   // neither should be called since the account was deleted
 
   // therefore, it also shouldn't call exposeObject to expose the SessionI
-  ON_CALL(server_mock, exposeObject(_, _)).WillByDefault(Return(magicProxy));
-  EXPECT_CALL(server_mock, exposeObject(_, _)).Times(0);
+  ON_CALL(*server_mock, exposeObject(_, _)).WillByDefault(Return(magicProxy));
+  EXPECT_CALL(*server_mock, exposeObject(_, _)).Times(0);
 
+  // shouldn't be able to login anymore - account was just deleted
   ASSERT_THROW(auth->login(u, password, id, curr), sdc::AuthenticationException);
+
+
+  auto container = sdc::SecureContainer {
+    sdc::ByteSeq(), sdc::ByteSeq()
+  };
+
+  // also shouldn't be able to do anything else
+  ASSERT_THROW(session->retrieveUser("someone@" + Config::hostname(), curr), sdc::SessionException);
+  ASSERT_THROW(session->initChat(curr), sdc::SessionException);
+  ASSERT_THROW(session->leaveChat("some@" + Config::hostname(), curr), sdc::SessionException);
+  ASSERT_THROW(session->invite(u, "some@" + Config::hostname(), sdc::ByteSeq(), curr), sdc::SessionException);
+  ASSERT_THROW(session->sendMessage(sdc::ByteSeq(), "some@" + Config::hostname(), curr), sdc::SessionException);
+  ASSERT_THROW(session->deleteUser(u, curr), sdc::SessionException);
+  ASSERT_THROW(session->saveLog("some@" + Config::hostname(), 4, container, curr), sdc::SessionException);
+  ASSERT_THROW(session->retrieveLoglist(curr), sdc::SessionException);
+  ASSERT_THROW(session->retrieveLog("some@" + Config::hostname(), 4, curr), sdc::SessionException);
+  ASSERT_THROW(session->saveContactList(container, curr), sdc::SessionException);
+  ASSERT_THROW(session->retrieveContactList(curr), sdc::SessionException);
 }
 
 TEST_F(SessionTest, CantDeleteOtherAccount) {
@@ -152,4 +181,13 @@ TEST_F(SessionTest, CanRetrieveUser) {
 
 TEST_F(SessionTest, CantLeaveChatUserIsNotIn) {
   ASSERT_THROW(session->leaveChat("chan@" + Config::hostname(), curr), sdc::SessionException);
+}
+
+TEST_F(SessionTest, ChatNamesShouldBeUnique) {
+  ASSERT_NE(session->initChat(curr), session->initChat(curr));
+}
+
+
+TEST_F(SessionTest, CanOnlySendToExistingChannels) {
+  ASSERT_THROW(session->sendMessage(sdc::ByteSeq(), "someChan", curr), sdc::MessageException);
 }

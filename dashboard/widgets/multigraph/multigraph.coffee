@@ -17,10 +17,10 @@ class Dashing.Multigraph extends Dashing.Widget
       height: height
       series: [
         {
-        color: "#fff",
+        color: "#f00",
         data: [{x:0, y:0}]
         }, {
-        color: "#f00",
+        color: "#fff",
         data: [{x:0, y:0}]
         }
       ]
