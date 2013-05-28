@@ -21,6 +21,15 @@ sdc::User Chat::getUser(const string &s){
   return users[s];
 }
 
+bool Chat::hasUser(const string &n) {
+  try {
+    users.at(n);
+  } catch(...) {
+    return false;
+  }
+  return true;
+}
+
 vector<sdc::User> Chat::getUsers() {
   vector<sdc::User> list;
   for(map<string, sdc::User>::iterator iter = users.begin();

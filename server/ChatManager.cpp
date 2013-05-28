@@ -17,6 +17,10 @@ shared_ptr<Chat> ChatManager::newChat() {
 shared_ptr<Chat> ChatManager::getChat(const string &name) {
     return chats.at(name);  // possible exception must be caught by caller
 }
+    
+ChatManager::chatlist *ChatManager::getChats() {
+  return &chats;
+}
 
 void ChatManager::rmChat(string){
 	//TODO implement rmChat
