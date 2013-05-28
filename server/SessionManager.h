@@ -14,17 +14,17 @@ using namespace std;
 */
 class SessionManager {
   public:
-    typedef multimap<string, shared_ptr<SessionImpl>> sessionlist;
+    typedef multimap<string, SessionImpl*> sessionlist;
     SessionManager();
-    void addSession(shared_ptr<SessionImpl> s);
+    void addSession(SessionImpl *s);
     pair<sessionlist::iterator, sessionlist::iterator> getSessions(const string &id);
-    void removeSession(const string &id, shared_ptr<SessionImpl> s);
+    void removeSession(const string &id, SessionImpl *s);
   private:
     sessionlist sessions;
 };
 
 #define userCallback(srv, u, callback) {\
-  auto sl = srv->session_mgr->getSessions(u.ID);\
+  auto sl = srv->getSessions()->getSessions(u.ID);\
   for(auto iter = sl.first; iter != sl.second; ++iter) {\
     iter->second->getCallback()->callback;\
   }\

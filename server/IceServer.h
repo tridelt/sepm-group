@@ -70,14 +70,17 @@ public:
     return true;
   }
   
-  shared_ptr<DBPool> db_pool;
-  shared_ptr<ChatManager> chat_mgr;
-  shared_ptr<SessionManager> session_mgr;
+  shared_ptr<DBPool> getDBPool() { return db_pool; }
+  shared_ptr<ChatManager> getChats() { return chat_mgr; }
+  shared_ptr<SessionManager> getSessions() { return session_mgr; }
 
 private:
   bool initialized;
   Ice::CommunicatorPtr ic;
   Ice::ObjectAdapterPtr oa;
+  shared_ptr<DBPool> db_pool;
+  shared_ptr<ChatManager> chat_mgr;
+  shared_ptr<SessionManager> session_mgr;
 };
 
 #endif

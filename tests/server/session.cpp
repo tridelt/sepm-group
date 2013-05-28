@@ -24,16 +24,22 @@ class SessionTest : public ::testing::Test {
     sql << "DROP TABLE IF EXISTS users;";
     password = "secret";
     u.ID = "hello@" + Config::hostname();
-    mgr.reset(new ChatManager());
-    auth.reset(new AuthenticationImpl(&server_mock, pool, mgr));
-    session.reset(new SessionImpl(u, pool, mgr));
+    cmgr.reset(new ChatManager());
+    smgr.reset(new SessionManager());
+    server_mock = new ::testing::NiceMock<IceServerMock>(pool, cmgr, smgr);
+    auth.reset(new AuthenticationImpl(server_mock));
+    CallbackMock callback_mock;
+    auto callback_fake = shared_ptr<ChatClientCallbackInd>(new CallbackFake(&callback_mock));
+    session.reset(new SessionImpl(u, server_mock, callback_fake));
   }
 
   virtual void TearDown() {
+    delete server_mock;
     pool.reset();
     auth.reset();
     session.reset();
-    mgr.reset();
+    cmgr.reset();
+    smgr.reset();
   }
 
   Ice::Current curr;
@@ -42,9 +48,10 @@ class SessionTest : public ::testing::Test {
   sdc::User u;
   shared_ptr<AuthenticationImpl> auth;
   shared_ptr<DBPool> pool;
-  shared_ptr<ChatManager> mgr;
+  shared_ptr<ChatManager> cmgr;
+  shared_ptr<SessionManager> smgr;
   shared_ptr<SessionImpl> session;
-  IceServerMock server_mock;  // used by auth to expose the SessionI
+  ::testing::NiceMock<IceServerMock> *server_mock;  // used by auth to expose the SessionI
 };
 
 TEST_F(SessionTest, ThrowAfterLogout) {
@@ -124,15 +131,15 @@ TEST_F(SessionTest, CanDeleteOwnAccount) {
 
   // login() should test the validity of the connection before allowing a login
   // first it has to create a proxy for the connection
-  ON_CALL(server_mock, callbackForID(_, _)).WillByDefault(Return(callback_fake));
-  EXPECT_CALL(server_mock, callbackForID(_, _)).Times(0);
+  ON_CALL(*server_mock, callbackForID(_, _)).WillByDefault(Return(callback_fake));
+  EXPECT_CALL(*server_mock, callbackForID(_, _)).Times(0);
   // then call echo on the client callback
   EXPECT_CALL(callback_mock, echo(_)).Times(0);
   // neither should be called since the account was deleted
 
   // therefore, it also shouldn't call exposeObject to expose the SessionI
-  ON_CALL(server_mock, exposeObject(_, _)).WillByDefault(Return(magicProxy));
-  EXPECT_CALL(server_mock, exposeObject(_, _)).Times(0);
+  ON_CALL(*server_mock, exposeObject(_, _)).WillByDefault(Return(magicProxy));
+  EXPECT_CALL(*server_mock, exposeObject(_, _)).Times(0);
 
   // shouldn't be able to login anymore - account was just deleted
   ASSERT_THROW(auth->login(u, password, id, curr), sdc::AuthenticationException);

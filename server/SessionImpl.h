@@ -2,7 +2,7 @@
 #define SESSION_IMPL_H
 
 #include "SecureDistributedChat.h"
-#include "IceServer.h"
+#include "IceServerI.h"
 #include "ChatManager.h"
 #include "ChatClientCallbackInd.h"
 using namespace std;
@@ -12,7 +12,7 @@ class DBPool;
 
 class SessionImpl : public virtual sdc::SessionI {
 public:
-  SessionImpl(sdc::User, shared_ptr<IceServer> srv, shared_ptr<ChatClientCallbackInd> cb);
+  SessionImpl(sdc::User, IceServerI *srv, shared_ptr<ChatClientCallbackInd> cb);
   void logout(const Ice::Current&);
   sdc::User retrieveUser(const string&, const Ice::Current&);
   std::string initChat(const Ice::Current&);
@@ -30,7 +30,7 @@ public:
 private:
   bool loggedIn;
   sdc::User user;
-  shared_ptr<IceServer> server;
+  IceServerI *server;
   shared_ptr<ChatClientCallbackInd> callback;
 };
 

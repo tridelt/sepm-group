@@ -10,9 +10,9 @@
 using namespace std;
 using namespace soci;
 
-SessionImpl::SessionImpl(sdc::User u, shared_ptr<IceServer> srv, shared_ptr<ChatClientCallbackInd> cb) :
+SessionImpl::SessionImpl(sdc::User u, IceServerI *srv, shared_ptr<ChatClientCallbackInd> cb) :
   loggedIn(true), user(u), server(srv), callback(cb) {
-    server->session_mgr->addSession(shared_ptr<SessionImpl>(this));
+    server->getSessions()->addSession(this);
 }
 
 sdc::User SessionImpl::retrieveUser(const string &id, const Ice::Current&) {
@@ -23,7 +23,7 @@ sdc::User SessionImpl::retrieveUser(const string &id, const Ice::Current&) {
 void SessionImpl::logout(const Ice::Current&) {
   INFO("logging out ", user.ID);
   this->loggedIn = false;
-  server->session_mgr->removeSession(user.ID, shared_ptr<SessionImpl>(this));
+  server->getSessions()->removeSession(user.ID, this);
 }
 
 void SessionImpl::deleteUser(const sdc::User &u, const Ice::Current&) {
@@ -36,7 +36,7 @@ void SessionImpl::deleteUser(const sdc::User &u, const Ice::Current&) {
   if(sdc::sdcHelper::isValidID(u.ID))
     name = sdc::sdcHelper::getNameFromID(u.ID);
 
-  session sql(server->db_pool->getPool());
+  session sql(server->getDBPool()->getPool());
 
   try {
     sql << "DELETE FROM users WHERE id = :id", use(name);
@@ -55,7 +55,7 @@ void SessionImpl::deleteUser(const sdc::User &u, const Ice::Current&) {
 
 string SessionImpl::initChat(const Ice::Current&) {
   INFO("initChat by ", user.ID);
-  auto cp = server->chat_mgr->newChat();
+  auto cp = server->getChats()->newChat();
   //TODO: prevent creation of new chat with exisiting name
   cp->addUser(user);
   return cp->getName();
@@ -65,7 +65,7 @@ void SessionImpl::leaveChat(const string &chat, const Ice::Current&) {
   INFO("leaveChat ", user.ID, " leaves chat ", chat);
   shared_ptr<Chat> cp;
   try {
-    cp = server->chat_mgr->getChat(chat);
+    cp = server->getChats()->getChat(chat);
   } catch(...) {
     //TODO: forward to remote server if chat is not local
     //remote->leaveChat(user, chat);
@@ -80,7 +80,7 @@ void SessionImpl::invite(const sdc::User &other, const string &chat,
   const sdc::ByteSeq &pubkey, const Ice::Current&) {
   INFO(user.ID, " invites ", other.ID, " to ", chat);
 
-  auto c = server->chat_mgr->getChat(chat);
+  auto c = server->getChats()->getChat(chat);
   //TODO: relay to remote server if applicable
   userCallback(server, other, initChat(c->getUserList(), chat, pubkey));
   auto pk = pubkey;

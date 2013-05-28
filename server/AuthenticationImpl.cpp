@@ -5,7 +5,7 @@
 #include <boost/optional.hpp>
 #include "SessionImpl.h"
 #include "Logging.h"
-#include "IceServer.h"
+#include "IceServerI.h"
 #include "config.h"
 #include "PwdHash.h"
 
@@ -24,7 +24,7 @@ void AuthenticationImpl::registerUser(const sdc::User &u, const string &pw,
     WARN("malformed ID ", u.ID);
   }
 
-  session sql(server->db_pool->getPool());
+  session sql(server->getDBPool()->getPool());
 
   sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, pubkey text)";
 
@@ -67,7 +67,7 @@ sdc::SessionIPrx AuthenticationImpl::login(const sdc::User &u, const string &pw,
     WARN("malformed ID ", u.ID);
   }
 
-  session sql(server->db_pool->getPool());
+  session sql(server->getDBPool()->getPool());
 
   sql << "CREATE TABLE IF NOT EXISTS users(id text, pw text, pubkey text)";
 

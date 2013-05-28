@@ -6,6 +6,9 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include "ChatClientCallbackInd.h"
+#include "DBPool.h"
+#include "ChatManager.h"
+#include "SessionManager.h"
 
 using namespace std;
 
@@ -16,6 +19,12 @@ public:
   virtual shared_ptr<ChatClientCallbackInd> callbackForID(const Ice::Identity &callbackID,
                                 const Ice::ConnectionPtr &con) = 0;
   virtual ~IceServerI() {}
+  
+  virtual bool isLocal(const string &) = 0;
+ 
+  virtual shared_ptr<DBPool> getDBPool() = 0;
+  virtual shared_ptr<ChatManager> getChats() = 0;
+  virtual shared_ptr<SessionManager> getSessions() = 0;
 };
 
 #endif
