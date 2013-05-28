@@ -34,9 +34,17 @@ set(CMAKE_AUTOMOC TRUE)
 
 find_package(ZeroCIce REQUIRED)
 
-find_package(Qt4 COMPONENTS QtCore REQUIRED)
+find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
 include(${QT_USE_FILE})
 add_definitions(${QT_DEFINITIONS})
+
+#ui files
+file(GLOB GUI_CPP ui/*.cpp)
+file(GLOB GUI_UI ui/*.ui)
+
+QT4_WRAP_UI(GUI_UI_H ${GUI_UI})
+ADD_LIBRARY(GUI SHARED ${GUI_CPP} ${GUI_UI_H})
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 find_package(QCA2 REQUIRED)
 
@@ -69,7 +77,7 @@ endif()
 find_package(PerlModules COMPONENTS Regexp::Common Getopt::ArgvFile Getopt::Long Term::ANSIColor)
 if(${PERLMODULES_FOUND} STREQUAL "TRUE")
   if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_COMPILER_IS_GNUCPP)
-    option(COLOR_GCC "Use GCCFilter to color compiler output messages" ON)
+    option(COLOR_GCC "Use GCCFilter to color compiler output messages" OFF)
     set(COLOR_GCC_OPTIONS "-c -r -w" CACHE STRING "Arguments that are passed to gccfilter when output coloring is switchend on. Defaults to -c -r -w.")
     if(COLOR_GCC)
       set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${PROJECT_SOURCE_DIR}/cmake/gccfilter ${COLOR_GCC_OPTIONS}")
