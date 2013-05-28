@@ -68,8 +68,10 @@ void SessionImpl::leaveChat(const string &chat, const Ice::Current&) {
     cp = server->chat_mgr->getChat(chat);
   } catch(...) {
     //TODO: forward to remote server if chat is not local
+    //remote->leaveChat(user, chat);
     throw sdc::SessionException("chat " + chat + " does not exist");
   }
+  chatBroadcastCallback(cp, server, removeChatParticipant(user, chat), clientRemoveChatParticipant(_u, user, chat));
   if(!cp->rmUser(user)) throw sdc::SessionException("you are not in chat " + chat);
 }
 
@@ -80,13 +82,22 @@ void SessionImpl::invite(const sdc::User &other, const string &chat,
 
   auto c = server->chat_mgr->getChat(chat);
   //TODO: relay to remote server if applicable
-  userCallback(server, other.ID, initChat(c->getUserList(), chat, pubkey));
+  userCallback(server, other, initChat(c->getUserList(), chat, pubkey));
   auto pk = pubkey;
 }
 
-void SessionImpl::sendMessage(const sdc::ByteSeq &, const string &chat,
+void SessionImpl::sendMessage(const sdc::ByteSeq &msg, const string &chat,
   const Ice::Current&) {
-  INFO("<stub> ", user.ID, " posts to ", chat);
+  INFO(user.ID, " posts to ", chat, ": ", &msg);
+  /*shared_ptr<Chat> cp;
+  try {
+    cp = server->chat_mgr->getChat(chat);
+  } catch(...) {
+    //TODO: forward to remote server if chat is not local
+    //remote->sendMessage(user, msg, chat);
+    throw sdc::MessageException("chat " + chat + " does not exist");
+  }
+  chatBroadcastCallback(cp, server, appendMessageToChat(msg, chat, user), clientAppendMessageToChat(_c, msg, chat, user));*/
 }
 
 void SessionImpl::saveLog(const string&, Ice::Long, const sdc::SecureContainer&, const Ice::Current&) {

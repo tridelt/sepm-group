@@ -24,7 +24,7 @@ class SessionManager {
 };
 
 #define userCallback(srv, u, callback) {\
-  auto sl = srv->session_mgr->getSessions(u);\
+  auto sl = srv->session_mgr->getSessions(u.ID);\
   for(auto iter = sl.first; iter != sl.second; ++iter) {\
     iter->second->getCallback()->callback;\
   }\
