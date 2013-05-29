@@ -16,8 +16,8 @@ SessionImpl::SessionImpl(sdc::User u, IceServerI *srv, shared_ptr<ChatClientCall
 }
 
 sdc::User SessionImpl::retrieveUser(const string &id, const Ice::Current&) {
-  INFO("<stub> retrieveUser ", id);
-  return sdc::User();
+  INFO("retrieveUser ", id);
+  return server->getISManager()->getServerForID(id)->retrieveUser(id);
 }
 
 void SessionImpl::logout(const Ice::Current &cur) {

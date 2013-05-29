@@ -91,17 +91,50 @@ void InterServerImpl::leaveChat(const User &participant, const string &chat, con
   }
 }
 
-void InterServerImpl::clientInitChat(const User &recipient, const StringSeq&, const string &chat, const ByteSeq&, const Ice::Current&) {
-  INFO("<stub> clientInitChat notify ", recipient.ID, " of ", chat);
+void InterServerImpl::clientInitChat(const User &recipient, const StringSeq &users, const string &chat, const ByteSeq &key, const Ice::Current&) {
+  INFO("clientInitChat notify ", recipient.ID, " of ", chat);
+  
+  auto sl = server->getSessions()->getSessions(recipient.ID);
+  
+  if(sl.first == sl.second) {
+    throw sdc::InterServerException("user " + recipient.ID + " is not online");
+  }
+  
+  for(auto iter = sl.first; iter != sl.second; ++iter) {
+    iter->second->getCallback()->initChat(users, chat, key);
+  }
 }
 
 void InterServerImpl::clientAddChatParticipant(const User &recipient, const User &other, const string &chat, const Ice::Current&) {
-  INFO("<stub> clientAddChatParticipant notify ", recipient.ID, " that ", other.ID, " joined ", chat);
+  INFO("clientAddChatParticipant notify ", recipient.ID, " that ", other.ID, " joined ", chat);
+  
+  auto sl = server->getSessions()->getSessions(recipient.ID);
+
+  if(sl.first == sl.second) {
+    throw sdc::InterServerException("user " + recipient.ID + " is not online");
+  }
+
+  for(auto iter = sl.first; iter != sl.second; ++iter) {
+    auto cb = iter->second->getCallback();
+    //FIXME: callback hangs everything - client's fault?
+    //iter->second->getCallback()->addChatParticipant(participant, chat);
+  }
 }
 
 void InterServerImpl::clientRemoveChatParticipant(const User &recipient, const User &other, const string &chat, const Ice::Current&) {
   INFO("<stub> clientRemoveChatParticipant notify ", recipient.ID, " that ", other.ID, " left ", chat);
 
+  auto sl = server->getSessions()->getSessions(recipient.ID);
+
+  if(sl.first == sl.second) {
+    throw sdc::InterServerException("user " + recipient.ID + " is not online");
+  }
+
+  for(auto iter = sl.first; iter != sl.second; ++iter) {
+    auto cb = iter->second->getCallback();
+    //FIXME: callback hangs everything - client's fault?
+    //iter->second->getCallback()->removeChatParticipant(participant, chat);
+  }
 
 }
 
