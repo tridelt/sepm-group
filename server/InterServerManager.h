@@ -10,7 +10,7 @@ using namespace sdc;
 
 class InterServerManager {
 public:
-  InterServerManager(const string &cafile);
+  InterServerManager(Ice::CommunicatorPtr server_ic);
   InterServerIPrx getServerForID(const string &id);
 private:
   Ice::CommunicatorPtr ic;

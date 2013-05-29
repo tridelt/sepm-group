@@ -10,19 +10,8 @@
 
 //TODO: call destroy on communicator when server quits
 
-InterServerManager::InterServerManager(const string &cafile)
-{
-  try {
-    Ice::PropertiesPtr props = Ice::createProperties();
-    props->setProperty("Ice.Plugin.IceSSL", "IceSSL:createIceSSL");
-    props->setProperty("IceSSL.CertAuthFile", cafile);
-    Ice::InitializationData id;
-    id.properties = props;
-    id.threadHook = new ThreadHook(); 
-    ic = Ice::initialize(id);
-  } catch(...) {
-    ERROR("failed to create Ice connection for InterServerManager");
-  }
+InterServerManager::InterServerManager(Ice::CommunicatorPtr server_ic)
+  : ic(server_ic) {
 }
 
 InterServerIPrx InterServerManager::getServerForID(const string &id) {

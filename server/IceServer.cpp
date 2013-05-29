@@ -19,7 +19,6 @@ IceServer::IceServer(string pub_key_path, string priv_key_path, string ca_path) 
   db_pool.reset(DBPool::ProdPool());
   chat_mgr.reset(new ChatManager());
   session_mgr.reset(new SessionManager());
-  is_mgr.reset(new InterServerManager(ca_path));
 
   int argc = 1;
   char prog_name[] = "sdc_client";
@@ -46,6 +45,8 @@ IceServer::IceServer(string pub_key_path, string priv_key_path, string ca_path) 
     id.properties = props;
     id.threadHook = new ThreadHook();
     ic = Ice::initialize(id);
+  
+    is_mgr.reset(new InterServerManager(ic));
 
     oa = ic->createObjectAdapterWithEndpoints("ServerEndpoint", "ssl -p 1337");
     oa->add(new AuthenticationImpl(this), ic->stringToIdentity("Authentication"));
